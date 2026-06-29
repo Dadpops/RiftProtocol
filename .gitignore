@@ -1,0 +1,15 @@
+# dependencies (Railway runs `npm install`)
+node_modules/
+
+# runtime multiplayer session logs (ephemeral)
+logs/
+*.log
+
+# scratch / throwaway scripts and dumps
+_*.mjs
+_*.out
+*.b64
+
+# os
+.DS_Store
+Thumbs.db
