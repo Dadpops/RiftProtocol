@@ -2465,8 +2465,9 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   let escRun = null;
 
   /* ===================== Online multiplayer (additive, isolated) =====================
-     CONFIG — change this to the Railway public URL before deploying.                  */
-  const RIFT_SERVER_URL = "http://localhost:3000";
+     CONFIG — the deployed RIFT server (Railway). For local dev, change to
+     "http://localhost:3000" and run `node server.js`.                                  */
+  const RIFT_SERVER_URL = "https://genrefighters-production.up.railway.app";
   // All multiplayer state lives here; when MP.socket is null every mp* function is a
   // no-op, so nothing here can affect Hotseat / Escalations / standard play.
   const MP = {
