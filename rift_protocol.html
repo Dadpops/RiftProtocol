@@ -165,7 +165,7 @@
 
   /* ============ NO-SCROLL BATTLE FRAME ============ */
   #battle{position:fixed;inset:0;height:100dvh;display:grid;gap:8px;padding:8px;box-sizing:border-box;overflow:hidden;
-    grid-template-columns:minmax(140px,200px) minmax(0,1fr) minmax(140px,200px);
+    grid-template-columns:minmax(0,1fr) minmax(140px,200px);   /* arena (full width) · right rail */
     grid-template-rows:auto auto minmax(0,1fr) auto;   /* top · enemy+staging · hand (full width) · your team */
     background:radial-gradient(120% 90% at 50% 0%, #20201a, #100f0b)}
   /* the Warp Zone background now stretches across the whole battle screen */
@@ -197,11 +197,10 @@
   @keyframes noticePulse{
     0%,100%{box-shadow:0 0 14px color-mix(in srgb,var(--tn) 40%,transparent)}
     50%{box-shadow:0 0 34px color-mix(in srgb,var(--tn) 90%,transparent)}}
-  .bf-left{grid-column:1;grid-row:2;overflow-y:auto;overflow-x:hidden;max-height:46vh}
-  /* row 2 center: enemy team + staging/lock-in (side panels flank it) */
-  .bf-center{grid-column:2;grid-row:2;position:relative;display:flex;flex-direction:column;
+  /* row 2 arena: enemy team + staging/lock-in (full width; left sidebar removed) */
+  .bf-center{grid-column:1;grid-row:2;position:relative;display:flex;flex-direction:column;
     align-items:center;justify-content:flex-start;gap:8px;padding:4px 10px;min-height:0}
-  .bf-right{grid-column:3;grid-row:2;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+  .bf-right{grid-column:2;grid-row:2;display:flex;flex-direction:column;gap:8px;overflow:hidden}
   /* hand row: FULL WIDTH so cards are never clipped by the narrow side columns */
   .bf-hand{grid-column:1 / -1;grid-row:3;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
   /* your team: full-width row pinned to the bottom */
@@ -721,12 +720,20 @@
   .mp-timer{font-size:14px;font-weight:800;letter-spacing:.5px;color:var(--accent);border:1px solid var(--accent);border-radius:20px;padding:5px 12px;background:rgba(12,11,8,.5)}
   .mp-timer.low{color:var(--bad);border-color:var(--bad)}
   /* ---- Feedback (bug report / feature request) ---- */
-  .fb-btn{position:fixed;right:12px;bottom:12px;z-index:100;font-size:12px;font-weight:600;letter-spacing:.3px;
+  .fb-btn{position:fixed;right:16px;bottom:70px;z-index:100;font-size:12px;font-weight:600;letter-spacing:.3px;
     padding:7px 13px;border-radius:8px;background:rgba(18,17,13,.92);border:1px solid var(--line);color:var(--muted);
     cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.45)}
   .fb-btn:hover{border-color:var(--accent);color:var(--accent)}
-  /* on small screens, sit it just under the top-right audio control so it never overlaps the card rail */
-  @media(max-width:760px){ .fb-btn{bottom:auto;top:50px;right:10px;padding:6px 11px} }
+  /* circular ? help button, bottom-right; feedback button sits just above it (no overlap) */
+  .help-btn{position:fixed;right:16px;bottom:16px;z-index:120;width:44px;height:44px;border-radius:50%;
+    font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    background:rgba(18,17,13,.92);border:1px solid var(--line);color:var(--muted);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+  .help-btn:hover{border-color:var(--accent);color:var(--accent)}
+  /* on small screens, stack both under the top-right audio control so they never overlap the card tray */
+  @media(max-width:760px){
+    .help-btn{bottom:auto;top:50px;right:10px;width:38px;height:38px;font-size:16px}
+    .fb-btn{bottom:auto;top:94px;right:10px;padding:6px 11px}
+  }
   .fb-modal{position:fixed;inset:0;z-index:210;background:rgba(6,5,3,.7);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
   .fb-card{background:var(--panel);border:1px solid var(--accent);border-radius:14px;width:min(480px,92vw);max-height:90vh;
     overflow-y:auto;padding:20px;box-sizing:border-box;box-shadow:0 18px 50px rgba(0,0,0,.6)}
@@ -750,6 +757,61 @@
   .fb-ok{text-align:center;padding:16px 6px}
   .fb-ok .ic{font-size:44px;line-height:1;color:var(--good)}
   .fb-ok h2{margin:10px 0 2px;font-size:20px}
+  /* ---- Help panel ---- */
+  .help-modal{position:fixed;inset:0;z-index:210;background:rgba(6,5,3,.72);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+  .help-card{background:var(--panel);border:1px solid var(--accent);border-radius:14px;width:min(640px,94vw);max-height:88vh;
+    display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(0,0,0,.6);overflow:hidden}
+  .help-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .help-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+  .help-tab{font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted);cursor:pointer}
+  .help-tab:hover{border-color:var(--accent);color:var(--ink)}
+  .help-tab.active{background:color-mix(in srgb,var(--accent) 26%,#1a1812);border-color:var(--accent);color:var(--accent)}
+  .help-close{flex:0 0 auto;font-size:15px;line-height:1;padding:5px 10px;border-radius:7px;background:var(--bg);border:1px solid var(--line);color:var(--muted);cursor:pointer}
+  .help-close:hover{border-color:var(--bad);color:var(--bad)}
+  .help-body{padding:16px 18px;overflow-y:auto}
+  .help-sec{margin-bottom:16px}
+  .help-sec h3{margin:0 0 5px;font-size:15px;color:var(--accent)}
+  .help-sec p{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink)}
+  .help-callout{margin-top:8px;background:rgba(12,11,8,.6);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:12.5px;color:var(--muted);line-height:1.45}
+  .help-callout b{color:var(--ink)}
+  /* battle log tab */
+  .bl-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 10px}
+  .bl-feed{display:flex;flex-direction:column;gap:12px}
+  .bl-round .bl-rhead{font-size:12px;font-weight:800;letter-spacing:.5px;color:var(--accent);margin-bottom:4px;text-transform:uppercase}
+  .bl-line{font:12.5px/1.5 "Consolas",monospace;color:var(--ink);padding:1px 0}
+  .bl-line.dmg{color:var(--bad)} .bl-line.pie{color:var(--pierce)} .bl-line.heal{color:var(--good)}
+  .bl-line.cancel{color:#8c8676;text-decoration:line-through;font-style:italic} .bl-line.death{font-weight:700}
+  /* credits tab */
+  .help-credits{text-align:center;padding:18px 6px}
+  .help-credit-title{margin:0 0 14px;font-size:24px;color:var(--accent);letter-spacing:2px}
+  .help-credit-by{margin:0 0 12px;color:var(--ink);font-size:15px}
+  .help-link{color:var(--accent);text-decoration:none;font-size:14px} .help-link:hover{text-decoration:underline}
+  .help-ver{margin:14px 0 0;color:var(--muted);font-size:13px}
+  .help-credit-foot{margin:6px 0 0;color:var(--muted);font-style:italic;font-size:13px}
+  /* ---- Splash screen ---- */
+  #splash{position:fixed;inset:0;z-index:300;background:#0a0612;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:splashIn .6s ease}
+  #splash.fade-out{opacity:0;transition:opacity .3s ease;pointer-events:none}
+  #splash .splash-inner{text-align:center}
+  #splash .title{font-size:clamp(54px,8vw,84px);letter-spacing:3px;margin:0;color:var(--accent);text-shadow:0 4px 22px #000}
+  #splash .splash-sub{margin-top:16px;font-size:14px;color:var(--muted);letter-spacing:.12em;text-transform:lowercase}
+  @keyframes splashIn{from{opacity:0}to{opacity:1}}
+  /* ---- Card tray (per-operative sections, tinted by class color) ---- */
+  .card-tray{display:flex;align-items:stretch;justify-content:center;width:100%;box-sizing:border-box;
+    background:rgba(10,6,20,0.88);border-top:0.5px solid rgba(255,255,255,0.08);padding:10px 14px}
+  .tray-sec{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .tray-label{font-size:9px;font-weight:500;letter-spacing:.06em;color:var(--cls,var(--muted))}
+  .tray-sec.ko .tray-label{opacity:.5}
+  .tray-empty{font-size:10px;color:var(--muted);padding:24px 0}
+  .tray-div{width:1px;background:rgba(255,255,255,0.12);align-self:stretch;margin:6px 4px}
+  .card-tray .hand-fan{padding:2px 4px 0}
+  .card-tray .tray-cards{display:flex;justify-content:center}
+  /* tint each card with its operative's class color (the card already carries --cls) */
+  .card-tray .pcard{background:color-mix(in srgb, var(--cls) 10%, #14130f);border-color:color-mix(in srgb, var(--cls) 35%, transparent)}
+  .card-tray .pcard .cost-badge{background:color-mix(in srgb, var(--cls) 20%, transparent);color:var(--cls)}
+  .card-tray .pcard .pn{color:color-mix(in srgb, var(--cls) 70%, #ffffff)}
+  /* mobile: each section scrolls its cards horizontally if they overflow */
+  @media(max-width:760px){ .card-tray .hand-fan{overflow-x:auto;justify-content:flex-start} }
 </style>
 </head>
 <body>
@@ -2501,6 +2563,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // Feedback (bug reports / feature requests) are POSTed to this Discord webhook.
   // Referenced only by name below — never inlined or logged.
   const FEEDBACK_WEBHOOK_URL = "https://discord.com/api/webhooks/1521223903253368944/EsbCAZs7Xk9D7KI5QeMYGTHk-IywNYGQi0nUKT1YaCbcq4vfojiFxSFOfKBL_oEpPgtn";
+  const GAME_VERSION = "0.1.0";
   // All multiplayer state lives here; when MP.socket is null every mp* function is a
   // no-op, so nothing here can affect Hotseat / Escalations / standard play.
   const MP = {
@@ -2568,7 +2631,6 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     render(`
       <div id="menu">
         <h1 class="title">RIFT PROTOCOL</h1>
-        <p class="tagline">The breach points are open. Six operatives. Infinite threats. Pick your operative, enter the Warp Zone, and close the fold.</p>
         <div class="menu-nav">
           <button class="menu-item primary" data-nav="fight">${NAV_ICO.fight}<span>Deploy</span></button>
           <button class="menu-item" data-nav="escalations">${NAV_ICO.escalations}<span>Escalations</span></button>
@@ -2589,15 +2651,13 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
             <button data-mpnav="multiplayer"><b>Multiplayer</b><span class="fs-sub">Online · 1v1</span></button>
           </div>
         </div>
-        <a class="devcredit" href="https://github.com/dadpops" target="_blank" rel="noopener noreferrer">Created by <b>Dadpops</b> ↗</a>
-        <footer style="margin-top:18px">Single-file build · engine verified against 12 rules assertions · ${GF.CARDS.length} cards loaded</footer>
       </div>
     `);
     $('[data-nav="fight"]').onclick=()=>{ $('#fightsub').classList.toggle('hidden'); };
     $('[data-nav="escalations"]').onclick=()=> showEscalations();
     $('[data-nav="characters"]').onclick=()=> showCharacters();
     $('[data-nav="lore"]').onclick=()=> showLore();
-    $('[data-nav="tutorial"]').onclick=()=> showTutorial();
+    $('[data-nav="tutorial"]').onclick=()=> openHelp('howto');
     $$('[data-mode]').forEach(b=> b.onclick=()=>{ UI.mode=b.dataset.mode; UI.classesP1=[]; UI.classesP2=[]; showClassSelect(1); });
     const mpBtn=$('[data-mpnav="multiplayer"]'); if(mpBtn) mpBtn.onclick=()=> mpEnterFlow();
     applyMenuBg();
@@ -2866,6 +2926,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     UI.state = GF.newMatch({ seed,
       sideA:{ name:'You', classes:classesA, ai:null },
       sideB:{ name:'AI', classes:classesB, ai:UI.mode } });
+    UI.battleLog = [];   // fresh battle log for the new match
     music('battle');   // crossfade to the battle theme under the cinematic
     playIntro(()=> runRound());
   }
@@ -3229,19 +3290,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     // quit + round + hint across the top.
     const top = topBarHTML(st, hint);
 
-    // left: How-to-play, collapsed by default, each feature its own accordion row.
-    const left = `<div class="sidepanel tutpanel">
-        <button class="tut-toggle" data-act="tut">How to play <span class="chev">${UI.tutOpen?'▾':'▸'}</span></button>
-        <div class="tut-body ${UI.tutOpen?'':'hidden'}">
-          ${tutorialSections().map(([h,b],i)=>{
-            const open=!!UI.tutSec[i];
-            return `<div class="acc-item">
-              <button class="acc-head" data-acc="${i}">${h} <span class="chev">${open?'▾':'▸'}</span></button>
-              <div class="acc-body ${open?'':'hidden'}">${b}</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
+    // (left How-to-play sidebar removed — help now lives in the bottom-right ? panel)
 
     // right: energy meter + lock / undo controls.
     const right = `<div class="sidepanel">
@@ -3274,21 +3323,31 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         </div>
       </div>`;
 
-    // dock: just the hand, full width (queued cards are staged, not shown here).
+    // card tray: one section per operative, tinted with that operative's class color.
+    // `gi` walks the flat `hand` order (groups preserve fighter order), so the
+    // data-hand indices stay aligned with the wiring below.
     let gi = 0;
-    const handHTML = groups.map(g=>{
-        const cards = g.items.map(hi=>{
+    const traySecs = side.fighters.map(f=>{
+      const g = groups.find(gr=>gr.owner===f);     // undefined if this operative has no cards in hand
+      let cardsHTML='';
+      if(g){
+        cardsHTML = g.items.map(hi=>{
           const idx = gi++;                         // absolute index into flat `hand`
           if(usedItems.has(hi) || reservedDiscards.has(hi)) return '';   // queued or spent as discard cost
-          // discard-on-play cards need at least one other card to discard
           const others = hand.some(h=> h!==hi && !usedItems.has(h) && !reservedDiscards.has(h));
           const playable = (addableMap.get(hi)||[]).length>0 && (!hi.card.discardOnPlay || others);
           const unaffordable = !playable && GF.energyCost(hi.card) > remaining;
           return handCardHTML(hi, idx, false, !playable && !unaffordable, sel.pendingHi===hi, unaffordable, !sel.discardUsed);
         }).join('');
-        return cards ? `<div class="hand-group">${cards}</div>` : '';
-      }).join('');
-    const handSlot = `<div class="hand-fan">${handHTML}</div>`;
+      }
+      const label = f.alive ? esc(dn(f.className)) : (esc(dn(f.className)) + " — KO'd");
+      const inner = !f.alive ? '<div class="tray-empty">—</div>'
+                  : !g       ? '<div class="tray-empty">No cards</div>'
+                  : `<div class="hand-fan"><div class="hand-group">${cardsHTML}</div></div>`;
+      return `<div class="tray-sec ${f.alive?'':'ko'}" style="--cls:${classColor(f.className)}">
+          <div class="tray-label">${label}</div>${inner}</div>`;
+    }).join('<div class="tray-div"></div>');
+    const handSlot = `<div class="card-tray">${traySecs}</div>`;
 
     // deck viewer (opened by clicking a deck in the right rail), contained in the arena
     let deckViewer='', dvCards=[];
@@ -3299,7 +3358,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     }
 
     render(frameHTML({
-      top, left, right,
+      top, right,
       center: enemyZoneHTML(sideIdx, st, {
         staging, deckViewer,
         enemy:(f)=>({enemy:true, clickable: validEnemy.has(f.uid), targetKind:'enemy'})
@@ -3397,10 +3456,9 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
   /* ---------------- shared battle-frame rendering ---------------- */
   // Battle frame, top→bottom: top bar · [left | enemy+staging | right] · hand (full width) · your team (full width)
-  function frameHTML({top, left, center, right, hand, you}){
+  function frameHTML({top, center, right, hand, you}){
     return `<div id="battle">
       <div class="bf-top">${top||''}</div>
-      <div class="bf-left">${left||''}</div>
       <div class="bf-center">${center||''}</div>
       <div class="bf-right">${right||''}</div>
       <div class="bf-hand">${hand||''}</div>
@@ -3693,8 +3751,6 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const pre = st._preHp || {};   // pre-resolution HP, for the bar start positions
     render(frameHTML({
       top: topBarHTML(st, 'Resolving — cards fire by speed tier T1 → T4'),
-      left: `<div class="sidepanel"><h3>Resolving…</h3>
-          <p class="tip">Cards fire in speed-tier order: <b>T1 → T2 → T3 → T4</b>. A card whose fighter was already defeated is cancelled.</p></div>`,
       center: enemyZoneHTML(sideIdx, st, {
         enemy:(f)=>({enemy:true, hp: pre[f.uid]!=null?pre[f.uid]:f.hp})
       }),
@@ -3708,6 +3764,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
     // reset bars to pre-HP visually (cfighterHTML already rendered them at pre)
     const tl = st.timeline || [];
+    captureBattleLog(st, tl);   // feed the help-panel Battle Log tab
     let skipped=false, shown=0;
     const skipBtn=$('[data-act="skip"]'); if(skipBtn) skipBtn.onclick=()=>{ skipped=true; };
     const logEl = $('#docklog');
@@ -4182,7 +4239,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
   /* ---- match lifecycle (host authority) ---- */
   function mpOnMatchStarted(d){
-    MP.inMatch=true; MP.screen='match'; MP.chatOpen=false; MP.unread=0;
+    MP.inMatch=true; MP.screen='match'; MP.chatOpen=false; MP.unread=0; UI.battleLog=[];
     MP.timer=(d&&'timer' in d)?d.timer:MP.timer; MP.mapKey=(d&&d.mapKey)||MP.mapKey;
     MP.host=(d&&d.host)||MP.host; MP.joiner=(d&&d.joiner)||MP.joiner;
     MP.isHost=(MP.role==='host'); UI.viewSide=MP.isHost?0:1;
@@ -4355,11 +4412,109 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   try{ document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ try{ mpRenderTimer(); }catch(e){} } }); }catch(e){}
 
   /* ===================== Feedback (Discord webhook; additive, isolated) =====================
-     A fixed Feedback button on every screen → a modal that POSTs a bug report /
-     feature request to FEEDBACK_WEBHOOK_URL. Purely additive: never touches match,
-     Escalation, or lobby state; a failed send can't crash or freeze the game. */
-  let _fbEl=null, _fbEsc=null, _fbSending=false;
+     Shared form used by both the standalone Feedback modal and the Help panel's
+     Feedback tab. Class-based selectors so multiple instances coexist. A failed
+     send can't crash or freeze the game. */
+  let _fbEl=null, _fbEsc=null;
   const FB_AREAS=['Gameplay / Cards','Escalations','Multiplayer','Audio','UI / Visual','Lore / Text','Other'];
+  function fbFormHTML(){
+    return `<div class="fb-form">
+        <div class="fb-field"><label>Type</label>
+          <select class="fbType"><option value="">Select a type…</option><option value="Bug Report">Bug Report</option><option value="Feature Request">Feature Request</option></select>
+          <div class="fb-err fbErrType"></div></div>
+        <div class="fb-field"><label>Area</label>
+          <select class="fbArea"><option value="">Select an area…</option>${FB_AREAS.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('')}</select>
+          <div class="fb-err fbErrArea"></div></div>
+        <div class="fb-field"><label>Name</label>
+          <input class="fbName" type="text" maxlength="60" placeholder="Your name (optional)" autocomplete="off"></div>
+        <div class="fb-field"><label>Email</label>
+          <input class="fbEmail" type="text" maxlength="100" placeholder="Your email (optional)" autocomplete="off"></div>
+        <div class="fb-field"><label>Message</label>
+          <textarea class="fbMsg" maxlength="1000" placeholder="Describe the bug or feature request... (30 characters minimum)"></textarea>
+          <div class="fb-count short fbCount">0 / 1000</div>
+          <div class="fb-err fbErrMsg"></div></div>
+        <button class="fb-send primary fbSend" disabled>Send Feedback</button>
+        <div class="fb-err fbErrSend" style="text-align:center"></div>
+      </div>`;
+  }
+  function fbWire(form, onClose){
+    if(!form) return;
+    const q=(s)=>form.querySelector(s);
+    const typeEl=q('.fbType'), areaEl=q('.fbArea'), msgEl=q('.fbMsg'), countEl=q('.fbCount'), sendEl=q('.fbSend');
+    form._sending=false;
+    const refresh=()=>{ const raw=(msgEl.value||'').length; countEl.textContent=raw+' / 1000';
+      countEl.classList.toggle('short', raw<30); sendEl.disabled=!(typeEl.value && areaEl.value && raw>=30); };
+    typeEl.onchange=()=>{ q('.fbErrType').textContent=''; refresh(); };
+    areaEl.onchange=()=>{ q('.fbErrArea').textContent=''; refresh(); };
+    msgEl.oninput=()=>{ q('.fbErrMsg').textContent=''; refresh(); };
+    sendEl.onclick=()=> fbDoSubmit(form, onClose);
+    refresh();
+  }
+  function fbDoSubmit(form, onClose){
+    if(form._sending) return;
+    const q=(s)=>form.querySelector(s);
+    const type=q('.fbType').value, area=q('.fbArea').value;
+    const name=(q('.fbName').value||'').trim(), email=(q('.fbEmail').value||'').trim();
+    const msg=(q('.fbMsg').value||'').trim();
+    let bad=false;
+    q('.fbErrType').textContent = type ? '' : 'Please select a feedback type.'; if(!type) bad=true;
+    q('.fbErrArea').textContent = area ? '' : 'Please select an area.'; if(!area) bad=true;
+    q('.fbErrMsg').textContent  = (msg.length>=30) ? '' : 'Message must be at least 30 characters.'; if(msg.length<30) bad=true;
+    q('.fbErrSend').textContent='';
+    if(bad) return;
+    form._sending=true;
+    const sendEl=q('.fbSend'); sendEl.disabled=true; sendEl.textContent='Sending…';
+    const d=new Date(), pad=n=>String(n).padStart(2,'0');
+    const ts=`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+    const payload={ embeds:[{
+      title: type+' — '+area, description: msg,
+      color: type==='Bug Report' ? 15158332 : 3447003,
+      fields:[
+        { name:'Name',  value: name  || 'Not provided', inline:true },
+        { name:'Email', value: email || 'Not provided', inline:true },
+        { name:'Submitted', value: ts, inline:false },
+      ],
+      footer:{ text:'RIFT PROTOCOL Feedback · v'+GAME_VERSION },
+    }]};
+    (async()=>{
+      try{
+        const res = await fetch(FEEDBACK_WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+        if(res && res.ok) fbOk(form, onClose); else fbBad(form);
+      }catch(e){ fbBad(form); }
+    })();
+  }
+  function fbOk(form, onClose){
+    form._sending=false;
+    form.innerHTML = `<div class="fb-ok"><div class="ic">✓</div><h2>Feedback received.</h2>
+      <p class="fb-sub" style="margin-top:4px">Thanks for helping improve RIFT PROTOCOL.</p>
+      <button class="fb-send primary fbDone" style="max-width:180px;margin:12px auto 0">Close</button></div>`;
+    const b=form.querySelector('.fbDone'); if(b) b.onclick=()=>{ if(onClose) onClose(); };
+  }
+  function fbBad(form){
+    form._sending=false;
+    const s=form.querySelector('.fbSend'); if(s){ s.disabled=false; s.textContent='Send Feedback'; }
+    const e=form.querySelector('.fbErrSend'); if(e) e.textContent='Something went wrong. Please try again.';
+  }
+  function openFeedback(){
+    if(_fbEl) return;
+    const ov=document.createElement('div'); ov.className='fb-modal'; _fbEl=ov;
+    ov.innerHTML = `<div class="fb-card" role="dialog" aria-modal="true">
+        <div class="fb-head"><h2>Feedback</h2><button class="fb-close" data-fb="close" aria-label="Close">✕</button></div>
+        <div class="fb-sub">Help us improve RIFT PROTOCOL.</div>
+        ${fbFormHTML()}
+      </div>`;
+    document.body.appendChild(ov);
+    ov.querySelector('[data-fb="close"]').onclick=()=> closeFeedback();
+    ov.addEventListener('mousedown', (e)=>{ if(e.target===ov) closeFeedback(); });
+    _fbEsc=(e)=>{ if(e.key==='Escape') closeFeedback(); };
+    document.addEventListener('keydown', _fbEsc);
+    fbWire(ov.querySelector('.fb-form'), closeFeedback);
+    setTimeout(()=>{ try{ ov.querySelector('.fbType').focus(); }catch(e){} }, 30);
+  }
+  function closeFeedback(){
+    if(_fbEsc){ document.removeEventListener('keydown', _fbEsc); _fbEsc=null; }
+    if(_fbEl){ _fbEl.remove(); _fbEl=null; }
+  }
   function mountFeedbackButton(){
     if(document.getElementById('fbBtn')) return;
     const b=document.createElement('button'); b.id='fbBtn'; b.className='fb-btn'; b.type='button';
@@ -4367,106 +4522,126 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     b.onclick=(e)=>{ e.stopPropagation(); openFeedback(); };
     document.body.appendChild(b);
   }
-  function openFeedback(){
-    if(_fbEl) return;
-    const ov=document.createElement('div'); ov.className='fb-modal'; _fbEl=ov;
-    ov.innerHTML = `<div class="fb-card" role="dialog" aria-modal="true">
-        <div class="fb-head"><h2>Feedback</h2><button class="fb-close" data-fb="close" title="Close" aria-label="Close">✕</button></div>
-        <div class="fb-sub">Help us improve RIFT PROTOCOL.</div>
-        <div id="fbForm">
-          <div class="fb-field"><label>Type</label>
-            <select id="fbType"><option value="">Select a type…</option><option value="Bug Report">Bug Report</option><option value="Feature Request">Feature Request</option></select>
-            <div class="fb-err" id="fbErrType"></div></div>
-          <div class="fb-field"><label>Area</label>
-            <select id="fbArea"><option value="">Select an area…</option>${FB_AREAS.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('')}</select>
-            <div class="fb-err" id="fbErrArea"></div></div>
-          <div class="fb-field"><label>Name</label>
-            <input id="fbName" type="text" maxlength="60" placeholder="Your name (optional)" autocomplete="off"></div>
-          <div class="fb-field"><label>Email</label>
-            <input id="fbEmail" type="text" maxlength="100" placeholder="Your email (optional)" autocomplete="off"></div>
-          <div class="fb-field"><label>Message</label>
-            <textarea id="fbMsg" maxlength="1000" placeholder="Describe the bug or feature request... (30 characters minimum)"></textarea>
-            <div class="fb-count short" id="fbCount">0 / 1000</div>
-            <div class="fb-err" id="fbErrMsg"></div></div>
-          <button class="fb-send primary" id="fbSend" disabled>Send Feedback</button>
-          <div class="fb-err" id="fbErrSend" style="text-align:center"></div>
+
+  /* ===================== Help panel (How to Play / Battle Log / Feedback / Credits) ===================== */
+  let _helpEl=null, _helpEsc=null;
+  function mountHelpButton(){
+    if(document.getElementById('helpBtn')) return;
+    const b=document.createElement('button'); b.id='helpBtn'; b.className='help-btn'; b.type='button';
+    b.textContent='?'; b.setAttribute('aria-label','Help');
+    b.onclick=(e)=>{ e.stopPropagation(); openHelp('howto'); };
+    document.body.appendChild(b);
+  }
+  function openHelp(tab){
+    closeHelp();
+    const ov=document.createElement('div'); ov.className='help-modal'; _helpEl=ov;
+    ov.innerHTML = `<div class="help-card" role="dialog" aria-modal="true">
+        <div class="help-head">
+          <div class="help-tabs">
+            <button class="help-tab" data-tab="howto">How to Play</button>
+            <button class="help-tab" data-tab="log">Battle Log</button>
+            <button class="help-tab" data-tab="feedback">Feedback</button>
+            <button class="help-tab" data-tab="credits">Credits</button>
+          </div>
+          <button class="help-close" data-help="close" aria-label="Close">✕</button>
         </div>
+        <div class="help-body" id="helpBody"></div>
       </div>`;
     document.body.appendChild(ov);
-    const q=(s)=>ov.querySelector(s);
-    const typeEl=q('#fbType'), areaEl=q('#fbArea'), msgEl=q('#fbMsg'), countEl=q('#fbCount'), sendEl=q('#fbSend');
-    const refresh=()=>{
-      const raw=(msgEl.value||'').length;
-      countEl.textContent = raw + ' / 1000';
-      countEl.classList.toggle('short', raw<30);
-      sendEl.disabled = !(typeEl.value && areaEl.value && raw>=30);
+    ov.querySelector('[data-help="close"]').onclick=()=> closeHelp();
+    ov.addEventListener('mousedown', (e)=>{ if(e.target===ov) closeHelp(); });
+    _helpEsc=(e)=>{ if(e.key==='Escape') closeHelp(); };
+    document.addEventListener('keydown', _helpEsc);
+    ov.querySelectorAll('.help-tab').forEach(b=> b.onclick=()=> helpShowTab(b.dataset.tab));
+    helpShowTab(tab||'howto');
+  }
+  function closeHelp(){
+    if(_helpEsc){ document.removeEventListener('keydown', _helpEsc); _helpEsc=null; }
+    if(_helpEl){ _helpEl.remove(); _helpEl=null; }
+  }
+  function helpShowTab(tab){
+    const ov=_helpEl; if(!ov) return;
+    ov.querySelectorAll('.help-tab').forEach(b=> b.classList.toggle('active', b.dataset.tab===tab));
+    const body=ov.querySelector('#helpBody'); if(!body) return;
+    if(tab==='howto'){ body.innerHTML = helpHowToHTML(); body.scrollTop=0; }
+    else if(tab==='log'){ body.innerHTML = helpBattleLogHTML(); const f=body.querySelector('.bl-feed'); if(f) f.scrollTop=f.scrollHeight; }
+    else if(tab==='credits'){ body.innerHTML = helpCreditsHTML(); body.scrollTop=0; }
+    else if(tab==='feedback'){ body.innerHTML = `<div class="fb-sub" style="margin-bottom:12px">Help us improve RIFT PROTOCOL.</div>`+fbFormHTML(); fbWire(body.querySelector('.fb-form'), closeHelp); body.scrollTop=0; }
+  }
+  function helpRefreshLogIfOpen(){
+    if(!_helpEl) return; const act=_helpEl.querySelector('.help-tab.active');
+    if(act && act.dataset.tab==='log') helpShowTab('log');
+  }
+  function helpSec(title, body, callout){
+    return `<div class="help-sec"><h3>${title}</h3><p>${body}</p>${callout?`<div class="help-callout">${callout}</div>`:''}</div>`;
+  }
+  function helpHowToHTML(){
+    return [
+      helpSec('What is RIFT PROTOCOL?', 'You command two RIFT operatives pulled from folding worlds and deployed to breach points across six Warp Zones. Each match is 5 rounds. The team that deals the most kills wins — tiebreak goes to total HP remaining, then a draw.', 'Most kills wins. Tiebreak: total HP remaining, then a draw.'),
+      helpSec('Picking your operatives', 'Choose two operative classes before each match. Each class has a unique deck of 20 cards and a distinct combat identity. You can pick two of the same class. Your team shares a hand of cards during the match.'),
+      helpSec('How a round works', 'Each round you have an energy pool (starts at 3, grows each round: 3-4-6-8-10). Stage cards from your hand by clicking them, then assign targets. When ready, click Lock In. Both teams resolve simultaneously in tier order: T1 first, then T2, T3, T4. Higher tiers can interrupt lower tiers if the operative is knocked out mid-resolution.', 'Resolution order: T1 → T2 → T3 → T4 — both teams at once, interrupts on KO.'),
+      helpSec('Energy', 'Every card has an energy cost shown in the badge at the top left. You can play multiple cards per round as long as you have energy. Unused energy does not carry over. Next round\'s energy is shown in the top right panel.'),
+      helpSec('Card types', 'Attack cards deal damage to enemy operatives. Defend cards protect your operatives from incoming damage. Some cards have special effects — read the description carefully. The italic flavor text at the bottom of each card is lore only and has no gameplay effect.'),
+      helpSec('The Breachblade Junction mechanic', 'The Breachblade class has a unique Junction system. Play a Junction card (Fire, Frost, or Thunder) to set your weapon element. Then play flurry cards to deal cascading elemental hits. Setting a new Junction element overwrites the previous one.', 'Junction sets your element; flurry cards ride it. A new Junction overwrites the old.'),
+      helpSec('Redraw', 'Once per round, each operative can discard one of their cards and immediately draw a replacement from their deck. Click the trashcan icon on a card while hovering to trigger a redraw. The trashcan greys out after use and resets at the start of the next round.'),
+      helpSec('AI difficulty', 'When playing against AI, choose your difficulty from the Deploy menu.', '<b>Recruit</b> — random plays · <b>Clasher</b> — basic heuristic · <b>Captain</b> — reads HP and hand · <b>Warden</b> — class-aware, plays around your threats.'),
+      helpSec('Escalations', 'Escalations are single-player challenge runs. Pick an Escalation, choose your operative team, and fight through a series of battles against escalating AI. The final battle of every Escalation is always a mirror team — two of the home zone\'s operative class. Health resets between each battle.', 'Easy = 3 battles · Medium = 4 · Hard = 5. The final battle is always a mirror team.'),
+      helpSec('Multiplayer', 'Create a room to get a 4-character code. Share it with a friend. The host picks the map and turn timer. Both players pick their operative teams in the lobby, ready up, then the host starts the match. Turn timer auto-locks your staged cards when it hits zero. Chat is available in the lobby and during the match via the chat icon.'),
+    ].join('');
+  }
+  function helpBattleLogHTML(){
+    if(!UI.battleLog || !UI.battleLog.length) return `<div class="bl-empty">No active match. Battle log appears here during a match.</div>`;
+    const rounds = UI.battleLog.map(r=>`<div class="bl-round"><div class="bl-rhead">Round ${r.round} of 5</div>${
+      r.items.map(it=>`<div class="bl-line ${esc(it.cls||'')}"${it.actorClass?` style="color:${classColor(it.actorClass)}"`:''}>${esc(it.text)}</div>`).join('')
+    }</div>`).join('');
+    return `<div class="bl-feed">${rounds}</div>`;
+  }
+  function helpCreditsHTML(){
+    return `<div class="help-credits">
+        <h2 class="help-credit-title">RIFT PROTOCOL</h2>
+        <p class="help-credit-by">Designed and built by Kit Cabena</p>
+        <p><a class="help-link" href="https://github.com/kitcabena" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+        <p class="help-ver">v${GAME_VERSION}</p>
+        <p class="help-credit-foot">Built with the Web Audio API, Socket.io, and a lot of sims.</p>
+      </div>`;
+  }
+  function captureBattleLog(st, tl){
+    try{
+      if(!UI.battleLog) UI.battleLog=[];
+      if(UI.battleLog.length && UI.battleLog[UI.battleLog.length-1].round===st.round) return;  // captured already
+      const items=[];
+      for(const tier of (tl||[])){
+        for(const e of (tier.lines||[])){
+          if(e.cls==='tier') continue;
+          items.push({ text: dnText((e.text||'').trim()), cls:e.cls, actorClass:e.actorClass||null });
+        }
+      }
+      UI.battleLog.push({ round: st.round, items });
+      helpRefreshLogIfOpen();
+    }catch(e){}
+  }
+
+  /* ===================== Splash screen (shown once per page load) ===================== */
+  function showSplash(){
+    const ov=document.createElement('div'); ov.id='splash';
+    ov.innerHTML = `<div class="splash-inner"><h1 class="title">RIFT PROTOCOL</h1><div class="splash-sub">click to continue</div></div>`;
+    document.body.appendChild(ov);
+    let done=false;
+    const dismiss=()=>{ if(done) return; done=true;
+      try{ if(window.RiftAudio && window.RiftAudio.unlock) window.RiftAudio.unlock(); }catch(e){}   // Web Audio user-gesture init
+      document.removeEventListener('click', dismiss, true);
+      document.removeEventListener('keydown', dismiss, true);
+      ov.classList.add('fade-out');
+      setTimeout(()=>{ try{ ov.remove(); }catch(e){} }, 320);
+      showStart();
     };
-    typeEl.onchange=()=>{ q('#fbErrType').textContent=''; refresh(); };
-    areaEl.onchange=()=>{ q('#fbErrArea').textContent=''; refresh(); };
-    msgEl.oninput=()=>{ q('#fbErrMsg').textContent=''; refresh(); };
-    sendEl.onclick=()=> fbSubmit(ov);
-    q('[data-fb="close"]').onclick=()=> closeFeedback();
-    ov.addEventListener('mousedown', (e)=>{ if(e.target===ov) closeFeedback(); });   // click outside closes
-    _fbEsc=(e)=>{ if(e.key==='Escape') closeFeedback(); };
-    document.addEventListener('keydown', _fbEsc);
-    refresh();
-    setTimeout(()=>{ try{ typeEl.focus(); }catch(e){} }, 30);
-  }
-  function closeFeedback(){
-    if(_fbEsc){ document.removeEventListener('keydown', _fbEsc); _fbEsc=null; }
-    if(_fbEl){ _fbEl.remove(); _fbEl=null; }   // node destroyed → form fully reset on next open
-    _fbSending=false;
-  }
-  function fbSubmit(ov){
-    if(_fbSending) return;
-    const q=(s)=>ov.querySelector(s);
-    const type=q('#fbType').value, area=q('#fbArea').value;
-    const name=(q('#fbName').value||'').trim(), email=(q('#fbEmail').value||'').trim();
-    const msg=(q('#fbMsg').value||'').trim();
-    let bad=false;
-    q('#fbErrType').textContent = type ? '' : 'Please select a feedback type.'; if(!type) bad=true;
-    q('#fbErrArea').textContent = area ? '' : 'Please select an area.'; if(!area) bad=true;
-    q('#fbErrMsg').textContent  = (msg.length>=30) ? '' : 'Message must be at least 30 characters.'; if(msg.length<30) bad=true;
-    q('#fbErrSend').textContent='';
-    if(bad) return;
-    _fbSending=true;
-    const sendEl=q('#fbSend'); sendEl.disabled=true; sendEl.textContent='Sending…';
-    const d=new Date(), pad=n=>String(n).padStart(2,'0');
-    const ts=`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
-    const payload={ embeds:[{
-      title: type+' — '+area,
-      description: msg,
-      color: type==='Bug Report' ? 15158332 : 3447003,
-      fields:[
-        { name:'Name',  value: name  || 'Not provided', inline:true },
-        { name:'Email', value: email || 'Not provided', inline:true },
-        { name:'Submitted', value: ts, inline:false },
-      ],
-      footer:{ text:'RIFT PROTOCOL Feedback' },
-    }]};
-    (async()=>{
-      try{
-        const res = await fetch(FEEDBACK_WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-        if(res && res.ok) fbSuccess(ov); else fbFail(ov);
-      }catch(e){ fbFail(ov); }
-    })();
-  }
-  function fbSuccess(ov){
-    _fbSending=false;
-    const card=ov.querySelector('.fb-card');
-    card.innerHTML = `<div class="fb-ok"><div class="ic">✓</div><h2>Feedback received.</h2>
-      <p class="fb-sub" style="margin-top:4px">Thanks for helping improve RIFT PROTOCOL.</p>
-      <button class="fb-send primary" data-fb="close" style="max-width:180px;margin:12px auto 0">Close</button></div>`;
-    card.querySelector('[data-fb="close"]').onclick=()=> closeFeedback();
-  }
-  function fbFail(ov){
-    _fbSending=false;
-    const sendEl=ov.querySelector('#fbSend'); if(sendEl){ sendEl.disabled=false; sendEl.textContent='Send Feedback'; }
-    const e=ov.querySelector('#fbErrSend'); if(e) e.textContent='Something went wrong. Please try again.';
+    document.addEventListener('click', dismiss, true);
+    document.addEventListener('keydown', dismiss, true);
   }
 
   mountFeedbackButton();
-  showStart();
+  mountHelpButton();
+  showSplash();
 })();
 </script>
 </body>
