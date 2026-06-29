@@ -15,7 +15,7 @@ _Pick your pair, enter the Warp Zone, and close the fold._
 
 ## What is it?
 
-**RIFT PROTOCOL** is a tactical 2v2 card battler that runs entirely in the browser — no install, no build step. You command a pair of **RIFT operatives** (Rapid Interdimensional Field Team), each pulled from a collapsing world and fighting with that world's combat style. Stage your cards, lock in, and watch the round resolve in strict speed-tiers. Matches last about **3 minutes**.
+**RIFT PROTOCOL** is a tactical 2v2 card battler that runs entirely in the browser — no install, no build step. You command a pair of **RIFT operatives** (Rapid Interdimensional Field Team), each pulled from a collapsing world and fighting with that world's combat style. Stage your cards, confirm, and watch the round resolve in strict speed-tiers. Matches last about **3 minutes**.
 
 - **6 operatives**, each a distinct archetype — **120 cards** total (20 per class)
 - **~3-minute matches**, 5 rounds, deep enough to reward planning
@@ -56,7 +56,7 @@ Teams are **two different operatives**; pairings create the strategy. Balance is
 ## How it plays
 
 - **Energy ramps** each round (3 → 4 → 6 → 8 → 10). Cards cost by speed tier (T1=1 … T4=5).
-- Each round you **stage** cards for your living operatives, choose targets, then **Lock in**.
+- Each round you **stage** cards for your living operatives, choose targets, then **Confirm**.
 - Cards resolve in **speed tiers T1 → T4**, simultaneous within a tier, with **interrupt-on-kill** — defenses played fast are already up when heavy hits land.
 - **Blocks** are depletable pools; **pierce** ignores them. Burn, splash, ripostes, buffs and debuffs all interact.
 - **5 rounds.** Wipe both enemies to win outright; otherwise the tiebreak is **most kills → most HP → draw**.

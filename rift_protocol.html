@@ -38,6 +38,8 @@
 
   /* class select */
   .classgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:760px){ .classgrid{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:480px){ .classgrid{grid-template-columns:1fr} }
   .classcard{cursor:pointer;transition:border-color .1s}
   .classcard .cname{font-size:18px;font-weight:700;color:var(--accent)}
   .classcard .ctag{color:var(--muted);font-size:13px}
@@ -226,7 +228,7 @@
     .staging-row{gap:7px;flex-wrap:wrap;overflow:visible;justify-content:center}   /* short pills can wrap safely */
     .staged{width:auto;flex-direction:row;align-items:center;gap:8px;padding:7px 12px;
       border-top-width:1px;border-left:4px solid var(--cls,var(--accent));border-radius:10px}
-    .staged .cardart,.staged .pn,.staged .pe,.staged .pt{display:none}
+    .staged.pcard .cardart,.staged.pcard .pn,.staged.pcard .pe,.staged.pcard .pt{display:none}
     .staged .compact-cost{display:inline-flex;align-items:center;gap:3px;order:1;font-size:12px;font-weight:700;padding:1px 7px;border-radius:9px}
     .staged .compact-name{display:inline;order:2;font-weight:800;font-size:14px}
     .staged .staged-tgt{order:3;padding:0;color:var(--muted);font-weight:600}
@@ -869,6 +871,63 @@
   .card-tray .pcard .pn{color:color-mix(in srgb, var(--cls) 70%, #ffffff)}
   /* mobile: each section scrolls its cards horizontally if they overflow */
   @media(max-width:760px){ .card-tray .hand-fan{overflow-x:auto;justify-content:flex-start} }
+
+  /* =========================================================================
+     MOBILE / PHONE PASS — keep the whole battle inside a narrow portrait
+     viewport: fighter cards shrink so two fit per row, the HUD wraps, the
+     hand becomes one horizontal swipe-row, decks tuck under the team.
+     ========================================================================= */
+  @media (max-width:600px){
+    /* fighter cards: let the 2-col grid shrink below content + smaller portraits */
+    .pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;max-width:100%}
+    .cfighter{min-width:0;padding:7px 8px;gap:7px;border-radius:9px}
+    .cfighter .cport{width:48px;height:48px;flex:0 0 48px;min-width:48px;min-height:48px}
+    .cfighter .cname{font-size:12px}
+    .cfighter .chpwrap{margin:3px 0;gap:4px}
+    .chpnum{font-size:9.5px;min-width:32px}
+    .ctags{gap:2px}
+    .ctag{font-size:8px;padding:0 3px;line-height:1.45}
+    /* enemy team slightly larger than yours but still compact */
+    .enemy-side{margin:0 auto}
+    .enemy-side .pair{gap:8px;max-width:100%}
+    .enemy-side .cfighter .cport{width:54px;height:54px;flex:0 0 54px;min-width:54px;min-height:54px}
+    .enemy-side .cfighter .cname{font-size:12.5px}
+    .enemy-side .cfighter .ctag{font-size:8.5px;padding:0 3px}
+    .arena-side .label{font-size:9.5px}
+    .bf-center{padding:2px 6px;gap:6px}
+
+    /* HUD cluster: wrap onto two lines, drop the "next round" hint to save width */
+    .ctrl-cluster{flex-wrap:wrap;justify-content:center;gap:6px 10px;padding:6px 10px;max-width:100%}
+    .ctrl-cluster .energy-box .tip{display:none}
+    .energy-box .big{font-size:14px}
+    .round-inline{font-size:12.5px;padding:4px 12px}
+    .ctrl-buttons{gap:8px}
+    .ctrl-buttons .ctrlbtn{min-width:90px;padding:9px 10px}
+
+    /* hand: one horizontal swipe-row holding BOTH operatives' cards */
+    .card-tray{overflow-x:auto;justify-content:flex-start;padding:6px 8px;-webkit-overflow-scrolling:touch}
+    .card-tray .hand-fan{overflow:visible}
+    .tray-sec{flex:0 0 auto}
+    .hand-fan .pcard{width:104px;height:clamp(150px,24vh,176px);margin-left:-6px}
+    .hand-group .pcard:first-child{margin-left:0}
+
+    /* decks: compact row tucked under the team (no longer overlapping it) */
+    .bf-you{flex-direction:column-reverse;gap:4px;align-items:center}
+    .deck-corner{position:static;flex-direction:row;align-items:center;gap:10px}
+    .deck-corner .rail-label{display:none}
+    .deck-corner .deck{flex-direction:row;gap:5px;align-items:center}
+    .deck-corner .deck-back{width:30px;height:42px}
+    .deck-corner .deck-count{font-size:9px}
+
+    /* top bar: keep the hint clear of the Menu button */
+    .top-hint{font-size:11px;max-width:62vw}
+    .quit-btn{font-size:11px;padding:5px 9px}
+  }
+  /* very short screens: keep it from clipping vertically */
+  @media (max-height:560px){
+    .hand-fan .pcard{height:clamp(120px,20vh,150px)}
+    .cfighter .cport{width:44px;height:44px;flex:0 0 44px;min-width:44px;min-height:44px}
+  }
 </style>
 </head>
 <body>
@@ -2661,7 +2720,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   /* ---- shared rules copy, reused by the in-match panel and the Tutorial page ---- */
   function tutorialSections(){
     return [
-      ['Deployment &amp; operatives', `You command a pair of <span class="k">RIFT operatives</span> at a breach point. Each round, queue actions for your living operatives, then <span class="k">Lock in</span>. Every ability is performed by the operative who owns it — you only choose the <span class="k">enemy</span> target (attacks) or the <span class="k">ally</span> who receives it.`],
+      ['Deployment &amp; operatives', `You command a pair of <span class="k">RIFT operatives</span> at a breach point. Each round, queue actions for your living operatives, then <span class="k">Confirm</span>. Every ability is performed by the operative who owns it — you only choose the <span class="k">enemy</span> target (attacks) or the <span class="k">ally</span> who receives it.`],
       ['Energy &amp; the ramp', `The breach yields more energy each round: <span class="k">3 → 4 → 6 → 8 → 10</span>. Cards cost by tier: <span class="k">T1=1, T2=2, T3=3, T4=5</span>. Play any mix you can afford; unplayed cards carry over, and once per turn you may <span class="k">discard &amp; redraw</span> — swap one card for a fresh draw from its deck.`],
       ['Speed tiers &amp; order', `Locked cards resolve by speed tier <span class="k">T1 → T2 → T3 → T4</span>. Cards in the same tier resolve together, so defenses played at a lower tier are already up when higher-tier attacks land.`],
       ['Blocks &amp; pierce', `Defends raise a depletable <span class="k">block pool</span> that soaks incoming damage until spent (capped at 17 absorb). <span class="k">Pierce</span> attacks ignore blocks entirely and strike the operative directly.`],
@@ -3340,7 +3399,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const hint = sel.stage==='target' ? `Choose the <b>enemy</b> target for <b>${esc(sel.pendingHi.card.name)}</b>.`
               : sel.stage==='ally'   ? `Choose which <b>ally</b> receives <b>${esc(sel.pendingHi.card.name)}</b>.`
               : sel.stage==='discard'? `Choose a card to <b>discard</b> for <b>${esc(sel.pendingHi.card.name)}</b> — click it again to cancel.`
-              : remaining<=0 ? `Out of energy — lock in.`
+              : remaining<=0 ? `Out of energy — confirm.`
               : `Click a card to play it. <b>${remaining}</b> energy left.`;
 
     // --- top bar, side panels, staging & dock ---
@@ -4212,7 +4271,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     if(!container) return;
     const classes=Object.keys(GF.CLASSES);
     const draw=()=>{
-      container.innerHTML = `<div class="classgrid" style="grid-template-columns:repeat(3,1fr);gap:8px">`+
+      container.innerHTML = `<div class="classgrid" style="gap:8px">`+
         classes.map(c=>{ const sel=MP.myTeam.includes(c);
           return `<div class="card classcard ${sel?'sel':''}" data-mpc="${c}" style="--cls:${classColor(c)}">
             <div class="cport"><img src="${portraitFor({className:c})}" onerror="this.style.display='none'"><span class="ph">${esc(dn(c))}</span></div>
@@ -4353,7 +4412,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   }
   function mpHostAfterLock(){ mpStopTimer();
     if(MP.pendingJoinerPicks!=null) mpHostResolve();
-    else { MP.hostLockedWaiting=true; mpShowWaiting('Waiting for opponent to lock in…'); }
+    else { MP.hostLockedWaiting=true; mpShowWaiting('Waiting for opponent to confirm…'); }
   }
   function mpHostResolve(){
     MP.hostLockedWaiting=false; mpStopTimer(); mpResolvedTimer(); clearOverlay();
@@ -4646,7 +4705,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     return [
       helpSec('What is RIFT PROTOCOL?', 'You command two RIFT operatives pulled from folding worlds and deployed to breach points across six Warp Zones. Each match is 5 rounds. The team that deals the most kills wins — tiebreak goes to total HP remaining, then a draw.', 'Most kills wins. Tiebreak: total HP remaining, then a draw.'),
       helpSec('Picking your operatives', 'Choose two operative classes before each match. Each class has a unique deck of 20 cards and a distinct combat identity. You can pick two of the same class. Your team shares a hand of cards during the match.'),
-      helpSec('How a round works', 'Each round you have an energy pool (starts at 3, grows each round: 3-4-6-8-10). Stage cards from your hand by clicking them, then assign targets. When ready, click Lock In. Both teams resolve simultaneously in tier order: T1 first, then T2, T3, T4. Higher tiers can interrupt lower tiers if the operative is knocked out mid-resolution.', 'Resolution order: T1 → T2 → T3 → T4 — both teams at once, interrupts on KO.'),
+      helpSec('How a round works', 'Each round you have an energy pool (starts at 3, grows each round: 3-4-6-8-10). Stage cards from your hand by clicking them, then assign targets. When ready, click Confirm. Both teams resolve simultaneously in tier order: T1 first, then T2, T3, T4. Higher tiers can interrupt lower tiers if the operative is knocked out mid-resolution.', 'Resolution order: T1 → T2 → T3 → T4 — both teams at once, interrupts on KO.'),
       helpSec('Energy', 'Every card has an energy cost shown in the badge at the top left. You can play multiple cards per round as long as you have energy. Unused energy does not carry over. Next round\'s energy is shown in the top right panel.'),
       helpSec('Card types', 'Attack cards deal damage to enemy operatives. Defend cards protect your operatives from incoming damage. Some cards have special effects — read the description carefully. The italic flavor text at the bottom of each card is lore only and has no gameplay effect.'),
       helpSec('The Breachblade Junction mechanic', 'The Breachblade class has a unique Junction system. Play a Junction card (Fire, Frost, or Thunder) to set your weapon element. Then play flurry cards to deal cascading elemental hits. Setting a new Junction element overwrites the previous one.', 'Junction sets your element; flurry cards ride it. A new Junction overwrites the old.'),
