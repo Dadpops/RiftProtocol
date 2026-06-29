@@ -11,8 +11,14 @@
     --bg:#15140f; --panel:#22211b; --panel2:#2c2c24; --ink:#ece7d8; --muted:#9c9684;
     --line:#3a392f; --accent:#d8a657; --good:#7fae5e; --bad:#d06b56; --pierce:#c77dff;
     --t1:#5e9bd6; --t2:#5ec8c0; --t3:#d8a657; --t4:#d06b56;
+    --energy:#6fdc5a;   /* energy is green to set it apart from the gold UI */
   }
   *{box-sizing:border-box}
+  /* energy pip glyph — replaces the lightning bolt everywhere energy is shown */
+  .ecirc{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--energy);
+    border:1px solid color-mix(in srgb,var(--energy) 60%,#000);box-shadow:0 0 4px var(--energy);
+    vertical-align:-1px;flex:0 0 auto}
+  .ecirc.lg{width:13px;height:13px;vertical-align:-2px}
   html,body{margin:0;height:100%}
   body{background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,sans-serif;}
   #app{max-width:1080px;margin:0 auto;padding:16px;}
@@ -67,7 +73,7 @@
     border-radius:20px;color:var(--accent);font-weight:700;font-size:13px}
   .energy .pips{display:inline-flex;gap:3px}
   .energy .pips i{width:9px;height:9px;border-radius:50%;background:#000;border:1px solid var(--line)}
-  .energy .pips i.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 4px var(--accent)}
+  .energy .pips i.on{background:var(--energy);border-color:var(--energy);box-shadow:0 0 4px var(--energy)}
   .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
   .tag{font-size:11px;padding:1px 6px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
   .tag.block{color:var(--t1);border-color:var(--t1)}
@@ -92,12 +98,15 @@
   .cardart .artph{font-size:9px;letter-spacing:1px;color:rgba(255,255,255,.5);text-transform:uppercase}
   /* energy cost badge — top-left corner over the card art */
   .cardart .cost-badge{position:absolute;top:4px;left:4px;z-index:2;font-size:12px;font-weight:800;
-    padding:1px 7px;border-radius:10px;color:#11100b;box-shadow:0 1px 5px rgba(0,0,0,.55)}
+    padding:1px 7px;border-radius:10px;color:var(--energy);background:rgba(8,8,6,.85);
+    border:1px solid color-mix(in srgb,var(--energy) 45%,#000);box-shadow:0 1px 5px rgba(0,0,0,.6)}
   .catcard-art{height:58px;margin:6px -11px;border-top:1px solid var(--line)}
   .pcard .ph{display:flex;justify-content:space-between;align-items:center;gap:6px}
   .pcard .pn{font-weight:700;font-size:13px;line-height:1.2}
-  .pcard .cost{font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;color:#11100b}
-  .cost.t1{background:var(--t1)} .cost.t2{background:var(--t2)} .cost.t3{background:var(--t3)} .cost.t4{background:var(--t4)}
+  /* energy cost pill — black bg + green so it reads over any card art (tier is shown by the T# badge) */
+  .cost{font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;color:var(--energy);
+    background:rgba(8,8,6,.85);border:1px solid color-mix(in srgb,var(--energy) 45%,#000);
+    display:inline-flex;align-items:center;gap:3px;line-height:1.5}
   /* type/tier/symbol footer pinned to the bottom of the card */
   .pcard .pt{font-size:11px;color:var(--muted);margin-top:auto;padding:5px 0;display:flex;align-items:center;gap:5px;border-top:1px solid var(--line)}
   .pcard .pe{font-size:12px;color:var(--ink);margin-top:4px}
@@ -165,27 +174,64 @@
 
   /* ============ NO-SCROLL BATTLE FRAME ============ */
   #battle{position:fixed;inset:0;height:100dvh;display:grid;gap:8px;padding:8px;box-sizing:border-box;overflow:hidden;
-    grid-template-columns:minmax(0,1fr) minmax(140px,200px);   /* arena (full width) · right rail */
-    grid-template-rows:auto auto minmax(0,1fr) auto;   /* top · enemy+staging · hand (full width) · your team */
+    grid-template-columns:minmax(0,1fr);   /* full-width arena, no side rail */
+    grid-template-rows:auto minmax(0,1fr) auto minmax(0,1fr) auto;   /* top · enemy half · controls(middle) · hand half · your team */
     background:radial-gradient(120% 90% at 50% 0%, #20201a, #100f0b)}
   /* the Warp Zone background now stretches across the whole battle screen */
   #battle.hasbg{background-image:linear-gradient(rgba(13,12,9,.5),rgba(13,12,9,.82)), var(--arena);background-size:cover;background-position:center}
   .bf-top{position:relative;grid-column:1 / -1;grid-row:1;display:flex;align-items:center;justify-content:center;gap:14px;min-height:0}
+  /* centered control cluster (energy → round → confirm/undo) sitting above the hands */
+  .bf-controls{grid-column:1 / -1;grid-row:3;display:flex;justify-content:center;align-items:center;min-height:0;
+    position:relative;z-index:12}   /* always above the staging row so Confirm/Undo stay clickable */
+  .ctrl-cluster{display:flex;align-items:center;gap:18px;background:rgba(18,17,13,.82);border:1px solid var(--line);
+    border-radius:14px;padding:8px 18px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  .ctrl-cluster .energy-box{flex-direction:row;align-items:center;gap:8px}
+  .ctrl-cluster .energy-box .tip{margin:0}
+  .round-inline{font-size:15px;font-weight:800;letter-spacing:.5px;color:var(--accent);
+    border:1px solid var(--accent);border-radius:20px;padding:5px 16px;background:rgba(12,11,8,.5);white-space:nowrap}
+  .ctrl-buttons{display:flex;gap:10px}
+  .ctrl-buttons .ctrlbtn{width:auto;min-width:104px}
+  .skip-btn{width:auto;min-width:120px}
+  /* Confirm = green (commit to battle), Undo = red */
+  .confirm-btn{background:var(--good);color:#0d1408;border-color:var(--good);font-weight:800}
+  .confirm-btn:hover:not(:disabled){border-color:#eafbe0;background:color-mix(in srgb,var(--good) 88%,#fff)}
+  .confirm-btn .cb-sword{font-size:14px;vertical-align:-1px}
+  .undo-btn{background:transparent;color:var(--bad);border-color:var(--bad);font-weight:700}
+  .undo-btn:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 20%,transparent);border-color:var(--bad)}
   .quit-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:12px;padding:6px 12px}
   .quit-btn:hover{border-color:var(--bad);color:var(--bad)}
   /* staging area — clicked cards wait in the middle of the arena */
-  .arena-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;z-index:6}
-  .staging{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .arena-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0;overflow:hidden;z-index:6}
+  .staging{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-height:0}
   .staging-label{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent)}
-  .staging-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:700px}
-  .staged{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:9px;cursor:pointer;
-    background:rgba(20,19,15,.92);border:1px solid var(--accent);border-left:3px solid var(--cls,var(--accent));
-    box-shadow:0 4px 12px rgba(0,0,0,.5);font-size:12.5px;transition:transform .1s}
-  .staged:hover{transform:translateY(-2px);background:rgba(44,32,18,.95)}
-  .staged .staged-name{font-weight:700}
-  .staged .staged-tgt{color:var(--muted);font-size:11px}
-  .staged .staged-cost{font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px;color:#11100b}
-  .staged .staged-x{color:var(--bad);font-weight:800;margin-left:2px}
+  /* staged cards stay on ONE horizontally-scrolling row so they never wrap down over the controls */
+  .staging-row{display:flex;flex-wrap:nowrap;gap:8px;justify-content:flex-start;max-width:min(94vw,1000px);
+    overflow-x:auto;overflow-y:hidden;padding:2px 2px 6px;scrollbar-width:thin}
+  .staging-row:not(:hover){scrollbar-color:var(--line) transparent}
+  .staging-row::-webkit-scrollbar{height:7px}
+  .staging-row::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  /* center when few cards; left-align (scroll) only once they overflow the row */
+  .staging-row{justify-content:safe center}
+  /* staged = full hand-card face; collapses to a compact pill on small screens */
+  .staged{position:relative;width:clamp(120px,11vw,150px);cursor:pointer;border-color:var(--accent);
+    box-shadow:0 5px 16px rgba(0,0,0,.55);padding:0 8px 7px;transition:transform .1s}
+  .staged:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .staged .pe{font-size:11px;-webkit-line-clamp:2}   /* shorter than the hand card so the row stays compact */
+  .staged .staged-tgt{font-size:11px;font-weight:700;color:var(--accent);text-align:center;padding-top:3px}
+  .staged .staged-x{position:absolute;top:3px;right:4px;z-index:4;width:18px;height:18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;line-height:1;font-size:12px;font-weight:800;
+    color:var(--bad);background:rgba(8,8,6,.72)}
+  .staged .compact-cost,.staged .compact-name{display:none}
+  @media (max-width:780px),(max-height:700px){
+    .staging-row{gap:7px;flex-wrap:wrap;overflow:visible;justify-content:center}   /* short pills can wrap safely */
+    .staged{width:auto;flex-direction:row;align-items:center;gap:8px;padding:7px 12px;
+      border-top-width:1px;border-left:4px solid var(--cls,var(--accent));border-radius:10px}
+    .staged .cardart,.staged .pn,.staged .pe,.staged .pt{display:none}
+    .staged .compact-cost{display:inline-flex;align-items:center;gap:3px;order:1;font-size:12px;font-weight:700;padding:1px 7px;border-radius:9px}
+    .staged .compact-name{display:inline;order:2;font-weight:800;font-size:14px}
+    .staged .staged-tgt{order:3;padding:0;color:var(--muted);font-weight:600}
+    .staged .staged-x{position:static;order:4;background:none;width:auto;height:auto;font-size:14px}
+  }
   .staging-empty{font-size:11.5px;color:var(--muted);opacity:.55}
   /* prominent middle-of-screen prompt while choosing a target */
   .target-notice{font-size:16px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:11px;text-align:center;
@@ -198,13 +244,16 @@
     0%,100%{box-shadow:0 0 14px color-mix(in srgb,var(--tn) 40%,transparent)}
     50%{box-shadow:0 0 34px color-mix(in srgb,var(--tn) 90%,transparent)}}
   /* row 2 arena: enemy team + staging/lock-in (full width; left sidebar removed) */
-  .bf-center{grid-column:1;grid-row:2;position:relative;display:flex;flex-direction:column;
-    align-items:center;justify-content:flex-start;gap:8px;padding:4px 10px;min-height:0}
-  .bf-right{grid-column:2;grid-row:2;display:flex;flex-direction:column;gap:8px;overflow:hidden}
-  /* hand row: FULL WIDTH so cards are never clipped by the narrow side columns */
-  .bf-hand{grid-column:1 / -1;grid-row:3;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  /* your team: full-width row pinned to the bottom */
-  .bf-you{grid-column:1 / -1;grid-row:4;display:flex;justify-content:center;align-items:flex-end}
+  .bf-center{grid-column:1 / -1;grid-row:2;position:relative;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:10px;padding:4px 10px;min-height:0}
+  /* hand row: FULL WIDTH so cards are never clipped */
+  .bf-hand{grid-column:1 / -1;grid-row:4;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  /* your team: full-width row pinned to the bottom; decks tuck into the bottom-left corner */
+  .bf-you{grid-column:1 / -1;grid-row:5;position:relative;display:flex;justify-content:center;align-items:flex-end}
+  .deck-corner{position:absolute;left:4px;bottom:2px;z-index:5;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+  .deck-corner .deck-rail{justify-content:flex-start;gap:8px}
+  .deck-corner .deck-back{width:46px;height:66px}
+  .deck-corner .deck-count{font-size:9.5px}
   .arena-slot{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:center}
   /* top bar: round counter (and turn hint) across the top of the screen */
   .round-pill{font-size:14px;font-weight:800;letter-spacing:.5px;color:var(--accent);
@@ -217,6 +266,14 @@
   .arena-side{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0}
   .arena-side .label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
   .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:640px;flex-shrink:0}
+  /* enemy team — larger & centered, so buffs/debuffs/armor read clearly (per design slide) */
+  .enemy-side{margin:0 auto}
+  .enemy-side .pair{max-width:760px;gap:20px}
+  .enemy-side .label{font-size:12px}
+  .enemy-side .cfighter{padding:13px 16px;gap:13px}
+  .enemy-side .cfighter .cport{width:104px;height:104px;flex:0 0 104px;min-width:104px;min-height:104px}
+  .enemy-side .cfighter .cname{font-size:17px}
+  .enemy-side .cfighter .ctag{font-size:11px;padding:1px 6px}
   /* the operative rows never participate in the battle-log's reflow: lock their size
      so the end-of-turn log (its own grid row) can't compress portraits. Size stays
      viewport-driven only. */
@@ -302,7 +359,7 @@
   .dv-card{display:inline-flex;align-items:center;gap:6px;height:fit-content;padding:5px 9px;border-radius:8px;cursor:pointer;
     background:rgba(20,19,15,.92);border:1px solid var(--line);border-left:3px solid var(--cls,var(--accent));font-size:12px}
   .dv-card:hover,.dv-card.active{border-color:var(--accent);background:rgba(44,32,18,.95)}
-  .dv-cost{font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px;color:#11100b}
+  .dv-cost{font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px}
   .dv-name{font-weight:600}
   .dv-divider{height:1px;background:var(--line);margin:0 12px;flex:0 0 auto}
   .dv-preview{flex:1 0 auto;min-height:200px;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box}
@@ -332,10 +389,10 @@
 
   /* right-margin controls */
   .energy-box{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-  .energy-box .big{font-size:15px;font-weight:800;color:var(--accent)}
+  .energy-box .big{font-size:16px;font-weight:800;color:var(--energy);display:inline-flex;align-items:center;gap:5px}
   .energy-box .pips{display:flex;gap:4px}
   .energy-box .pips i{width:11px;height:11px;border-radius:50%;background:#000;border:1px solid var(--line)}
-  .energy-box .pips i.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 5px var(--accent)}
+  .energy-box .pips i.on{background:var(--energy);border-color:var(--energy);box-shadow:0 0 5px var(--energy)}
   .ctrlbtn{width:100%}
 
   /* ============ HAND (fan + hover focus) — now in the arena, above your team ============ */
@@ -346,8 +403,8 @@
      pile on top of each other on smaller screens */
   .hand-fan{flex:1;display:flex;justify-content:center;align-items:flex-end;gap:clamp(14px,2.6vw,38px);padding:6px 18px 2px;min-height:0}
   .hand-group{display:flex;align-items:flex-end;min-width:0;justify-content:center}
-  .hand-fan .pcard{width:clamp(100px,10vw,140px);flex:0 0 auto;margin-left:clamp(-30px,-1.4vw,-12px);
-    height:clamp(150px,22vh,210px);cursor:pointer;
+  .hand-fan .pcard{width:clamp(124px,12.5vw,172px);flex:0 0 auto;margin-left:clamp(-30px,-1.4vw,-12px);
+    height:clamp(184px,30vh,262px);cursor:pointer;
     transition:transform .16s ease, margin .16s ease, opacity .16s ease;transform-origin:bottom center}
   .hand-group .pcard:first-child{margin-left:0}
   .hand-fan:hover .pcard{opacity:.82}
@@ -808,7 +865,7 @@
   .card-tray .tray-cards{display:flex;justify-content:center}
   /* tint each card with its operative's class color (the card already carries --cls) */
   .card-tray .pcard{background:color-mix(in srgb, var(--cls) 10%, #14130f);border-color:color-mix(in srgb, var(--cls) 35%, transparent)}
-  .card-tray .pcard .cost-badge{background:color-mix(in srgb, var(--cls) 20%, transparent);color:var(--cls)}
+  .card-tray .pcard .cost-badge{background:rgba(8,8,6,.85);color:var(--energy)}
   .card-tray .pcard .pn{color:color-mix(in srgb, var(--cls) 70%, #ffffff)}
   /* mobile: each section scrolls its cards horizontally if they overflow */
   @media(max-width:760px){ .card-tray .hand-fan{overflow-x:auto;justify-content:flex-start} }
@@ -2738,7 +2795,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const cost=GF.energyCost(c);
     return `<div class="catcard" style="--cls:${classColor(c.cls)}">
       <div class="ph"><span class="pn">${esc(c.name)}</span>
-        <span class="cost t${c.speed}" title="costs ${cost} energy (T${c.speed})">⚡${cost}</span></div>
+        <span class="cost t${c.speed}" title="costs ${cost} energy (T${c.speed})"><span class="ecirc"></span>${cost}</span></div>
       <div class="cardart catcard-art sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">
         <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
         <span class="artph">${esc(c.type)}</span>
@@ -3292,15 +3349,20 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
     // (left How-to-play sidebar removed — help now lives in the bottom-right ? panel)
 
-    // right: energy meter + lock / undo controls.
-    const right = `<div class="sidepanel">
+    // center control cluster (above the hands): energy → round → Confirm / Undo.
+    const hasStaged = sel.picks.length||sel.pendingHi;
+    const controls = `<div class="ctrl-cluster">
         <div class="energy-box">
-          <div class="big">⚡ ${remaining} / ${budget}</div>
+          <div class="big"><span class="ecirc lg"></span> ${remaining} / ${budget}</div>
           <div class="pips">${Array.from({length:budget}).map((_,i)=>`<i class="${i<remaining?'on':''}"></i>`).join('')}</div>
-          ${st.round<5?`<div class="tip" style="margin:2px 0 0">→ ${nextEnergy} next round</div>`:`<div class="tip" style="margin:2px 0 0">max (final round)</div>`}
+          ${st.round<5?`<div class="tip">→ ${nextEnergy} next round</div>`:`<div class="tip">max (final round)</div>`}
         </div>
-      </div>
-      <div class="sidepanel"><div class="rail-label">Your decks</div>${deckRailHTML(side)}</div>`;
+        <div class="round-inline">Round ${st.round} of 5</div>
+        <div class="ctrl-buttons">
+          <button class="ctrlbtn confirm-btn" data-act="lock">Confirm <span class="cb-sword">⚔</span></button>
+          <button class="ctrlbtn undo-btn" data-act="clear" ${hasStaged?'':'disabled'}>Undo</button>
+        </div>
+      </div>`;
 
     // staging: clicked cards wait in the arena middle, shown in cast order (tier
     // speed). Lock in / Undo all sit directly beneath them, above your portraits.
@@ -3317,10 +3379,6 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <div class="staging-label">${sel.picks.length ? 'Playing this round (cast order) — tap to remove' : ''}</div>
         <div class="staging-row">${ordered.map(o=>stagedCardHTML(o.p,o.i)).join('')}</div>
         ${sel.picks.length||sel.pendingHi ? '' : '<div class="staging-empty">Tap a card below to stage it here</div>'}
-        <div class="mid-controls">
-          <button class="primary ctrlbtn" data-act="lock">Lock in →</button>
-          <button class="ctrlbtn" data-act="clear" ${sel.picks.length||sel.pendingHi?'':'disabled'}>Undo all</button>
-        </div>
       </div>`;
 
     // card tray: one section per operative, tinted with that operative's class color.
@@ -3358,13 +3416,14 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     }
 
     render(frameHTML({
-      top, right,
+      top, controls,
       center: enemyZoneHTML(sideIdx, st, {
         staging, deckViewer,
         enemy:(f)=>({enemy:true, clickable: validEnemy.has(f.uid), targetKind:'enemy'})
       }),
       hand: `<div class="arena-slot">${handSlot}</div>`,
       you: yourZoneHTML(sideIdx, st, {
+        decks: deckRailHTML(side),
         you:(f)=>({clickable: validAlly.has(f.uid), targetKind:'ally'})
       })
     }));
@@ -3407,12 +3466,10 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       if(validEnemy.has(uid)) el.onclick=()=> commitPick(addableMap.get(sel.pendingHi).find(p=>p.target&&p.target.uid===uid));
       else if(validAlly.has(uid)) el.onclick=()=> commitPick(addableMap.get(sel.pendingHi).find(p=>p.target&&p.target.uid===uid));
     });
-    // staged cards: tap to unqueue, hover to preview the full card
+    // staged cards (full card face): tap anywhere to unqueue
     $$('.staged[data-pick]').forEach(el=>{
       const pi=+el.dataset.pick;
       el.onclick=()=>{ hideCardPreview(); aud('CARD_REMOVE'); sel.picks.splice(pi,1); resetPending(); drawSelection(); };
-      el.onmouseenter=()=>{ const p=sel.picks[pi]; if(p) showCardPreview(p.card, el); };
-      el.onmouseleave=hideCardPreview;
     });
     // deck rail: click a deck to toggle its card viewer
     $$('[data-deckview]').forEach(el=> el.onclick=()=>{ const uid=+el.dataset.deckview; UI.deckView=(UI.deckView===uid?null:uid); drawSelection(); });
@@ -3456,11 +3513,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
   /* ---------------- shared battle-frame rendering ---------------- */
   // Battle frame, top→bottom: top bar · [left | enemy+staging | right] · hand (full width) · your team (full width)
-  function frameHTML({top, center, right, hand, you}){
+  function frameHTML({top, center, controls, hand, you}){
     return `<div id="battle">
       <div class="bf-top">${top||''}</div>
       <div class="bf-center">${center||''}</div>
-      <div class="bf-right">${right||''}</div>
+      <div class="bf-controls">${controls||''}</div>
       <div class="bf-hand">${hand||''}</div>
       <div class="bf-you">${you||''}</div>
     </div>`;
@@ -3478,7 +3535,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // your team (full-width bottom row)
   function yourZoneHTML(sideIdx, st, fopt){
     const you = st.sides[sideIdx];
-    return `<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
+    const decks = fopt.decks ? `<div class="deck-corner"><div class="rail-label">Your decks</div>${fopt.decks}</div>` : '';
+    return `${decks}<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
         <div class="pair">${you.fighters.map(f=> cfighterHTML(f, fopt.you?fopt.you(f):{})).join('')}</div></div>`;
   }
   // two player decks (draw piles) for the right rail, under Lock in / Undo.
@@ -3486,17 +3544,27 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     return `<div class="deck-rail">${side.fighters.map(f=>deckHTML(f)).join('')}</div>`;
   }
   // a card staged in the arena middle (clicked, waiting to play); tap to unqueue.
+  // staged card = the full hand-card face (collapses to a compact pill on small
+  // screens via CSS). Tap anywhere to unqueue. The compact-* spans only show in
+  // the small-screen fallback; the full face uses .cardart/.pn/.pe/.pt.
   function stagedCardHTML(p, i){
     const c=p.card, cost=GF.energyCost(c);
     const tgt = (p.target && p.target!==p.owner)
-      ? (c.aim==='enemy' ? '→ '+dn(p.target.className) : '('+dn(p.target.className)+')') : '';
-    return `<div class="staged" data-pick="${i}" style="--cls:${classColor(c.cls)}" title="Tap to remove ${esc(c.name)}">
-      <span class="staged-cost cost t${c.speed}">⚡${cost}</span>
-      <span class="tsym-wrap">${typeSymHTML(c)}</span>
-      <span class="staged-name">${esc(c.name)}</span>
-      ${tgt?`<span class="staged-tgt">${esc(tgt)}</span>`:''}
-      ${p.discardHi?`<span class="staged-tgt">⤵ ${esc(p.discardHi.card.name)}</span>`:''}
-      <span class="staged-x">✕</span>
+      ? (c.aim==='enemy' ? '→ '+dn(p.target.className) : 'to '+dn(p.target.className)) : '';
+    return `<div class="pcard staged" data-pick="${i}" style="--cls:${classColor(c.cls)}" title="Tap to remove ${esc(c.name)}">
+      <span class="staged-x" aria-hidden="true">✕</span>
+      <span class="compact-cost cost t${c.speed}"><span class="ecirc"></span>${cost}</span>
+      <div class="cardart sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">
+        <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
+        <span class="artph">${esc(c.type)}</span>
+        <span class="cost-badge cost t${c.speed}" title="costs ${cost} energy (T${c.speed})"><span class="ecirc"></span>${cost}</span>
+      </div>
+      <div class="pn">${esc(c.name)}</div>
+      <span class="compact-name">${esc(c.name)}</span>
+      <div class="pe">${esc(c.text)}</div>
+      <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}</div>
+      ${tgt?`<div class="staged-tgt">${esc(tgt)}</div>`:''}
+      ${p.discardHi?`<div class="staged-tgt">⤵ ${esc(p.discardHi.card.name)}</div>`:''}
     </div>`;
   }
   // Recon tutor picker: choose one card from the fighter's draw pile into hand.
@@ -3508,7 +3576,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <h1 style="font-size:26px;margin:0">Pick a card into your hand</h1>
         <div class="dv-grid reconpick-grid">
           ${cards.length ? cards.map((c,i)=>`<div class="dv-card" data-rp="${i}" style="--cls:${classColor(c.cls)}" title="${esc(c.text)}">
-              <span class="dv-cost cost t${c.speed}">⚡${GF.energyCost(c)}</span>
+              <span class="dv-cost cost t${c.speed}"><span class="ecirc"></span>${GF.energyCost(c)}</span>
               <span class="tsym-wrap">${typeSymHTML(c)}</span>
               <span class="dv-name">${esc(c.name)}</span>
             </div>`).join('') : '<div class="dv-hint">Deck empty — nothing to pick.</div>'}
@@ -3527,8 +3595,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const timerHTML = (MP.inMatch && typeof MP.timer==='number')
       ? `<span class="mp-timer" id="mpTimer">${mpFmtTime(MP.timeLeft)}</span>` : '';
     return `<button class="quit-btn" data-act="quit" title="Quit to main menu">⮜ Menu</button>
-      <span class="round-pill">Round ${st.round} of 5</span>${timerHTML}
-      <span class="top-hint">${hint||''}</span>`;
+      ${timerHTML}<span class="top-hint">${hint||''}</span>`;
   }
   // confirm dialog before abandoning a match.
   function confirmQuit(){
@@ -3566,7 +3633,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <button class="dv-close" data-act="dvclose" title="Close">✕</button></div>
       <div class="dv-grid">
         ${cards.map((c,i)=>`<div class="dv-card" data-dvi="${i}" style="--cls:${classColor(c.cls)}">
-          <span class="dv-cost cost t${c.speed}">⚡${GF.energyCost(c)}</span>
+          <span class="dv-cost cost t${c.speed}"><span class="ecirc"></span>${GF.energyCost(c)}</span>
           <span class="tsym-wrap">${typeSymHTML(c)}</span>
           <span class="dv-name">${esc(c.name)}</span>
         </div>`).join('')}
@@ -3582,7 +3649,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     return `<div class="dv-prev-card" style="--cls:${classColor(c.cls)}">
       <div class="dv-prev-head">
         <div class="dv-prev-name">${esc(c.name)}</div>
-        <div class="dv-prev-badges"><span class="cost t${c.speed}" title="costs ${cost} energy (T${c.speed})">⚡${cost}</span><span class="tsym-wrap">${typeSymHTML(c)}</span><span class="spd t${c.speed}">T${c.speed}</span> <span>${esc(c.type)}${c.once?' · once':''}</span></div>
+        <div class="dv-prev-badges"><span class="cost t${c.speed}" title="costs ${cost} energy (T${c.speed})"><span class="ecirc"></span>${cost}</span><span class="tsym-wrap">${typeSymHTML(c)}</span><span class="spd t${c.speed}">T${c.speed}</span> <span>${esc(c.type)}${c.once?' · once':''}</span></div>
       </div>
       <div class="cardart dv-prev-art sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">
         <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
@@ -3729,7 +3796,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       <div class="cardart sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">
         <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
         <span class="artph">${esc(c.type)}</span>
-        <span class="cost-badge cost t${c.speed}" title="costs ${cost} energy (T${c.speed})">⚡${cost}</span>
+        <span class="cost-badge cost t${c.speed}" title="costs ${cost} energy (T${c.speed})"><span class="ecirc"></span>${cost}</span>
       </div>
       <div class="pn">${esc(c.name)}</div>
       <div class="pe">${esc(c.text)}</div>
@@ -3756,8 +3823,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       }),
       hand: `<div class="arena-slot"><div class="dockwrap"><div class="dock-log" id="docklog"></div></div></div>`,
       you: yourZoneHTML(sideIdx, st, { you:(f)=>({hp: pre[f.uid]!=null?pre[f.uid]:f.hp}) }),
-      right: `<div class="sidepanel"><button class="ctrlbtn" data-act="skip">Skip ▶▶</button></div>
-        <div class="sidepanel" id="contbox" style="flex:1;display:none"></div>`
+      controls: `<button class="ctrlbtn skip-btn" data-act="skip">Skip ▶▶</button>
+        <div id="contbox" style="display:none"></div>`
     }));
     applyArena('#battle', st);
     const qb=$('[data-act="quit"]'); if(qb) qb.onclick=()=> confirmQuit();
@@ -4639,7 +4706,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     document.addEventListener('keydown', dismiss, true);
   }
 
-  mountFeedbackButton();
+  // Floating in-game Feedback button removed (per design slide); feedback still
+  // lives in the Help panel's Feedback tab. mountFeedbackButton() kept for reuse.
   mountHelpButton();
   showSplash();
 })();
