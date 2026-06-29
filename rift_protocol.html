@@ -720,6 +720,36 @@
   .mp-chat-panel .mp-row input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:7px 9px;font-size:13px}
   .mp-timer{font-size:14px;font-weight:800;letter-spacing:.5px;color:var(--accent);border:1px solid var(--accent);border-radius:20px;padding:5px 12px;background:rgba(12,11,8,.5)}
   .mp-timer.low{color:var(--bad);border-color:var(--bad)}
+  /* ---- Feedback (bug report / feature request) ---- */
+  .fb-btn{position:fixed;right:12px;bottom:12px;z-index:100;font-size:12px;font-weight:600;letter-spacing:.3px;
+    padding:7px 13px;border-radius:8px;background:rgba(18,17,13,.92);border:1px solid var(--line);color:var(--muted);
+    cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+  .fb-btn:hover{border-color:var(--accent);color:var(--accent)}
+  /* on small screens, sit it just under the top-right audio control so it never overlaps the card rail */
+  @media(max-width:760px){ .fb-btn{bottom:auto;top:50px;right:10px;padding:6px 11px} }
+  .fb-modal{position:fixed;inset:0;z-index:210;background:rgba(6,5,3,.7);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+  .fb-card{background:var(--panel);border:1px solid var(--accent);border-radius:14px;width:min(480px,92vw);max-height:90vh;
+    overflow-y:auto;padding:20px;box-sizing:border-box;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+  .fb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .fb-head h2{margin:0;font-size:20px}
+  .fb-sub{color:var(--muted);font-size:13px;margin:2px 0 14px}
+  .fb-close{font-size:15px;line-height:1;padding:4px 9px;border-radius:7px;background:var(--bg);border:1px solid var(--line);color:var(--muted);cursor:pointer}
+  .fb-close:hover{border-color:var(--bad);color:var(--bad)}
+  .fb-field{margin-bottom:12px}
+  .fb-field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px}
+  .fb-field select,.fb-field input,.fb-field textarea{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line);
+    border-radius:9px;color:var(--ink);padding:10px 11px;font-size:14px;font-family:inherit}
+  .fb-field textarea{resize:vertical;min-height:96px;line-height:1.45}
+  .fb-field select:focus,.fb-field input:focus,.fb-field textarea:focus{outline:none;border-color:var(--accent)}
+  .fb-count{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+  .fb-count.short{color:var(--bad)}
+  .fb-err{color:var(--bad);font-size:12px;margin-top:4px;min-height:14px}
+  .fb-send.primary{width:100%;margin-top:6px;padding:11px;border-radius:9px;font-weight:800;cursor:pointer;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 30%,#1a1812),#15140f);border:1px solid var(--accent);color:var(--accent)}
+  .fb-send:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}
+  .fb-ok{text-align:center;padding:16px 6px}
+  .fb-ok .ic{font-size:44px;line-height:1;color:var(--good)}
+  .fb-ok h2{margin:10px 0 2px;font-size:20px}
 </style>
 </head>
 <body>
@@ -2468,6 +2498,9 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
      CONFIG — the deployed RIFT server (Railway). For local dev, change to
      "http://localhost:3000" and run `node server.js`.                                  */
   const RIFT_SERVER_URL = "https://genrefighters-production.up.railway.app";
+  // Feedback (bug reports / feature requests) are POSTed to this Discord webhook.
+  // Referenced only by name below — never inlined or logged.
+  const FEEDBACK_WEBHOOK_URL = "https://discord.com/api/webhooks/1521223903253368944/EsbCAZs7Xk9D7KI5QeMYGTHk-IywNYGQi0nUKT1YaCbcq4vfojiFxSFOfKBL_oEpPgtn";
   // All multiplayer state lives here; when MP.socket is null every mp* function is a
   // no-op, so nothing here can affect Hotseat / Escalations / standard play.
   const MP = {
@@ -4321,6 +4354,118 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // on refocus, snap the (wall-clock) turn timer to the correct value immediately
   try{ document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ try{ mpRenderTimer(); }catch(e){} } }); }catch(e){}
 
+  /* ===================== Feedback (Discord webhook; additive, isolated) =====================
+     A fixed Feedback button on every screen → a modal that POSTs a bug report /
+     feature request to FEEDBACK_WEBHOOK_URL. Purely additive: never touches match,
+     Escalation, or lobby state; a failed send can't crash or freeze the game. */
+  let _fbEl=null, _fbEsc=null, _fbSending=false;
+  const FB_AREAS=['Gameplay / Cards','Escalations','Multiplayer','Audio','UI / Visual','Lore / Text','Other'];
+  function mountFeedbackButton(){
+    if(document.getElementById('fbBtn')) return;
+    const b=document.createElement('button'); b.id='fbBtn'; b.className='fb-btn'; b.type='button';
+    b.textContent='Feedback'; b.setAttribute('aria-label','Send feedback');
+    b.onclick=(e)=>{ e.stopPropagation(); openFeedback(); };
+    document.body.appendChild(b);
+  }
+  function openFeedback(){
+    if(_fbEl) return;
+    const ov=document.createElement('div'); ov.className='fb-modal'; _fbEl=ov;
+    ov.innerHTML = `<div class="fb-card" role="dialog" aria-modal="true">
+        <div class="fb-head"><h2>Feedback</h2><button class="fb-close" data-fb="close" title="Close" aria-label="Close">✕</button></div>
+        <div class="fb-sub">Help us improve RIFT PROTOCOL.</div>
+        <div id="fbForm">
+          <div class="fb-field"><label>Type</label>
+            <select id="fbType"><option value="">Select a type…</option><option value="Bug Report">Bug Report</option><option value="Feature Request">Feature Request</option></select>
+            <div class="fb-err" id="fbErrType"></div></div>
+          <div class="fb-field"><label>Area</label>
+            <select id="fbArea"><option value="">Select an area…</option>${FB_AREAS.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('')}</select>
+            <div class="fb-err" id="fbErrArea"></div></div>
+          <div class="fb-field"><label>Name</label>
+            <input id="fbName" type="text" maxlength="60" placeholder="Your name (optional)" autocomplete="off"></div>
+          <div class="fb-field"><label>Email</label>
+            <input id="fbEmail" type="text" maxlength="100" placeholder="Your email (optional)" autocomplete="off"></div>
+          <div class="fb-field"><label>Message</label>
+            <textarea id="fbMsg" maxlength="1000" placeholder="Describe the bug or feature request... (30 characters minimum)"></textarea>
+            <div class="fb-count short" id="fbCount">0 / 1000</div>
+            <div class="fb-err" id="fbErrMsg"></div></div>
+          <button class="fb-send primary" id="fbSend" disabled>Send Feedback</button>
+          <div class="fb-err" id="fbErrSend" style="text-align:center"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    const q=(s)=>ov.querySelector(s);
+    const typeEl=q('#fbType'), areaEl=q('#fbArea'), msgEl=q('#fbMsg'), countEl=q('#fbCount'), sendEl=q('#fbSend');
+    const refresh=()=>{
+      const raw=(msgEl.value||'').length;
+      countEl.textContent = raw + ' / 1000';
+      countEl.classList.toggle('short', raw<30);
+      sendEl.disabled = !(typeEl.value && areaEl.value && raw>=30);
+    };
+    typeEl.onchange=()=>{ q('#fbErrType').textContent=''; refresh(); };
+    areaEl.onchange=()=>{ q('#fbErrArea').textContent=''; refresh(); };
+    msgEl.oninput=()=>{ q('#fbErrMsg').textContent=''; refresh(); };
+    sendEl.onclick=()=> fbSubmit(ov);
+    q('[data-fb="close"]').onclick=()=> closeFeedback();
+    ov.addEventListener('mousedown', (e)=>{ if(e.target===ov) closeFeedback(); });   // click outside closes
+    _fbEsc=(e)=>{ if(e.key==='Escape') closeFeedback(); };
+    document.addEventListener('keydown', _fbEsc);
+    refresh();
+    setTimeout(()=>{ try{ typeEl.focus(); }catch(e){} }, 30);
+  }
+  function closeFeedback(){
+    if(_fbEsc){ document.removeEventListener('keydown', _fbEsc); _fbEsc=null; }
+    if(_fbEl){ _fbEl.remove(); _fbEl=null; }   // node destroyed → form fully reset on next open
+    _fbSending=false;
+  }
+  function fbSubmit(ov){
+    if(_fbSending) return;
+    const q=(s)=>ov.querySelector(s);
+    const type=q('#fbType').value, area=q('#fbArea').value;
+    const name=(q('#fbName').value||'').trim(), email=(q('#fbEmail').value||'').trim();
+    const msg=(q('#fbMsg').value||'').trim();
+    let bad=false;
+    q('#fbErrType').textContent = type ? '' : 'Please select a feedback type.'; if(!type) bad=true;
+    q('#fbErrArea').textContent = area ? '' : 'Please select an area.'; if(!area) bad=true;
+    q('#fbErrMsg').textContent  = (msg.length>=30) ? '' : 'Message must be at least 30 characters.'; if(msg.length<30) bad=true;
+    q('#fbErrSend').textContent='';
+    if(bad) return;
+    _fbSending=true;
+    const sendEl=q('#fbSend'); sendEl.disabled=true; sendEl.textContent='Sending…';
+    const d=new Date(), pad=n=>String(n).padStart(2,'0');
+    const ts=`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+    const payload={ embeds:[{
+      title: type+' — '+area,
+      description: msg,
+      color: type==='Bug Report' ? 15158332 : 3447003,
+      fields:[
+        { name:'Name',  value: name  || 'Not provided', inline:true },
+        { name:'Email', value: email || 'Not provided', inline:true },
+        { name:'Submitted', value: ts, inline:false },
+      ],
+      footer:{ text:'RIFT PROTOCOL Feedback' },
+    }]};
+    (async()=>{
+      try{
+        const res = await fetch(FEEDBACK_WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+        if(res && res.ok) fbSuccess(ov); else fbFail(ov);
+      }catch(e){ fbFail(ov); }
+    })();
+  }
+  function fbSuccess(ov){
+    _fbSending=false;
+    const card=ov.querySelector('.fb-card');
+    card.innerHTML = `<div class="fb-ok"><div class="ic">✓</div><h2>Feedback received.</h2>
+      <p class="fb-sub" style="margin-top:4px">Thanks for helping improve RIFT PROTOCOL.</p>
+      <button class="fb-send primary" data-fb="close" style="max-width:180px;margin:12px auto 0">Close</button></div>`;
+    card.querySelector('[data-fb="close"]').onclick=()=> closeFeedback();
+  }
+  function fbFail(ov){
+    _fbSending=false;
+    const sendEl=ov.querySelector('#fbSend'); if(sendEl){ sendEl.disabled=false; sendEl.textContent='Send Feedback'; }
+    const e=ov.querySelector('#fbErrSend'); if(e) e.textContent='Something went wrong. Please try again.';
+  }
+
+  mountFeedbackButton();
   showStart();
 })();
 </script>
