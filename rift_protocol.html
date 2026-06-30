@@ -217,37 +217,21 @@
   /* Confirm/Undo colours + frame art are defined in the UI-art section below. */
   .quit-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:12px}
   /* staging area — clicked cards wait in the middle of the arena */
-  .arena-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0;overflow:hidden;z-index:6}
+  .arena-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0;overflow:visible;z-index:6}
   .staging{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-height:0}
   .staging-label{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent)}
-  /* staged cards stay on ONE horizontally-scrolling row so they never wrap down over the controls */
-  .staging-row{display:flex;flex-wrap:nowrap;gap:8px;justify-content:flex-start;max-width:min(94vw,1000px);
-    overflow-x:auto;overflow-y:hidden;padding:2px 2px 6px;scrollbar-width:thin}
-  .staging-row:not(:hover){scrollbar-color:var(--line) transparent}
-  .staging-row::-webkit-scrollbar{height:7px}
-  .staging-row::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
-  /* center when few cards; left-align (scroll) only once they overflow the row */
-  .staging-row{justify-content:safe center}
-  /* staged = full hand-card face; collapses to a compact pill on small screens */
-  .staged{position:relative;width:clamp(120px,11vw,150px);cursor:pointer;border-color:var(--accent);
-    box-shadow:0 5px 16px rgba(0,0,0,.55);padding:0 8px 7px;transition:transform .1s}
-  .staged:hover{transform:translateY(-3px);border-color:var(--accent)}
-  .staged .pe{font-size:11px;-webkit-line-clamp:2}   /* shorter than the hand card so the row stays compact */
-  .staged .staged-tgt{font-size:11px;font-weight:700;color:var(--accent);text-align:center;padding-top:3px}
-  .staged .staged-x{position:absolute;top:3px;right:4px;z-index:4;width:18px;height:18px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;line-height:1;font-size:12px;font-weight:800;
-    color:var(--bad);background:rgba(8,8,6,.72)}
-  .staged .compact-cost,.staged .compact-name{display:none}
-  @media (max-width:780px),(max-height:700px){
-    .staging-row{gap:7px;flex-wrap:wrap;overflow:visible;justify-content:center}   /* short pills can wrap safely */
-    .staged{width:auto;flex-direction:row;align-items:center;gap:8px;padding:7px 12px;
-      border-top-width:1px;border-left:4px solid var(--cls,var(--accent));border-radius:10px}
-    .staged.pcard .cardart,.staged.pcard .pn,.staged.pcard .pe,.staged.pcard .pt{display:none}
-    .staged .compact-cost{display:inline-flex;align-items:center;gap:3px;order:1;font-size:12px;font-weight:700;padding:1px 7px;border-radius:9px}
-    .staged .compact-name{display:inline;order:2;font-weight:800;font-size:14px}
-    .staged .staged-tgt{order:3;padding:0;color:var(--muted);font-weight:600}
-    .staged .staged-x{position:static;order:4;background:none;width:auto;height:auto;font-size:14px}
-  }
+  /* staged cards = compact pills (the full card opens in the hover/press-hold popup).
+     Short, so they never clip in the staging strip; wrap + center when there are many. */
+  .staging-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:min(94vw,1000px);padding:2px}
+  .staged{position:relative;display:flex;flex-direction:row;align-items:center;gap:8px;width:auto;cursor:pointer;
+    border:1px solid var(--accent);border-left:4px solid var(--cls,var(--accent));border-radius:10px;
+    background:rgba(20,19,15,.94);box-shadow:0 4px 12px rgba(0,0,0,.5);padding:7px 12px;transition:transform .1s}
+  .staged:hover{transform:translateY(-2px);background:rgba(40,33,20,.95)}
+  .staged.pcard .cardart,.staged.pcard .pn,.staged.pcard .pe,.staged.pcard .pt{display:none}
+  .staged .compact-cost{display:inline-flex;align-items:center;gap:3px;order:1;font-size:13px;font-weight:700;padding:1px 7px;border-radius:9px}
+  .staged .compact-name{display:inline;order:2;font-weight:800;font-size:14.5px}
+  .staged .staged-tgt{order:3;padding:0;color:var(--muted);font-weight:600;font-size:12px}
+  .staged .staged-x{position:static;order:4;color:var(--bad);font-weight:800;font-size:15px;background:none}
   .staging-empty{font-size:11.5px;color:var(--muted);opacity:.55}
   /* prominent middle-of-screen prompt while choosing a target */
   .target-notice{font-size:16px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:11px;text-align:center;
@@ -267,10 +251,10 @@
   /* your team: full-width row pinned to the bottom; decks tuck into the bottom-left corner */
   .bf-you{grid-column:1 / -1;grid-row:5;position:relative;display:flex;justify-content:center;align-items:flex-end}
   .deck-corner{position:absolute;left:4px;bottom:2px;z-index:5;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
-  .deck-corner .deck-rail{justify-content:flex-start;gap:10px}
-  .deck-corner .rail-label{font-size:12px}
-  .deck-corner .deck-back{width:68px;height:96px}
-  .deck-corner .deck-count{font-size:12px}
+  .deck-corner .deck-rail{justify-content:flex-start;gap:12px}
+  .deck-corner .rail-label{font-size:13px}
+  .deck-corner .deck-back{width:90px;height:126px}
+  .deck-corner .deck-count{font-size:13px}
   .arena-slot{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:center}
   /* top bar: round counter (and turn hint) across the top of the screen */
   .top-hint{font-size:14.5px;color:var(--ink)}
@@ -961,8 +945,8 @@
     .deck-corner .rail-label{display:none}
     .deck-corner .deck-rail{flex-direction:column;gap:6px}
     .deck-corner .deck{flex-direction:row;gap:6px;align-items:center}
-    .deck-corner .deck-back{width:34px;height:48px}
-    .deck-corner .deck-count{font-size:10px}
+    .deck-corner .deck-back{width:46px;height:64px}
+    .deck-corner .deck-count{font-size:11px}
 
     /* top bar: keep the hint clear of the Menu button */
     .top-hint{font-size:11px;max-width:62vw}
@@ -1332,10 +1316,11 @@ function enemyOf(state, sideIdx){ return state.sides[1-sideIdx]; }
 
 /* ---- drawing ----
    Hands PERSIST across turns: unplayed cards carry over. Each turn we top each
-   living fighter's hand up to its cap (4 when both fighters live → up to 8 in
-   hand, 10 for a lone survivor so the hand stays full), plus any bonus draw. A
-   dead fighter's deck stops generating cards; its leftover hand is discarded. */
-const HAND_CAP_PAIR = 4, HAND_CAP_SOLO = 10;
+   living fighter's hand up to its cap (4 per fighter, whether paired or a lone
+   survivor — the survivor does NOT inherit the dead operative's cards, it just
+   refills from its own deck), plus any bonus draw. A dead fighter's deck stops
+   generating cards; its leftover hand is discarded. */
+const HAND_CAP_PAIR = 4, HAND_CAP_SOLO = 4;   // lone survivor keeps a normal hand (draws ~2/round); no carry-over balloon
 function drawN(f, n, rng){
   const out = [];
   for(let i=0;i<n;i++){
@@ -2368,21 +2353,21 @@ function runTests(report){
     assert(!again.ok, 'second potion should be rejected');
     return 'rejected as expected';
   });
-  // 11. Dead fighter's deck stops; the lone survivor refills to its solo cap (carry-over draw).
-  //     UPDATED for the hand-size change: per-fighter cap 5 (pair → up to 10 in hand), 10 solo.
-  T("11. Dead deck stops; lone survivor refills to 10", ()=>{
+  // 11. Dead fighter's deck stops; the lone survivor refills only to the normal
+  //     per-fighter cap (no carry-over balloon, no inheriting the dead operative's cards).
+  T("11. Dead deck stops; lone survivor refills to normal cap", ()=>{
     const st = newMatch({seed:7, sideA:{name:'A',classes:['Soldier','Arcanist']},
                                  sideB:{name:'B',classes:['Warden','Scout']}});
     // both alive: each fighter tops up to 4 -> hand of up to 8
     topUpHands(st);
     const both = st.sides[0].fighters.map(f=>f.hand.length);
     assert(both[0]===4 && both[1]===4, `both-alive expected 4+4, got ${both}`);
-    // one dies: its deck stops (hand discarded, draws 0); survivor refills to 10
+    // one dies: its deck stops (hand discarded, draws 0); survivor stays at its own cap
     st.sides[0].fighters[1].alive=false; st.sides[0].fighters[1].hp=0;
     topUpHands(st);
     const survivor = st.sides[0].fighters[0].hand.length, dead = st.sides[0].fighters[1].hand.length;
     assert(dead===0, `dead fighter's deck must stop drawing, got ${dead}`);
-    assert(survivor===10, `lone survivor should refill to 10, got ${survivor}`);
+    assert(survivor===HAND_CAP_SOLO, `lone survivor should refill to its cap (${HAND_CAP_SOLO}), got ${survivor}`);
     return `pair=${both} → survivor=${survivor}, dead=${dead}`;
   });
   // 12. Round-5 tiebreak: MOST ENEMY KILLS first, then total HP, then draw.
@@ -3662,7 +3647,9 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     // `gi` walks the flat `hand` order (groups preserve fighter order), so the
     // data-hand indices stay aligned with the wiring below.
     let gi = 0;
-    const traySecs = side.fighters.map(f=>{
+    // only living operatives get a hand section — a lone survivor's hand then
+    // centers across the full width instead of sitting in its half.
+    const traySecs = side.fighters.filter(f=>f.alive).map(f=>{
       const g = groups.find(gr=>gr.owner===f);     // undefined if this operative has no cards in hand
       let cardsHTML='';
       if(g){
