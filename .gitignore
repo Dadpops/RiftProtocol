@@ -10,6 +10,9 @@ _*.mjs
 _*.out
 *.b64
 
+# unused art masters / packs moved aside (kept locally, not shipped)
+_unused_assets/
+
 # os
 .DS_Store
 Thumbs.db

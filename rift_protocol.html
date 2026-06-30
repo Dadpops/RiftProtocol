@@ -11,25 +11,46 @@
     --bg:#15140f; --panel:#22211b; --panel2:#2c2c24; --ink:#ece7d8; --muted:#9c9684;
     --line:#3a392f; --accent:#d8a657; --good:#7fae5e; --bad:#d06b56; --pierce:#c77dff;
     --t1:#5e9bd6; --t2:#5ec8c0; --t3:#d8a657; --t4:#d06b56;
-    --energy:#6fdc5a;   /* energy is green to set it apart from the gold UI */
+    --energy:#6fd6c8;   /* energy accent = teal, matching the active-energy token art */
+    --font-display:'Asimovian','Segoe UI',system-ui,sans-serif;
+    --font-body:'Barlow Condensed','Segoe UI',system-ui,sans-serif;
   }
+  /* ---- custom fonts (TTF in artassets/fonts) ---- */
+  @font-face{font-family:'Asimovian';src:url("artassets/fonts/Asimovian/Asimovian-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:'Barlow Condensed';src:url("artassets/fonts/Barlow_Condensed/BarlowCondensed-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:'Barlow Condensed';src:url("artassets/fonts/Barlow_Condensed/BarlowCondensed-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
   *{box-sizing:border-box}
-  /* energy pip glyph — replaces the lightning bolt everywhere energy is shown */
-  .ecirc{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--energy);
-    border:1px solid color-mix(in srgb,var(--energy) 60%,#000);box-shadow:0 0 4px var(--energy);
-    vertical-align:-1px;flex:0 0 auto}
-  .ecirc.lg{width:13px;height:13px;vertical-align:-2px}
+  /* energy glyph — the active-energy token art, shown everywhere energy appears
+     (card costs, HUD readout, How-to-Play). Sized small; scales on mobile. */
+  .ecirc{display:inline-block;width:clamp(11px,3vw,13px);height:clamp(11px,3vw,13px);
+    background:url("artassets/uiUpdate1/opt/gf_energy_active.png") center/contain no-repeat;
+    vertical-align:-2px;flex:0 0 auto}
   html,body{margin:0;height:100%}
-  body{background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,sans-serif;}
+  body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--font-body);}
+  /* ---- font roles (family swap only; sizes/colours unchanged) ----
+     display = Asimovian on names, labels, round, buttons, headers, titles;
+     body = Barlow Condensed on descriptions, stats, helper text, general body. */
+  h1,h2,h3,h4,.title,.end-title,.help-credit-title,
+  button,.menu-item,.mp-btn,.mp-startbtn,.fb-send,.mp-copy,
+  .round-badge,
+  .pn,.dv-name,.dv-prev-name,.catname,
+  .cname,.tray-label,.slot-name,.end-op-name,.classpill,.arena-side .label,
+  .ap-h,.rail-label,.dv-head,.staging-label,.help-tab,.menu-tab,
+  .esc-card .esc-name,.lore-tab{font-family:var(--font-display)}
   #app{max-width:1080px;margin:0 auto;padding:16px;}
   h1{font-size:30px;letter-spacing:1px;margin:.2em 0;color:var(--accent)}
   h2{font-size:20px;margin:.6em 0 .3em}
   .sub{color:var(--muted);margin:0 0 16px}
-  button{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);
-    border-radius:8px;padding:9px 14px;cursor:pointer}
-  button:hover:not(:disabled){border-color:var(--accent)}
+  /* All buttons share the ornate metal frame art (border-image). The center is
+     the button's own background colour; primary buttons get a warm accent tint.
+     Icon/round/close buttons opt out via .btn-plain (see UI-art section). */
+  button{font:inherit;color:var(--ink);background:rgba(16,14,9,.55);
+    border:10px solid transparent;border-radius:0;padding:5px 14px;cursor:pointer;
+    border-image:url("artassets/uiUpdate1/opt/gf_btn_confirm.png") 19% 9% stretch}
+  button:hover:not(:disabled){border-color:transparent;color:var(--accent);background:rgba(36,29,15,.62)}
   button:disabled{opacity:.4;cursor:not-allowed}
-  button.primary{background:var(--accent);color:#1c1a12;border-color:var(--accent);font-weight:700}
+  button.primary{background:color-mix(in srgb,var(--accent) 26%,#0a0a08);color:#f3e6c8;font-weight:800}
+  button.primary:hover:not(:disabled){background:color-mix(in srgb,var(--accent) 40%,#0a0a08);color:#fff}
   .row{display:flex;gap:10px;flex-wrap:wrap}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .hidden{display:none !important}
@@ -99,22 +120,22 @@
   .cardart-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .cardart .artph{font-size:9px;letter-spacing:1px;color:rgba(255,255,255,.5);text-transform:uppercase}
   /* energy cost badge — top-left corner over the card art */
-  .cardart .cost-badge{position:absolute;top:4px;left:4px;z-index:2;font-size:12px;font-weight:800;
+  .cardart .cost-badge{position:absolute;top:4px;left:4px;z-index:2;font-size:13.5px;font-weight:800;
     padding:1px 7px;border-radius:10px;color:var(--energy);background:rgba(8,8,6,.85);
     border:1px solid color-mix(in srgb,var(--energy) 45%,#000);box-shadow:0 1px 5px rgba(0,0,0,.6)}
   .catcard-art{height:58px;margin:6px -11px;border-top:1px solid var(--line)}
   .pcard .ph{display:flex;justify-content:space-between;align-items:center;gap:6px}
-  .pcard .pn{font-weight:700;font-size:13px;line-height:1.2}
+  .pcard .pn{font-weight:700;font-size:15px;line-height:1.2}
   /* energy cost pill — black bg + green so it reads over any card art (tier is shown by the T# badge) */
-  .cost{font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;color:var(--energy);
+  .cost{font-size:13px;font-weight:700;padding:1px 7px;border-radius:10px;color:var(--energy);
     background:rgba(8,8,6,.85);border:1px solid color-mix(in srgb,var(--energy) 45%,#000);
     display:inline-flex;align-items:center;gap:3px;line-height:1.5}
   /* type/tier/symbol footer pinned to the bottom of the card */
-  .pcard .pt{font-size:11px;color:var(--muted);margin-top:auto;padding:5px 0;display:flex;align-items:center;gap:5px;border-top:1px solid var(--line)}
-  .pcard .pe{font-size:12px;color:var(--ink);margin-top:4px}
-  .pcard .phint{font-size:11px;color:var(--good);margin-top:4px}
-  .pcard .pf{font-size:11px;color:var(--muted);font-style:italic;margin-top:4px}
-  .spd{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;color:#11100b}
+  .pcard .pt{font-size:13px;color:var(--muted);margin-top:auto;padding:5px 0;display:flex;align-items:center;gap:5px;border-top:1px solid var(--line)}
+  .pcard .pe{font-size:14px;color:var(--ink);margin-top:4px}
+  .pcard .phint{font-size:13px;color:var(--good);margin-top:4px}
+  .pcard .pf{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:4px}
+  .spd{font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:4px;color:#11100b}
   .spd.t1{background:var(--t1)} .spd.t2{background:var(--t2)} .spd.t3{background:var(--t3)} .spd.t4{background:var(--t4)}
   .classpill{font-size:10px;color:var(--muted)}
 
@@ -175,7 +196,7 @@
   .team-slot .slot-x{position:absolute;top:5px;right:7px;color:var(--bad);font-weight:800;font-size:13px}
 
   /* ============ NO-SCROLL BATTLE FRAME ============ */
-  #battle{position:fixed;inset:0;height:100dvh;display:grid;gap:8px;padding:8px;box-sizing:border-box;overflow:hidden;
+  #battle{position:fixed;inset:0;height:100dvh;display:grid;gap:8px;padding:8px 8px clamp(20px,4.5vh,54px);box-sizing:border-box;overflow:hidden;
     grid-template-columns:minmax(0,1fr);   /* full-width arena, no side rail */
     grid-template-rows:auto minmax(0,1fr) auto minmax(0,1fr) auto;   /* top · enemy half · controls(middle) · hand half · your team */
     background:radial-gradient(120% 90% at 50% 0%, #20201a, #100f0b)}
@@ -185,23 +206,16 @@
   /* centered control cluster (energy → round → confirm/undo) sitting above the hands */
   .bf-controls{grid-column:1 / -1;grid-row:3;display:flex;justify-content:center;align-items:center;min-height:0;
     position:relative;z-index:12}   /* always above the staging row so Confirm/Undo stay clickable */
-  .ctrl-cluster{display:flex;align-items:center;gap:18px;background:rgba(18,17,13,.82);border:1px solid var(--line);
-    border-radius:14px;padding:8px 18px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  .ctrl-cluster{display:flex;align-items:center;justify-content:space-between;gap:clamp(74px,13vw,140px);
+    width:min(620px,94vw);background:rgba(18,17,13,.82);border:1px solid var(--line);
+    border-radius:14px;padding:8px 20px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
   .ctrl-cluster .energy-box{flex-direction:row;align-items:center;gap:8px}
   .ctrl-cluster .energy-box .tip{margin:0}
-  .round-inline{font-size:15px;font-weight:800;letter-spacing:.5px;color:var(--accent);
-    border:1px solid var(--accent);border-radius:20px;padding:5px 16px;background:rgba(12,11,8,.5);white-space:nowrap}
   .ctrl-buttons{display:flex;gap:10px}
-  .ctrl-buttons .ctrlbtn{width:auto;min-width:104px}
-  .skip-btn{width:auto;min-width:120px}
-  /* Confirm = green (commit to battle), Undo = red */
-  .confirm-btn{background:var(--good);color:#0d1408;border-color:var(--good);font-weight:800}
-  .confirm-btn:hover:not(:disabled){border-color:#eafbe0;background:color-mix(in srgb,var(--good) 88%,#fff)}
-  .confirm-btn .cb-sword{font-size:14px;vertical-align:-1px}
-  .undo-btn{background:transparent;color:var(--bad);border-color:var(--bad);font-weight:700}
-  .undo-btn:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 20%,transparent);border-color:var(--bad)}
-  .quit-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:12px;padding:6px 12px}
-  .quit-btn:hover{border-color:var(--bad);color:var(--bad)}
+  .ctrl-buttons .ctrlbtn{width:auto;min-width:108px;font-size:16px}
+  .skip-btn{width:auto;min-width:120px;font-size:16px}
+  /* Confirm/Undo colours + frame art are defined in the UI-art section below. */
+  .quit-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:12px}
   /* staging area — clicked cards wait in the middle of the arena */
   .arena-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0;overflow:hidden;z-index:6}
   .staging{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-height:0}
@@ -253,17 +267,13 @@
   /* your team: full-width row pinned to the bottom; decks tuck into the bottom-left corner */
   .bf-you{grid-column:1 / -1;grid-row:5;position:relative;display:flex;justify-content:center;align-items:flex-end}
   .deck-corner{position:absolute;left:4px;bottom:2px;z-index:5;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
-  .deck-corner .deck-rail{justify-content:flex-start;gap:8px}
-  .deck-corner .deck-back{width:46px;height:66px}
-  .deck-corner .deck-count{font-size:9.5px}
+  .deck-corner .deck-rail{justify-content:flex-start;gap:10px}
+  .deck-corner .rail-label{font-size:12px}
+  .deck-corner .deck-back{width:68px;height:96px}
+  .deck-corner .deck-count{font-size:12px}
   .arena-slot{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:center}
   /* top bar: round counter (and turn hint) across the top of the screen */
-  .round-pill{font-size:14px;font-weight:800;letter-spacing:.5px;color:var(--accent);
-    border:1px solid var(--accent);border-radius:20px;padding:5px 16px;background:rgba(12,11,8,.5)}
-  .top-hint{font-size:12.5px;color:var(--ink)}
-  .sidepanel{background:rgba(18,17,13,.82);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-  .sidepanel h3{margin:0 0 6px;font-size:13px;color:var(--accent);letter-spacing:.5px;text-transform:uppercase}
-  .sidepanel .tip{font-size:11.5px;color:var(--muted);line-height:1.45;margin:0 0 6px}
+  .top-hint{font-size:14.5px;color:var(--ink)}
 
   .arena-side{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0}
   .arena-side .label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
@@ -272,18 +282,20 @@
   .enemy-side{margin:0 auto}
   .enemy-side .pair{max-width:760px;gap:20px}
   .enemy-side .label{font-size:12px}
-  .enemy-side .cfighter{padding:13px 16px;gap:13px}
-  .enemy-side .cfighter .cport{width:104px;height:104px;flex:0 0 104px;min-width:104px;min-height:104px}
-  .enemy-side .cfighter .cname{font-size:17px}
-  .enemy-side .cfighter .ctag{font-size:11px;padding:1px 6px}
+  .enemy-side .cfighter{padding:9px 12px;gap:14px}
+  .enemy-side .cfighter .cport{width:134px;height:134px;flex:0 0 134px;min-width:134px;min-height:134px}
+  .enemy-side .cfighter .cname{font-size:19.5px}
+  .enemy-side .cfighter .ctag{font-size:12.5px;padding:1px 6px}
   /* the operative rows never participate in the battle-log's reflow: lock their size
      so the end-of-turn log (its own grid row) can't compress portraits. Size stays
      viewport-driven only. */
   .bf-center,.bf-you{flex-shrink:0}
   /* fighter card (larger, to balance the deck backs) */
-  .cfighter{position:relative;display:flex;gap:11px;align-items:center;padding:10px 13px;border-radius:11px;
-    background:rgba(20,19,15,.82);border:1px solid var(--line);border-top:3px solid var(--cls,var(--accent));
-    box-shadow:0 6px 14px rgba(0,0,0,.35)}
+  /* operative display: subtle original backdrop (just enough separation from the
+     arena — no decorative panel graphic). */
+  .cfighter{position:relative;display:flex;gap:12px;align-items:center;padding:9px 12px;border-radius:11px;
+    background:rgba(20,19,15,.72);border:1px solid var(--line);border-top:3px solid var(--cls,var(--accent));
+    box-shadow:0 5px 13px rgba(0,0,0,.32)}
   .cfighter.dead{opacity:.4;filter:grayscale(.7)}
   /* valid targets pulse — color-coded: enemies red, allies green */
   .cfighter.targetable{cursor:pointer;border-color:var(--tgl,var(--accent));z-index:3;
@@ -296,19 +308,19 @@
   .cfighter.seltarget{box-shadow:0 0 0 2px var(--accent) inset}
   /* during target selection, fade fighters that can't be chosen */
   #battle.targeting .cfighter:not(.targetable){opacity:.35}
-  .cfighter .cport{width:80px;height:80px;flex:0 0 80px;flex-shrink:0;min-width:80px;min-height:80px;border-radius:9px;overflow:hidden;position:relative;
-    background:linear-gradient(150deg, color-mix(in srgb, var(--cls) 55%, #1b1a14), #14130f)}
+  .cfighter .cport{width:118px;height:118px;flex:0 0 118px;flex-shrink:0;min-width:118px;min-height:118px;border-radius:9px;overflow:hidden;position:relative;
+    background:linear-gradient(150deg, color-mix(in srgb, var(--cls) 55%, #1b1a14), #14130f)}   /* original portrait backdrop */
   .cfighter .cport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .cfighter .cport.enemyart img{transform:scaleX(-1);filter:saturate(.85) brightness(.92)}
   .cfighter .cport .ph{display:none}
   .cfighter .cmeta{flex:1;min-width:0}
-  .cfighter .cname{font-weight:700;font-size:15px;display:flex;justify-content:space-between;gap:6px}
-  .cfighter .chpwrap{display:flex;align-items:center;gap:6px;margin:5px 0}
-  .chpbar{flex:1;height:8px;background:#000;border-radius:4px;overflow:hidden}
+  .cfighter .cname{font-weight:700;font-size:19px;display:flex;justify-content:space-between;gap:6px}
+  .cfighter .chpwrap{display:flex;align-items:center;gap:7px;margin:7px 0}
+  .chpbar{flex:1;height:12px;background:#000;border-radius:6px;overflow:hidden}
   .chpfill{height:100%;background:linear-gradient(90deg,var(--good),var(--accent));transition:width .42s ease}
-  .chpnum{font-size:12px;color:var(--muted);min-width:44px;text-align:right}
-  .ctags{display:flex;gap:3px;flex-wrap:wrap}
-  .ctag{font-size:9.5px;padding:0 4px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);line-height:1.5}
+  .chpnum{font-size:15px;color:var(--muted);min-width:50px;text-align:right}
+  .ctags{display:flex;gap:4px;flex-wrap:wrap}
+  .ctag{font-size:12.5px;padding:1px 6px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);line-height:1.5}
   .ctag.block{color:var(--t1);border-color:var(--t1)} .ctag.buff{color:var(--good);border-color:var(--good)}
   .ctag.debuff{color:var(--bad);border-color:var(--bad)} .ctag.equip{color:var(--accent);border-color:var(--accent)}
   .floatlayer{position:absolute;inset:0;pointer-events:none;overflow:visible}
@@ -389,12 +401,10 @@
   .intro-video{width:100%;height:100%;object-fit:cover}
   .intro-skip{position:absolute;right:18px;bottom:18px;z-index:81}
 
-  /* right-margin controls */
-  .energy-box{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-  .energy-box .big{font-size:16px;font-weight:800;color:var(--energy);display:inline-flex;align-items:center;gap:5px}
-  .energy-box .pips{display:flex;gap:4px}
-  .energy-box .pips i{width:11px;height:11px;border-radius:50%;background:#000;border:1px solid var(--line)}
-  .energy-box .pips i.on{background:var(--energy);border-color:var(--energy);box-shadow:0 0 5px var(--energy)}
+  /* right-margin controls — energy is plain teal text now (no pip/token icons) */
+  .energy-box{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+  .energy-box .big{font-size:21px;font-weight:800;color:var(--energy);white-space:nowrap}
+  .energy-box .big .enext{font-size:13px;font-weight:600;color:var(--muted)}
   .ctrlbtn{width:100%}
 
   /* ============ HAND (fan + hover focus) — now in the arena, above your team ============ */
@@ -405,13 +415,13 @@
      pile on top of each other on smaller screens */
   .hand-fan{flex:1;display:flex;justify-content:center;align-items:flex-end;gap:clamp(14px,2.6vw,38px);padding:6px 18px 2px;min-height:0}
   .hand-group{display:flex;align-items:flex-end;min-width:0;justify-content:center}
-  .hand-fan .pcard{width:clamp(124px,12.5vw,172px);flex:0 0 auto;margin-left:clamp(-30px,-1.4vw,-12px);
-    height:clamp(184px,30vh,262px);cursor:pointer;
+  .hand-fan .pcard{width:clamp(124px,12.5vw,172px);flex:0 0 auto;margin-left:clamp(-62px,-3.6vw,-30px);
+    height:auto;cursor:pointer;
     transition:transform .16s ease, margin .16s ease, opacity .16s ease;transform-origin:bottom center}
   .hand-group .pcard:first-child{margin-left:0}
-  .hand-fan:hover .pcard{opacity:.82}
-  .hand-fan .pcard:hover{opacity:1;transform:translateY(-16px) scale(1.07);z-index:6;margin-right:18px}
-  .hand-group:has(.pcard:hover) .pcard:hover ~ .pcard{transform:translateX(20px)}
+  .hand-fan:hover .pcard{opacity:.8}
+  .hand-fan .pcard:hover{opacity:1;transform:translateY(-22px) scale(1.12);z-index:6;margin-left:20px;margin-right:34px}
+  .hand-group:has(.pcard:hover) .pcard:hover ~ .pcard{transform:translateX(40px)}
   @media (max-width:900px){ .hand-fan .pcard{width:clamp(92px,12vw,120px)} }
   .pcard.cantafford,.pcard.illegal{opacity:.4 !important;cursor:not-allowed}
   /* queued: the card stays visible, lifts, brightens, and gets a ✓ badge */
@@ -481,7 +491,9 @@
   .acc-body .k{color:var(--ink);font-weight:700}
 
   /* ============ MAIN MENU NAV + DEV CREDIT ============ */
+  #menu .menu-deck-row{display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:22px}
   #menu .menu-nav{display:flex;flex-direction:column;gap:10px;max-width:300px}
+  @media(max-width:640px){ #menu .menu-deck-row{flex-direction:column;align-items:center} }
   .menu-item{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;
     padding:13px 18px;border-radius:11px;background:rgba(20,19,14,.78);
     border:1px solid var(--line);text-align:left;backdrop-filter:blur(2px)}
@@ -489,8 +501,9 @@
   .menu-item:hover{border-color:var(--accent);transform:translateX(3px);transition:transform .12s}
   .menu-item.primary{background:var(--accent);color:#1c1a12}
   .menu-item.primary .mi-ico{color:#1c1a12}
-  #menu .fight-sub{margin-top:12px;max-width:340px;background:rgba(14,13,9,.82);
+  #menu .fight-sub{margin-top:0;width:300px;max-width:340px;text-align:left;background:rgba(14,13,9,.82);
     border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  @media(max-width:640px){ #menu .fight-sub{margin-top:12px} }
   #menu .fight-sub .fs-h{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
   #menu .fight-sub .row{flex-direction:column;gap:8px}
   #menu .fight-sub button{width:100%;text-align:left;line-height:1.25}
@@ -551,42 +564,43 @@
     background:var(--panel);border:1px solid var(--line);color:var(--muted);cursor:pointer}
   .lore-tab:hover{border-color:var(--accent);color:var(--ink)}
   .lore-tab.active{background:var(--accent);color:#1c1a12;border-color:var(--accent)}
-  .lore-body{max-width:880px}
-  .lore-body>p{font-size:14px;line-height:1.6;color:var(--ink);max-width:680px}
-  .lore-body .sub{color:var(--muted)}
-  .lore-stub{color:var(--muted);font-size:13px}
-  .lore-tbd{color:var(--accent);font-style:italic;opacity:.85}
-  .lore-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px}
-  .lore-card{border:1px solid var(--line);border-left:4px solid var(--cls,var(--accent));border-radius:10px;
-    background:var(--panel);padding:11px 13px}
-  .lore-card-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
-  .lore-card-h b{font-size:16px;color:var(--cls,var(--accent))}
-  .lore-role{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-  .lore-origin{font-size:13px;color:var(--ink);margin:2px 0 6px;line-height:1.45}
-  .lore-card .lore-stub{margin:0;line-height:1.45}
-  .lore-note{max-width:680px;margin-top:14px;border-left:3px solid var(--accent);background:rgba(216,166,87,.08);
-    padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.55;color:var(--ink)}
+  /* lore content sits in a translucent panel over the menu background, larger text */
+  .lore-body{max-width:900px;margin:0 auto;background:rgba(10,9,7,.6);border:1px solid var(--line);
+    border-radius:14px;padding:18px 24px;text-align:left}
+  .lore-body>p{font-size:18px;line-height:1.65;color:var(--ink);max-width:780px;margin:0 0 14px}
+  .lore-body .sub{color:var(--muted);font-size:16px}
+  /* clickable image tiles (operatives / warp zones) → open a modal */
+  .lore-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:14px}
+  .lore-tile{position:relative;height:158px;border-radius:12px;overflow:hidden;cursor:pointer;padding:0;
+    background-size:cover;background-position:center;color:#fff;text-align:left;
+    border:1px solid color-mix(in srgb,var(--cls) 45%,var(--line));border-image:none;
+    display:flex;align-items:flex-end;transition:transform .12s}
+  .lore-tile:hover{border-color:var(--cls,var(--accent));box-shadow:0 8px 22px rgba(0,0,0,.55);transform:translateY(-3px)}
+  .lore-tile .lt-text{width:100%;padding:10px 13px;display:flex;flex-direction:column;gap:2px}
+  .lore-tile .lt-text b{font-size:20px;text-shadow:0 1px 4px #000}
+  .lore-tile .lt-role{font-size:12.5px;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.4px}
+  /* lore detail modal */
+  .lore-modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(6,5,3,.8);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}
+  .lore-modal{width:min(680px,94vw);max-height:90vh;overflow-y:auto;position:relative;text-align:left;
+    background:rgba(12,11,8,.98);border:1px solid var(--accent);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.72)}
+  .lore-modal .lm-close{position:absolute;top:10px;right:10px;z-index:2;width:36px;height:36px;border-radius:50%;
+    border-image:none;border:1px solid var(--line);background:rgba(8,8,6,.8);color:var(--ink);font-size:15px;padding:0}
+  .lore-modal .lm-close:hover{border-color:var(--bad);color:var(--bad)}
+  .lore-modal .lm-hero{height:230px;overflow:hidden;position:relative;border-bottom:2px solid var(--cls,var(--accent));background:#14130f}
+  .lore-modal .lm-hero img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
+  .lore-modal .lm-hero-wide img{object-position:center}
+  .lore-modal .lm-body{padding:18px 26px 26px;font-size:18px;line-height:1.66;color:var(--ink)}
+  .lore-modal .lm-body h2{font-size:30px;margin:0 0 2px;letter-spacing:.5px}
+  .lore-modal .lm-role{font-size:14px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:12px}
+  .lore-modal .lm-meta{font-size:14.5px;color:var(--muted);margin:0 0 14px}
+  .lore-modal .lm-body p{margin:0 0 14px}
+  @media(max-width:600px){ .lore-modal .lm-hero{height:170px} .lore-modal .lm-body{font-size:16px} .lore-modal .lm-body h2{font-size:24px} }
+  /* lore detail-modal meta line (used by the operative/zone modals) */
+  .lore-note{max-width:780px;margin-top:14px;border-left:3px solid var(--accent);background:rgba(216,166,87,.1);
+    padding:13px 18px;border-radius:0 8px 8px 0;font-size:16.5px;line-height:1.6;color:var(--ink)}
   .lore-note b{color:var(--accent)}
-  .lore-meta{font-size:12px;color:var(--muted);margin:0 0 6px}
   .lore-k{text-transform:uppercase;letter-spacing:.4px;color:var(--cls,var(--accent));font-weight:700;margin-right:4px}
   .lore-dot{margin:0 7px;opacity:.5}
-  .lore-back{font-size:12.5px;color:var(--muted);font-style:italic;margin:0;line-height:1.5}
-  /* operative portrait header in the Lore › Operatives cards */
-  .lore-card .op-head{display:flex;gap:12px;align-items:center;margin-bottom:8px}
-  .lore-card .op-port{width:62px;height:62px;flex:0 0 62px;border-radius:8px;overflow:hidden;position:relative;
-    border:1px solid color-mix(in srgb, var(--cls) 45%, var(--line));
-    background:linear-gradient(150deg, color-mix(in srgb, var(--cls) 55%, #1b1a14), #14130f)}
-  .lore-card .op-port img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .lore-card .op-head-text{min-width:0}
-  .lore-card .op-head-text b{display:block;font-size:16px;color:var(--cls,var(--accent))}
-  .lore-card .op-head-text .lore-role{display:block;margin-top:2px}
-  /* Warp Zone cards — background banner + report */
-  .warp-grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
-  .warp-card{padding:0;overflow:hidden}
-  .warp-bg{position:relative;height:118px;background:linear-gradient(150deg, color-mix(in srgb, var(--cls) 40%, #14130f), #100f0b)}
-  .warp-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .warp-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,12,9,.1), rgba(13,12,9,.85))}
-  .warp-body{padding:10px 14px 13px}
   /* Operative dossier — roster card mini-fields + detail backstory */
   .dossier-mini{margin:6px 0;display:flex;flex-direction:column;gap:3px}
   .dossier-mini .dm-row{display:flex;gap:7px;align-items:baseline;font-size:12px}
@@ -596,15 +610,19 @@
   /* Warp Zone selector on class-select */
   .map-select{margin:14px 0 4px}
   .map-select .ms-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:7px;text-align:center}
-  .map-select .ms-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-  .ms-chip{font-size:13px;font-weight:700;padding:7px 14px;border-radius:18px;cursor:pointer;
+  .map-select .ms-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:760px;margin:0 auto}
+  .ms-chip{font-size:13px;font-weight:700;padding:7px 14px;border-radius:10px;cursor:pointer;
     background:var(--panel);border:1px solid var(--line);color:var(--muted)}
   .ms-chip:hover{border-color:var(--cls,var(--accent));color:var(--ink)}
-  .ms-chip.sel{background:var(--cls,var(--accent));color:#1c1a12;border-color:var(--cls,var(--accent))}
+  .ms-chip.sel{border-color:var(--cls,var(--accent));box-shadow:0 0 0 2px var(--cls,var(--accent))}
+  /* map picker: image thumbnails with the warp-zone art + name overlay */
+  .ms-chip.ms-img{position:relative;width:128px;height:74px;padding:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;
+    background-size:cover;background-position:center;color:#fff}
+  .ms-chip.ms-img .ms-name{font-size:12.5px;font-weight:800;padding:4px 6px;text-shadow:0 1px 4px #000;text-align:center;width:100%}
+  .ms-chip.ms-rand{width:128px;height:74px;display:flex;align-items:center;justify-content:center}
+  .ms-chip.ms-img.sel{color:#fff}
+  @media(max-width:600px){ .ms-chip.ms-img,.ms-chip.ms-rand{width:104px;height:60px} }
 
-  /* Lock in / Undo, centered in the arena beneath the staged abilities */
-  .mid-controls{display:flex;gap:10px;justify-content:center;margin-top:10px}
-  .mid-controls .ctrlbtn{width:auto;min-width:120px}
   /* centered continue prompt in the middle of the battlefield after combat */
   .cont-center{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
   .cont-center .cont-btn{font-size:16px;padding:11px 30px}
@@ -612,17 +630,27 @@
   .card-preview{position:fixed;z-index:95;width:232px;pointer-events:none;display:none;
     filter:drop-shadow(0 12px 28px rgba(0,0,0,.7))}
   .card-preview .catcard{margin:0;background:var(--panel)}
-  /* big, easy-to-read hand-card popup pinned to the open bottom-right corner */
-  .hand-preview{position:fixed;right:16px;bottom:16px;z-index:95;width:clamp(240px,22vw,320px);
-    pointer-events:none;display:none;filter:drop-shadow(0 14px 32px rgba(0,0,0,.75))}
+  /* big, easy-to-read card popup over the MIDDLE/HUD area (energy/confirm/round) —
+     never covers the hand. Triggered by hover (desktop) or press-and-hold (mobile) */
+  .hand-preview{position:fixed;bottom:50vh;left:50%;transform:translateX(-50%);z-index:95;width:clamp(280px,28vw,380px);
+    pointer-events:none;display:none;filter:drop-shadow(0 14px 32px rgba(0,0,0,.85))}
   .hand-preview .catcard{margin:0;background:var(--panel);border-width:2px}
-  .hand-preview .catcard .pn{font-size:16px}
-  .hand-preview .catcard .pe{font-size:14px;line-height:1.5}
-  .hand-preview .catcard .cardart{height:84px}
-  .hand-preview .catcard .pf{font-size:12.5px}
+  .hand-preview .catcard .pn{font-size:21px}
+  .hand-preview .catcard .cost{font-size:15px}
+  .hand-preview .catcard .pe{font-size:16px;line-height:1.55}
+  .hand-preview .catcard .phint{font-size:14.5px;line-height:1.5}
+  .hand-preview .catcard .pt{font-size:14px}
+  .hand-preview .catcard .cardart{height:104px}
+  .hand-preview .catcard .pf{font-size:13.5px}
 
   /* centered content screens (Rift Cards / How to Play / Lore) */
   .cscreen{display:flex;flex-direction:column;align-items:center;text-align:center}
+  /* full-bleed screen backdrops (behind the centered content) */
+  .screen-bg-menu,.screen-bg-mp{position:relative}
+  .screen-bg-menu::before{content:"";position:fixed;inset:0;z-index:-1;
+    background:linear-gradient(rgba(13,12,9,.62),rgba(13,12,9,.9)), url("artassets/Backgrounds/gf_menu_bg.jpg") center/cover no-repeat}
+  .screen-bg-mp::before{content:"";position:fixed;inset:0;z-index:-1;
+    background:linear-gradient(rgba(10,9,14,.6),rgba(10,9,14,.82)), url("artassets/Backgrounds/gf_bg_multiplayer_v1.jpg") center/cover no-repeat}
   .cscreen>*{width:100%}
   .cscreen .bar{justify-content:center;position:relative}
   .cscreen .bar h1{margin:0}
@@ -633,7 +661,7 @@
     background:rgba(12,11,8,.72);border:1px solid var(--line);border-radius:9px;color:var(--ink);backdrop-filter:blur(2px)}
   .audio-toggle:hover{border-color:var(--accent);color:var(--accent)}
   /* mini volume popout (Music + Effects sliders) */
-  .audio-pop{position:fixed;top:50px;right:12px;z-index:201;width:182px;padding:11px 13px;
+  .audio-pop{position:fixed;top:50px;right:12px;z-index:201;width:212px;padding:11px 13px;
     background:rgba(14,13,9,.95);border:1px solid var(--line);border-radius:11px;backdrop-filter:blur(3px);
     box-shadow:0 10px 28px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:9px}
   .audio-pop.hidden{display:none}
@@ -641,6 +669,9 @@
   .audio-pop .ap-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--ink)}
   .audio-pop .ap-row span{flex:0 0 52px}
   .audio-pop input[type=range]{flex:1;min-width:0;accent-color:var(--accent);cursor:pointer}
+  .audio-pop .ap-sel{flex:1;min-width:0;background:var(--bg);color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;padding:3px 5px;font-size:11.5px;font-family:inherit;cursor:pointer}
+  .audio-pop .ap-sel:focus{outline:none;border-color:var(--accent)}
   .audio-pop .ap-mute{width:100%;font-size:12px;padding:5px;border-radius:7px;cursor:pointer;
     background:var(--panel);border:1px solid var(--line);color:var(--ink)}
   .audio-pop .ap-mute:hover{border-color:var(--accent);color:var(--accent)}
@@ -707,7 +738,11 @@
   .esc-prev-op .nm{font-size:13px;font-weight:700;margin-top:6px;color:var(--cls,var(--ink))}
   .esc-final-flag{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--bad);font-weight:800;margin-top:4px}
   /* ---- Multiplayer (online) ---- */
-  .mp-wrap{max-width:760px;margin:0 auto}
+  .mp-wrap{max-width:760px;margin:0 auto;position:relative}
+  /* full-bleed lobby backdrop (sits behind the centered MP content) */
+  .mp-wrap::before{content:"";position:fixed;inset:0;z-index:-1;
+    background:linear-gradient(rgba(10,9,14,.66),rgba(10,9,14,.84)),
+      url("artassets/Backgrounds/gf_bg_multiplayer_v1.jpg") center/cover no-repeat}
   .mp-entry{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:18px}
   .mp-entry .mp-btn{min-width:240px;font-size:16px;padding:14px 18px}
   .mp-reclog{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink);margin-top:6px;cursor:pointer}
@@ -869,6 +904,9 @@
   .card-tray .pcard{background:color-mix(in srgb, var(--cls) 10%, #14130f);border-color:color-mix(in srgb, var(--cls) 35%, transparent)}
   .card-tray .pcard .cost-badge{background:rgba(8,8,6,.85);color:var(--energy)}
   .card-tray .pcard .pn{color:color-mix(in srgb, var(--cls) 70%, #ffffff)}
+  /* tray cards show what the ability does (rules text), but the combo/tip hint and
+     flavor are hover-only (they appear in the popup) */
+  .card-tray .pcard .phint,.card-tray .pcard .pf{display:none}
   /* mobile: each section scrolls its cards horizontally if they overflow */
   @media(max-width:760px){ .card-tray .hand-fan{overflow-x:auto;justify-content:flex-start} }
 
@@ -880,44 +918,48 @@
   @media (max-width:600px){
     /* fighter cards: let the 2-col grid shrink below content + smaller portraits */
     .pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;max-width:100%}
-    .cfighter{min-width:0;padding:7px 8px;gap:7px;border-radius:9px}
-    .cfighter .cport{width:48px;height:48px;flex:0 0 48px;min-width:48px;min-height:48px}
-    .cfighter .cname{font-size:12px}
-    .cfighter .chpwrap{margin:3px 0;gap:4px}
-    .chpnum{font-size:9.5px;min-width:32px}
-    .ctags{gap:2px}
-    .ctag{font-size:8px;padding:0 3px;line-height:1.45}
+    .cfighter{min-width:0;padding:7px 8px;gap:8px;border-radius:9px}
+    .cfighter .cport{width:64px;height:64px;flex:0 0 64px;min-width:64px;min-height:64px}
+    .cfighter .cname{font-size:14px}
+    .cfighter .chpwrap{margin:4px 0;gap:5px}
+    .chpnum{font-size:11.5px;min-width:38px}
+    .ctags{gap:3px}
+    .ctag{font-size:10px;padding:0 4px;line-height:1.45}
     /* enemy team slightly larger than yours but still compact */
     .enemy-side{margin:0 auto}
     .enemy-side .pair{gap:8px;max-width:100%}
-    .enemy-side .cfighter .cport{width:54px;height:54px;flex:0 0 54px;min-width:54px;min-height:54px}
-    .enemy-side .cfighter .cname{font-size:12.5px}
-    .enemy-side .cfighter .ctag{font-size:8.5px;padding:0 3px}
+    .enemy-side .cfighter .cport{width:72px;height:72px;flex:0 0 72px;min-width:72px;min-height:72px}
+    .enemy-side .cfighter .cname{font-size:15px}
+    .enemy-side .cfighter .ctag{font-size:10.5px;padding:0 4px}
     .arena-side .label{font-size:9.5px}
     .bf-center{padding:2px 6px;gap:6px}
 
-    /* HUD cluster: wrap onto two lines, drop the "next round" hint to save width */
-    .ctrl-cluster{flex-wrap:wrap;justify-content:center;gap:6px 10px;padding:6px 10px;max-width:100%}
-    .ctrl-cluster .energy-box .tip{display:none}
-    .energy-box .big{font-size:14px}
-    .round-inline{font-size:12.5px;padding:4px 12px}
+    /* HUD: round badge on its own centered line ABOVE the energy+buttons row
+       (avoids overlap on a narrow screen while staying screen-centered) */
+    .bf-controls{flex-direction:column-reverse;gap:5px}
+    .round-badge{position:static;transform:none}
+    .ctrl-cluster{flex-wrap:nowrap;justify-content:center;gap:14px;padding:6px 10px;width:auto;max-width:100%}
+    .energy-box .big{font-size:18px}
+    .energy-box .big .enext{display:none}   /* hide "→ next round" on narrow screens */
     .ctrl-buttons{gap:8px}
-    .ctrl-buttons .ctrlbtn{min-width:90px;padding:9px 10px}
+    .ctrl-buttons .ctrlbtn{min-width:84px;padding:8px 10px}
 
     /* hand: one horizontal swipe-row holding BOTH operatives' cards */
     .card-tray{overflow-x:auto;justify-content:flex-start;padding:6px 8px;-webkit-overflow-scrolling:touch}
     .card-tray .hand-fan{overflow:visible}
     .tray-sec{flex:0 0 auto}
-    .hand-fan .pcard{width:104px;height:clamp(150px,24vh,176px);margin-left:-6px}
+    .hand-fan .pcard{width:118px;height:auto;margin-left:-6px}
     .hand-group .pcard:first-child{margin-left:0}
 
     /* decks: compact row tucked under the team (no longer overlapping it) */
     .bf-you{flex-direction:column-reverse;gap:4px;align-items:center}
-    .deck-corner{position:static;flex-direction:row;align-items:center;gap:10px}
+    /* decks stacked vertically (deck 1 on top, deck 2 below) — both visible, no swipe */
+    .deck-corner{position:static;flex-direction:column;align-items:flex-start;gap:4px}
     .deck-corner .rail-label{display:none}
-    .deck-corner .deck{flex-direction:row;gap:5px;align-items:center}
-    .deck-corner .deck-back{width:30px;height:42px}
-    .deck-corner .deck-count{font-size:9px}
+    .deck-corner .deck-rail{flex-direction:column;gap:6px}
+    .deck-corner .deck{flex-direction:row;gap:6px;align-items:center}
+    .deck-corner .deck-back{width:34px;height:48px}
+    .deck-corner .deck-count{font-size:10px}
 
     /* top bar: keep the hint clear of the Menu button */
     .top-hint{font-size:11px;max-width:62vw}
@@ -928,6 +970,80 @@
     .hand-fan .pcard{height:clamp(120px,20vh,150px)}
     .cfighter .cport{width:44px;height:44px;flex:0 0 44px;min-width:44px;min-height:44px}
   }
+
+  /* =========================================================================
+     RIFT PROTOCOL — UI ART OVERLAYS (artassets/uiUpdate1)
+     Frames/panels/buttons have FILLED centers, so they are applied as
+     border-image: the ornate ring frames the live content while the center
+     slice is dropped, so the underlying portrait/stats/label stay visible and
+     interactive. The tray panel, energy tokens and round badge use
+     background-image. Nothing is placed over an interactive target — art is
+     either a backdrop (behind content) or a border ring around the real
+     control. (gf_btn_undo was never exported → Undo reuses gf_btn_confirm;
+     gf_match_bg is intentionally skipped.)
+     ========================================================================= */
+
+  /* ---- Card tray: no panel behind the cards — they sit on the arena directly. ---- */
+  .card-tray{background:none;border-top:0}
+
+  /* ---- Operative portrait frame — kept ONLY on the browsing screens (character
+       select, escalations, RIFT cards, lore). The fight screen has no frame. ---- */
+  .classcard .cport,.team-slot .cport,.char-hero .cport,.esc-card .esc-port{
+    border-style:solid;border-color:transparent;border-radius:0;
+    border-image:url("artassets/uiUpdate1/opt/gf_portrait_frame.png") 13% stretch}
+  .classcard .cport{border-width:7px}
+  .team-slot .cport{border-width:9px}
+  .char-hero .cport{border-width:13px}
+  .esc-card .esc-port{border-width:6px}
+
+  /* round counter: plain white text styled like the energy number, no frame art;
+     absolutely pinned to the exact horizontal centre of the controls row */
+  .round-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:13;
+    display:flex;align-items:baseline;line-height:1;font-size:21px;font-weight:800;color:#fff;text-shadow:0 1px 4px #000}
+  .round-badge .rb-of{font-size:13px;font-weight:600;color:rgba(255,255,255,.7);margin-left:1px}
+
+  /* ---- Confirm / Undo: inherit the shared button frame; no green/red now.
+       Confirm keeps a subtle accent tint as the primary action. ---- */
+  .confirm-btn,.undo-btn{min-width:118px;max-width:210px}
+  .confirm-btn{background:color-mix(in srgb,var(--accent) 26%,#0a0a08);color:#f3e6c8}
+  .confirm-btn:hover:not(:disabled){background:color-mix(in srgb,var(--accent) 40%,#0a0a08);color:#fff}
+  .undo-btn{background:rgba(16,14,9,.5);color:var(--ink)}
+  .cb-sword{font-size:14px;vertical-align:-1px}
+
+  /* ---- Menu (quit) button uses the dedicated square menu-frame art ---- */
+  .quit-btn{border:9px solid transparent;border-radius:0;background:rgba(10,9,6,.4);color:var(--ink);
+    border-image:url("artassets/uiUpdate1/opt/gf_btn_menu.png") 15% stretch;padding:3px 8px}
+  .quit-btn:hover{color:var(--accent);border-color:transparent}
+
+  /* ---- Icon / round / close buttons opt OUT of the metal frame (it would break
+       their shape). Restored to a simple bordered look. ---- */
+  .audio-toggle,.help-btn{border-image:none;border:1px solid var(--line);border-radius:50%;background:rgba(18,17,13,.92)}
+  .fb-close,.dv-close,.ap-mute,.help-close,.mp-close,.fb-btn,.intro-skip{
+    border-image:none;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+  .audio-toggle:hover,.help-btn:hover,.fb-close:hover,.dv-close:hover{border-color:var(--accent);background:rgba(18,17,13,.92)}
+
+  /* ---- Button variants that define their own border/bg must also adopt the
+       frame so the look is consistent everywhere. ---- */
+  .menu-item,.mp-btn,.mp-startbtn,.fb-send,.mp-copy{
+    border:10px solid transparent;border-radius:0;background:rgba(16,14,9,.6);color:var(--ink);
+    border-image:url("artassets/uiUpdate1/opt/gf_btn_confirm.png") 19% 9% stretch}
+  .menu-item.primary,.mp-btn.primary,.mp-startbtn.primary,.fb-send.primary{
+    background:color-mix(in srgb,var(--accent) 26%,#0a0a08);color:#f3e6c8;font-weight:800}
+  .menu-item.primary .mi-ico{color:var(--accent)}
+  .menu-item:hover{border-color:transparent;background:rgba(36,29,15,.7)}
+  .mp-btn:hover:not(:disabled),.mp-startbtn:hover:not(:disabled),.fb-send:hover:not(:disabled){
+    border-color:transparent;background:rgba(36,29,15,.7);color:var(--accent)}
+
+  /* responsive border thinning so the frames don't swallow small elements */
+  @media (max-width:600px){
+    .confirm-btn,.undo-btn{min-width:90px}
+    button{border-width:8px}
+    .quit-btn{border-width:7px;padding:2px 6px}
+    /* round counter moves to its own centered line above the energy+buttons row */
+    .bf-controls{flex-direction:column-reverse;gap:5px}
+    .round-badge{position:static;transform:none}
+  }
+
 </style>
 </head>
 <body>
@@ -2368,7 +2484,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
   var ctx=null, master=null, musicBus=null, sfxBus=null, noiseBuf=null;
   var muted=false, musicVol=0.5, sfxVol=0.6;   // separate music / SFX levels
-  var current=null, desired=null, unlocked=false;
+  var current=null, desired=null, unlocked=false, gestured=false;   // gestured = any user gesture (lets HTMLAudio play even if Web Audio is unavailable)
+  /* ---- file-based music layer (HTMLAudio), selectable per context ---- */
+  var FILE_TRACKS = { boss:'music/Boss Bass - The Game.mp3', lofi:'music/VibeDepot - sweet lofi.mp3' };
+  var TRACK_LABELS = { synth:'Synth (original)', boss:'Boss Bass', lofi:'Sweet Lofi', off:'Off' };
+  var trackPrefs = { menu:'lofi', battle:'boss' };   // defaults = the new tracks
+  var fileAudio=null, fileKey=null;                  // current HTMLAudioElement + its key
   function clamp01(v){ v=+v; return v>=0 ? (v<=1 ? v : 1) : 0; }
   // perceptual curve: ears are logarithmic, so map the 0–1 slider to gain via a
   // square (×0.8 ceiling) — low slider positions get genuinely quiet, and the
@@ -2385,9 +2506,39 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       else if(typeof saved.volume==='number') musicVol = clamp01(saved.volume);   // migrate old single volume
       if(typeof saved.sfx==='number') sfxVol = clamp01(saved.sfx);
       else if(typeof saved.volume==='number') sfxVol = clamp01(saved.volume);
+      if(saved.tracks){
+        if(typeof saved.tracks.menu==='string')   trackPrefs.menu   = saved.tracks.menu;
+        if(typeof saved.tracks.battle==='string') trackPrefs.battle = saved.tracks.battle;
+      }
     }
   }catch(e){}
-  function save(){ try{ win.localStorage.setItem('rift_audio', JSON.stringify({muted:muted, music:musicVol, sfx:sfxVol})); }catch(e){} }
+  function save(){ try{ win.localStorage.setItem('rift_audio', JSON.stringify({muted:muted, music:musicVol, sfx:sfxVol, tracks:trackPrefs})); }catch(e){} }
+
+  /* ---- file-track playback helpers ---- */
+  function stopFile(){ if(fileAudio){ try{ fileAudio.pause(); }catch(e){} fileAudio=null; fileKey=null; } }
+  function startFile(key){
+    if(!FILE_TRACKS[key]) return;
+    if(fileKey===key && fileAudio){ try{ if(fileAudio.paused) fileAudio.play(); }catch(e){} return; }
+    stopFile();
+    try{
+      var a = new Audio(encodeURI(FILE_TRACKS[key]));
+      a.loop=true; a.volume = muted ? 0 : gainFor(musicVol);
+      fileAudio=a; fileKey=key;
+      var p=a.play(); if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  function stopSynth(){ if(current){ var c=current; c.fade(0,0.3); setTimeout(function(){ try{ c.stop(); }catch(e){} }, 350); current=null; } }
+  // route a context ('menu'/'battle') to its chosen source
+  function applyChoice(name, choice){
+    if(choice==='off'){ stopFile(); stopSynth(); return; }
+    if(choice==='boss' || choice==='lofi'){ stopSynth(); if(gestured) startFile(choice); return; }
+    /* synth */ stopFile(); if(ctx && unlocked) transition(name);   // else starts on unlock via resumeDesired
+  }
+  function resumeDesired(){
+    if(!desired || muted) return;
+    if(desired==='victory'){ stopFile(); transition('victory'); return; }
+    applyChoice(desired, trackPrefs[desired] || 'synth');
+  }
 
   function ensureCtx(){
     if(!supported) return null;
@@ -2407,11 +2558,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
   /* ---- gesture unlock: create ctx on first gesture, resume on any ---- */
   function unlock(){
-    if(!supported) return;
-    if(!ensureCtx()) return;
-    if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
-    if(!unlocked){ unlocked=true; if(desired && !muted) transition(desired); }
-    else if(desired && !current && !muted){ transition(desired); }
+    gestured=true;
+    if(supported && ensureCtx()){
+      if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
+      unlocked=true;
+    }
+    resumeDesired();   // start whatever's desired via the chosen source (synth needs ctx; file only needs the gesture)
   }
   if(win){
     ['pointerdown','touchstart','mousedown','keydown'].forEach(function(ev){
@@ -2597,22 +2749,39 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   /* ---- public music + settings API ---- */
   API.playMusic = function(name){ try{
     desired=name;
-    if(!supported || !ctx || !unlocked || muted) return;     // will start on unlock / unmute
+    if(name==='victory'){ stopFile(); if(supported && ctx && unlocked && !muted) transition('victory'); return; }
+    if(name==='menu' || name==='battle'){
+      if(muted) return;                                       // resumes on unmute via resumeDesired
+      applyChoice(name, trackPrefs[name] || 'synth');
+      return;
+    }
+    if(!supported || !ctx || !unlocked || muted) return;
     transition(name);
   }catch(e){} };
-  API.stopMusic = function(){ try{ if(current){ var c=current; c.fade(0,0.3); setTimeout(function(){ try{c.stop();}catch(e){} },350); current=null; } desired=null; }catch(e){} };
+  API.stopMusic = function(){ try{ stopFile(); stopSynth(); desired=null; }catch(e){} };
+  // per-context track selection (context: 'menu'|'battle'; choice: 'synth'|'boss'|'lofi'|'off')
+  API.setTrack = function(context, choice){
+    if(context!=='menu' && context!=='battle') return;
+    trackPrefs[context]=choice; save();
+    if(desired===context && !muted) applyChoice(context, choice);   // live-switch if this context is active
+  };
+  API.getTrack = function(context){ return trackPrefs[context] || 'synth'; };
+  API.trackOptions = function(){ return [['synth',TRACK_LABELS.synth],['boss',TRACK_LABELS.boss],['lofi',TRACK_LABELS.lofi],['off',TRACK_LABELS.off]]; };
 
   API.setMuted = function(m){
     muted=!!m; save();
+    // file-track layer (independent of the Web Audio graph)
+    try{ if(muted){ if(fileAudio) fileAudio.pause(); } }catch(e){}
     try{
-      if(!ctx) return;
+      if(!ctx){ if(!muted) resumeDesired(); return; }          // no ctx yet: still resume file music
       var g=master.gain; g.cancelScheduledValues(T()); g.setValueAtTime(g.value, T());
       if(muted){
         g.linearRampToValueAtTime(0, T()+0.5);               // fade out 0.5s
         setTimeout(function(){ if(muted && current){ current.stop(); current=null; } }, 520);  // pause scheduler
       } else {
         if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
-        if(desired && !current) transition(desired);          // resume scheduler
+        if(desired && !current && !fileAudio) resumeDesired(); // resume scheduler / file
+        else if(fileAudio){ try{ fileAudio.volume=gainFor(musicVol); var p=fileAudio.play(); if(p&&p.catch)p.catch(function(){}); }catch(e){} }
         g.linearRampToValueAtTime(1, T()+0.5);               // fade in 0.5s
       }
     }catch(e){}
@@ -2620,7 +2789,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   API.toggleMute = function(){ API.setMuted(!muted); return muted; };
   API.isMuted    = function(){ return muted; };
   API.setMusicVolume = function(v){ musicVol=clamp01(v); save();
-    try{ if(musicBus){ var g=musicBus.gain; g.cancelScheduledValues(T()); g.setValueAtTime(g.value,T()); g.linearRampToValueAtTime(gainFor(musicVol), T()+0.08); } }catch(e){} };
+    try{ if(musicBus){ var g=musicBus.gain; g.cancelScheduledValues(T()); g.setValueAtTime(g.value,T()); g.linearRampToValueAtTime(gainFor(musicVol), T()+0.08); } }catch(e){}
+    try{ if(fileAudio && !muted) fileAudio.volume = gainFor(musicVol); }catch(e){} };
   API.getMusicVolume = function(){ return musicVol; };
   API.setSfxVolume = function(v){ sfxVol=clamp01(v); save();
     try{ if(sfxBus){ sfxBus.gain.setValueAtTime(gainFor(sfxVol), T()); } }catch(e){} };
@@ -2747,6 +2917,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     render(`
       <div id="menu">
         <h1 class="title">RIFT PROTOCOL</h1>
+        <div class="menu-deck-row">
         <div class="menu-nav">
           <button class="menu-item primary" data-nav="fight">${NAV_ICO.fight}<span>Deploy</span></button>
           <button class="menu-item" data-nav="escalations">${NAV_ICO.escalations}<span>Escalations</span></button>
@@ -2767,6 +2938,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
             <button data-mpnav="multiplayer"><b>Multiplayer</b><span class="fs-sub">Online · 1v1</span></button>
           </div>
         </div>
+        </div>
       </div>
     `);
     $('[data-nav="fight"]').onclick=()=>{ $('#fightsub').classList.toggle('hidden'); };
@@ -2785,7 +2957,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     music('menu');
     const classes = Object.keys(GF.CLASSES);
     render(`
-      <div class="cscreen">
+      <div class="cscreen screen-bg-menu">
       <div class="bar"><h1 style="margin:0">Rift Cards</h1>
         <button data-act="back">← Menu</button></div>
       <div class="classgrid char-roster">
@@ -2823,7 +2995,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const info=GF.CLASSES[cls]; const hp=GF.makeFighterFromClass('x',cls).maxHp;
     const cards=GF.CARDS.filter(c=>c.cls===cls);
     render(`
-      <div class="cscreen">
+      <div class="cscreen screen-bg-menu">
       <div class="bar"><h1 style="margin:0">${esc(dn(cls))}</h1>
         <button data-act="back">← Rift Cards</button></div>
       <div class="char-hero" style="--cls:${classColor(cls)}">
@@ -2894,32 +3066,57 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <p>We recruit operatives from dying or destabilized dimensions, extract them before their world folds, and deploy them to active breach points to neutralize dimensional threats. You fight with the combat style of the world you came from — it is the one thing the fold could not take from you.</p>
         <div class="lore-note"><b>Field briefing.</b> The multiverse folds on itself. You may engage a version of yourself, recruited from a parallel cut of your own world. <i>This is documented. Neutralize them.</i></div>` ],
       ['Operatives', ()=> `
-        <p class="sub">Six operatives cleared for field duty. Each was extracted from a folding world and carries its combat style as the last thing it had left.</p>
-        <div class="lore-grid">
+        <p class="sub">Six operatives cleared for field duty — tap any dossier to read it in full.</p>
+        <div class="lore-tiles">
           ${classes.map(c=>{ const info=GF.CLASSES[c]; return `
-            <div class="card lore-card" style="--cls:${classColor(c)}">
-              <div class="op-head">
-                <div class="op-port"><img src="${portraitFor({className:c})}" alt="" onerror="this.style.display='none'"></div>
-                <div class="op-head-text"><b>${esc(dn(c))}</b><span class="lore-role">${esc(info.title)}</span></div>
-              </div>
-              <p class="lore-meta"><span class="lore-k">Origin</span> ${esc(info.world)}<span class="lore-dot">·</span><span class="lore-k">Clearance</span> ${esc(info.clearance)}</p>
-              <p class="lore-origin">${esc(info.worldDesc)}</p>
-              <p class="lore-back">${esc(info.backstory)}</p>
-            </div>`; }).join('')}
+            <button class="lore-tile" data-loreop="${c}" style="--cls:${classColor(c)};background-image:linear-gradient(rgba(8,8,6,.1),rgba(8,8,6,.82)), url('${portraitFor({className:c})}')">
+              <span class="lt-text"><b>${esc(dn(c))}</b><span class="lt-role">${esc(info.title)}</span></span>
+            </button>`; }).join('')}
         </div>` ],
       ['Warp Zones', ()=> `
-        <p class="sub">Active breach points, each opening onto the world an operative was pulled from. One operative holds primary assignment per zone.</p>
-        <div class="lore-grid warp-grid">
-          ${classes.map(c=>{ const info=GF.CLASSES[c]; const z=WARP_ZONES[c]; return `
-            <div class="card warp-card" style="--cls:${classColor(c)}">
-              <div class="warp-bg"><img src="${zoneBgPath(c)}" alt="" onerror="this.style.display='none'"></div>
-              <div class="warp-body">
-                <div class="lore-card-h"><b>${esc(info.world)}</b><span class="lore-role">Primary: ${esc(dn(c))}</span></div>
-                <p class="lore-origin">${esc(z.entry)}</p>
-              </div>
-            </div>`; }).join('')}
+        <p class="sub">Active breach points — tap any zone to read the full report.</p>
+        <div class="lore-tiles">
+          ${classes.map(c=>{ const info=GF.CLASSES[c]; return `
+            <button class="lore-tile" data-lorezone="${c}" style="--cls:${classColor(c)};background-image:linear-gradient(rgba(8,8,6,.1),rgba(8,8,6,.82)), url('${zoneBgPath(c)}')">
+              <span class="lt-text"><b>${esc(info.world)}</b><span class="lt-role">Primary: ${esc(dn(c))}</span></span>
+            </button>`; }).join('')}
         </div>` ],
     ];
+  }
+  // full-screen modal for a single operative dossier or warp-zone report (large text)
+  function loreOpModalHTML(c){
+    const info=GF.CLASSES[c];
+    return `<div class="lore-modal" role="dialog" aria-modal="true">
+      <button class="lm-close" data-act="lmclose" aria-label="Close">✕</button>
+      <div class="lm-hero" style="--cls:${classColor(c)}"><img src="${portraitFor({className:c})}" alt="" onerror="this.style.display='none'"></div>
+      <div class="lm-body">
+        <h2 style="color:${classColor(c)}">${esc(dn(c))}</h2>
+        <div class="lm-role">${esc(info.title)}</div>
+        <p class="lm-meta"><span class="lore-k">Origin</span> ${esc(info.world)} <span class="lore-dot">·</span> <span class="lore-k">Clearance</span> ${esc(info.clearance)}</p>
+        <p>${esc(info.worldDesc)}</p>
+        <p>${esc(info.backstory)}</p>
+      </div></div>`;
+  }
+  function loreZoneModalHTML(c){
+    const info=GF.CLASSES[c], z=WARP_ZONES[c];
+    return `<div class="lore-modal" role="dialog" aria-modal="true">
+      <button class="lm-close" data-act="lmclose" aria-label="Close">✕</button>
+      <div class="lm-hero lm-hero-wide" style="--cls:${classColor(c)}"><img src="${zoneBgPath(c)}" alt="" onerror="this.style.display='none'"></div>
+      <div class="lm-body">
+        <h2 style="color:${classColor(c)}">${esc(info.world)}</h2>
+        <div class="lm-role">Primary assignment: ${esc(dn(c))}</div>
+        <p>${esc(z.entry)}</p>
+      </div></div>`;
+  }
+  function openLoreModal(html){
+    const bd=document.createElement('div'); bd.className='lore-modal-backdrop'; bd.innerHTML=html;
+    document.body.appendChild(bd);
+    const close=()=>{ try{ bd.remove(); }catch(e){} document.removeEventListener('keydown', esc); };
+    function esc(e){ if(e.key==='Escape') close(); }
+    bd.addEventListener('mousedown', e=>{ if(e.target===bd) close(); });
+    bd.querySelector('[data-act="lmclose"]').onclick=close;
+    document.addEventListener('keydown', esc);
+    aud('MENU_SELECT');
   }
   function showLore(){
     clearOverlay();
@@ -2929,7 +3126,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const draw = ()=>{
       const [ , body ] = secs[UI.loreSec];
       render(`
-        <div class="cscreen">
+        <div class="cscreen screen-bg-menu">
         <div class="bar"><h1 style="margin:0">Lore</h1>
           <button data-act="back">← Menu</button></div>
         <div class="lore-tabs">
@@ -2941,6 +3138,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       `);
       $('[data-act="back"]').onclick=()=> showStart();
       $$('[data-sec]').forEach(b=> b.onclick=()=>{ UI.loreSec=+b.dataset.sec; draw(); });
+      $$('[data-loreop]').forEach(b=> b.onclick=()=> openLoreModal(loreOpModalHTML(b.dataset.loreop)));
+      $$('[data-lorezone]').forEach(b=> b.onclick=()=> openLoreModal(loreZoneModalHTML(b.dataset.lorezone)));
     };
     draw();
   }
@@ -2957,6 +3156,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const pill = inEsc ? `${esc(escDefn.name)} — choose 2 operatives` : `${esc(who)} — choose 2 operatives`;
     const draw = ()=>{
       render(`
+        <div class="cscreen screen-bg-mp">
         <div class="bar"><h1 style="margin:0">RIFT PROTOCOL</h1>
           <span class="pill">${esc(pill)}</span></div>
         <div class="classgrid">
@@ -2993,8 +3193,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <div class="map-select">
           <span class="ms-label">Warp Zone</span>
           <div class="ms-row">
-            <button class="ms-chip ${UI.map==='random'?'sel':''}" data-map="random">🎲 Random</button>
-            ${classes.map(c=>`<button class="ms-chip ${UI.map===c?'sel':''}" data-map="${c}" style="--cls:${classColor(c)}">${esc(GF.CLASSES[c].world)}</button>`).join('')}
+            <button class="ms-chip ms-rand ${UI.map==='random'?'sel':''}" data-map="random"><span class="ms-name">🎲 Random</span></button>
+            ${classes.map(c=>`<button class="ms-chip ms-img ${UI.map===c?'sel':''}" data-map="${c}" style="--cls:${classColor(c)};background-image:linear-gradient(rgba(8,8,6,.15),rgba(8,8,6,.78)), url('${zoneBgPath(c)}')"><span class="ms-name">${esc(GF.CLASSES[c].world)}</span></button>`).join('')}
           </div>
         </div>`}
         <div class="bar" style="margin-top:14px">
@@ -3003,6 +3203,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
             <button data-act="back">Back</button>
             <button class="primary" data-act="go" ${chosen.length===2?'':'disabled'}>Confirm team</button>
           </div>
+        </div>
         </div>
       `);
       $$('[data-cls]').forEach(d=> d.onclick=()=>{
@@ -3229,7 +3430,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     music('menu');
     const saved = loadPlayer();
     render(`
-      <div class="cscreen">
+      <div class="cscreen screen-bg-menu">
       <div class="bar"><h1 style="margin:0">Escalations</h1>
         <button data-act="back">← Menu</button></div>
       <p class="muted" style="max-width:620px;margin:0 auto 4px">Run a sequence of breaches in a fixed Warp Zone. Each Escalation ends against a mirror cell of its home operative — the deeper the tier, the higher the enemy clearance.</p>
@@ -3363,9 +3564,25 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // large, easy-to-read card popup pinned to an open corner (bottom-right) while
   // hovering a card in the hand.
   let _handPreviewEl=null;
+  // Full expanded card for the top-of-screen popup: name, cost, type, the rules
+  // text and the green "how it works" hint. (catalogCardHTML omits the hint.)
+  function previewCardHTML(c){
+    const cost=GF.energyCost(c);
+    return `<div class="catcard" style="--cls:${classColor(c.cls)}">
+      <div class="ph"><span class="pn">${esc(c.name)}</span>
+        <span class="cost t${c.speed}" title="costs ${cost} energy (T${c.speed})"><span class="ecirc"></span>${cost}</span></div>
+      <div class="cardart catcard-art sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">
+        <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
+        <span class="artph">${esc(c.type)}</span></div>
+      <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}${c.once?' · once':''}</div>
+      <div class="pe">${esc(c.text)}</div>
+      ${c.hint?`<div class="phint">↳ ${esc(c.hint)}</div>`:''}
+      ${c.flavor?`<div class="pf">${esc(c.flavor)}</div>`:''}
+    </div>`;
+  }
   function showHandPreview(card){
     if(!_handPreviewEl){ _handPreviewEl=document.createElement('div'); _handPreviewEl.className='hand-preview'; document.body.appendChild(_handPreviewEl); }
-    _handPreviewEl.innerHTML = catalogCardHTML(card);
+    _handPreviewEl.innerHTML = previewCardHTML(card);
     _handPreviewEl.style.display='block';
   }
   function hideHandPreview(){ if(_handPreviewEl) _handPreviewEl.style.display='none'; }
@@ -3412,16 +3629,14 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const hasStaged = sel.picks.length||sel.pendingHi;
     const controls = `<div class="ctrl-cluster">
         <div class="energy-box">
-          <div class="big"><span class="ecirc lg"></span> ${remaining} / ${budget}</div>
-          <div class="pips">${Array.from({length:budget}).map((_,i)=>`<i class="${i<remaining?'on':''}"></i>`).join('')}</div>
-          ${st.round<5?`<div class="tip">→ ${nextEnergy} next round</div>`:`<div class="tip">max (final round)</div>`}
+          <div class="big"><span class="elabel">Energy:</span> ${remaining} / ${budget}${st.round<5?` <span class="enext">→ ${nextEnergy} next round</span>`:` <span class="enext">max</span>`}</div>
         </div>
-        <div class="round-inline">Round ${st.round} of 5</div>
         <div class="ctrl-buttons">
-          <button class="ctrlbtn confirm-btn" data-act="lock">Confirm <span class="cb-sword">⚔</span></button>
-          <button class="ctrlbtn undo-btn" data-act="clear" ${hasStaged?'':'disabled'}>Undo</button>
+          <button class="ctrlbtn confirm-btn" data-act="lock"><span class="cbl">Confirm</span> <span class="cb-sword">⚔</span></button>
+          <button class="ctrlbtn undo-btn" data-act="clear" ${hasStaged?'':'disabled'}><span class="cbl">Undo</span></button>
         </div>
-      </div>`;
+      </div>
+      <div class="round-badge" title="Round ${st.round} of 5">Round ${st.round}<span class="rb-of">/5</span></div>`;
 
     // staging: clicked cards wait in the arena middle, shown in cast order (tier
     // speed). Lock in / Undo all sit directly beneath them, above your portraits.
@@ -3491,15 +3706,24 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     // wire hand cards
     $$('.hand-fan .pcard').forEach(el=>{
       const idx=+el.dataset.hand, hi=hand[idx];
-      // hover a hand card → big readable popup in the open bottom-right corner
-      el.onmouseenter=()=>{ if(hi) showHandPreview(hi.card); };
-      el.onmouseleave=hideHandPreview;
+      // Expanded card popup (top of screen): hover on desktop, press-and-hold on
+      // mobile. The same component for both; a quick tap still plays the card.
+      if(hi){
+        el.onmouseenter=()=> showHandPreview(hi.card);
+        el.onmouseleave=hideHandPreview;
+        let _pt=null;
+        el.addEventListener('touchstart',()=>{ el._lp=false; _pt=setTimeout(()=>{ el._lp=true; showHandPreview(hi.card); }, 240); }, {passive:true});
+        const endTouch=()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } if(el._lp) hideHandPreview(); };
+        el.addEventListener('touchend', endTouch); el.addEventListener('touchcancel', endTouch);
+        el.addEventListener('touchmove',()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } }, {passive:true});
+      }
       const disc=el.querySelector('.disc');
       if(disc) disc.onclick=(ev)=>{ ev.stopPropagation(); doDiscard(hi); };
       // during a discard-on-play selection, every card is a discard candidate
       if(sel.stage==='discard'){
         if(hi!==sel.pendingHi) el.classList.add('discardable');
         el.onclick=()=>{
+          if(el._lp){ el._lp=false; return; }   // ignore the tap that ends a long-press preview
           if(hi===sel.pendingHi){ resetPending(); drawSelection(); return; }  // click the source again to cancel
           const base=addableMap.get(sel.pendingHi)[0];
           commitPick(Object.assign({}, base, {discardHi:hi}));
@@ -3508,6 +3732,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       }
       if(usedItems.has(hi) || (addableMap.get(hi)||[]).length===0) return;
       el.onclick=()=>{
+        if(el._lp){ el._lp=false; return; }   // ignore the tap that ends a long-press preview
         const card=hi.card;
         sel.pendingHi=hi;
         if(card.discardOnPlay){ sel.stage='discard'; drawSelection(); }       // pick a card to discard
@@ -3816,8 +4041,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // main-menu key-art: try a dedicated menu bg, fall back to a battle bg.
   function applyMenuBg(){
     const el=$('#menu'); if(!el) return;
-    loadFirst(['artassets/Backgrounds/gf_menu_bg.png','artassets/gf_menu_bg_v1.jpg','artassets/gf_menu_bg_v1.png','artassets/Backgrounds/gf_menu_bg_v1.jpg',
-               'artassets/Backgrounds/gf_bg_shrine_v1.jpg','artassets/Backgrounds/gf_bg_cyberpunk_v1.jpg'],
+    loadFirst(['artassets/Backgrounds/gf_menu_bg.jpg','artassets/Backgrounds/gf_bg_shrine_v1.jpg','artassets/Backgrounds/gf_bg_cyberpunk_v1.jpg'],
       (u)=>{ el.style.setProperty('--menubg', `url("${u}")`); el.classList.add('hasbg'); });
   }
   // Fullscreen muted fight cinematic, played at match start. Cut off after 2s,
@@ -4039,11 +4263,24 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         '<div class="ap-h">Audio</div>'+
         '<label class="ap-row"><span>Music</span><input type="range" min="0" max="1" step="0.05" id="apMusic"></label>'+
         '<label class="ap-row"><span>Effects</span><input type="range" min="0" max="1" step="0.05" id="apSfx"></label>'+
+        '<div class="ap-h" style="margin-top:9px">Music track</div>'+
+        '<label class="ap-row"><span>Menu</span><select class="ap-sel" id="apMenuTrack"></select></label>'+
+        '<label class="ap-row"><span>Battle</span><select class="ap-sel" id="apBattleTrack"></select></label>'+
         '<button class="ap-mute" id="apMute" type="button"></button>';
       document.body.appendChild(ab); document.body.appendChild(pop);
       const apMusic=pop.querySelector('#apMusic'), apSfx=pop.querySelector('#apSfx'), apMute=pop.querySelector('#apMute');
+      const apMenuTrack=pop.querySelector('#apMenuTrack'), apBattleTrack=pop.querySelector('#apBattleTrack');
+      // populate the track selectors once
+      try{ const opts=(RA()&&RA().trackOptions)?RA().trackOptions():[['synth','Synth']];
+        const fill=(sel)=>{ sel.innerHTML=opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join(''); };
+        fill(apMenuTrack); fill(apBattleTrack);
+      }catch(e){}
+      apMenuTrack.onchange=function(){ try{ RA().setTrack('menu', this.value); aud('MENU_SELECT'); }catch(e){} };
+      apBattleTrack.onchange=function(){ try{ RA().setTrack('battle', this.value); aud('MENU_SELECT'); }catch(e){} };
       const syncIcon=()=>{ try{ ab.textContent=(RA()&&RA().isMuted())?'🔇':'🔊'; }catch(e){} };
-      const syncPop=()=>{ try{ const m=RA(); if(!m) return; apMusic.value=m.getMusicVolume(); apSfx.value=m.getSfxVolume(); apMute.textContent=m.isMuted()?'Unmute':'Mute'; apMute.classList.toggle('on', m.isMuted()); }catch(e){} };
+      const syncPop=()=>{ try{ const m=RA(); if(!m) return; apMusic.value=m.getMusicVolume(); apSfx.value=m.getSfxVolume();
+        if(m.getTrack){ apMenuTrack.value=m.getTrack('menu'); apBattleTrack.value=m.getTrack('battle'); }
+        apMute.textContent=m.isMuted()?'Unmute':'Mute'; apMute.classList.toggle('on', m.isMuted()); }catch(e){} };
       ab.onclick=(e)=>{ e.stopPropagation(); pop.classList.toggle('hidden'); if(!pop.classList.contains('hidden')) syncPop(); };
       pop.addEventListener('click', e=> e.stopPropagation());
       apMusic.oninput=function(){ try{ RA().setMusicVolume(parseFloat(this.value)); }catch(e){} };
@@ -4705,7 +4942,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     return [
       helpSec('What is RIFT PROTOCOL?', 'You command two RIFT operatives pulled from folding worlds and deployed to breach points across six Warp Zones. Each match is 5 rounds. The team that deals the most kills wins — tiebreak goes to total HP remaining, then a draw.', 'Most kills wins. Tiebreak: total HP remaining, then a draw.'),
       helpSec('Picking your operatives', 'Choose two operative classes before each match. Each class has a unique deck of 20 cards and a distinct combat identity. You can pick two of the same class. Your team shares a hand of cards during the match.'),
-      helpSec('How a round works', 'Each round you have an energy pool (starts at 3, grows each round: 3-4-6-8-10). Stage cards from your hand by clicking them, then assign targets. When ready, click Confirm. Both teams resolve simultaneously in tier order: T1 first, then T2, T3, T4. Higher tiers can interrupt lower tiers if the operative is knocked out mid-resolution.', 'Resolution order: T1 → T2 → T3 → T4 — both teams at once, interrupts on KO.'),
+      helpSec('How a round works', 'Each round you have an <span class="ecirc"></span> energy pool (the <span class="ecirc"></span> token marks energy on cards and your pool; starts at 3, grows each round: 3-4-6-8-10). Stage cards from your hand by clicking them, then assign targets. When ready, click Confirm. Both teams resolve simultaneously in tier order: T1 first, then T2, T3, T4. Higher tiers can interrupt lower tiers if the operative is knocked out mid-resolution.', 'Resolution order: T1 → T2 → T3 → T4 — both teams at once, interrupts on KO.'),
       helpSec('Energy', 'Every card has an energy cost shown in the badge at the top left. You can play multiple cards per round as long as you have energy. Unused energy does not carry over. Next round\'s energy is shown in the top right panel.'),
       helpSec('Card types', 'Attack cards deal damage to enemy operatives. Defend cards protect your operatives from incoming damage. Some cards have special effects — read the description carefully. The italic flavor text at the bottom of each card is lore only and has no gameplay effect.'),
       helpSec('The Breachblade Junction mechanic', 'The Breachblade class has a unique Junction system. Play a Junction card (Fire, Frost, or Thunder) to set your weapon element. Then play flurry cards to deal cascading elemental hits. Setting a new Junction element overwrites the previous one.', 'Junction sets your element; flurry cards ride it. A new Junction overwrites the old.'),
