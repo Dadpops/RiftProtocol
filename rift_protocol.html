@@ -164,8 +164,12 @@
   /* ============ MAIN MENU ============ */
   #menu{position:relative;min-height:calc(100dvh - 32px);display:flex;flex-direction:column;justify-content:center;
     align-items:center;text-align:center;
-    border-radius:16px;overflow:hidden;padding:34px;background:radial-gradient(120% 90% at 50% 0%, #26241c, #100f0b)}
-  #menu.hasbg{background-image:linear-gradient(rgba(13,12,9,.62),rgba(13,12,9,.9)), var(--menubg);background-size:cover;background-position:center}
+    border-radius:16px;padding:34px;background:radial-gradient(120% 90% at 50% 0%, #26241c, #100f0b)}
+  /* full-screen menu background (fixed layer like the other screens), not boxed to #app */
+  #menu.hasbg{background:transparent;overflow:visible}
+  #menu.hasbg::before{content:"";position:fixed;inset:0;z-index:-1;
+    background-image:linear-gradient(rgba(13,12,9,.62),rgba(13,12,9,.9)), var(--menubg);
+    background-size:cover;background-position:center}
   #menu .title{font-size:clamp(54px,8vw,84px);letter-spacing:3px;margin:0;color:var(--accent);text-shadow:0 4px 22px #000}
   #menu .tagline{color:var(--ink);opacity:.85;margin:4px 0 22px;max-width:560px}
   #menu .modes{display:flex;gap:12px;flex-wrap:wrap}
