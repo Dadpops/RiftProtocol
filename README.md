@@ -116,6 +116,17 @@ node test/regression.mjs    # 20 regression tests
 
 See [ROADMAP.md](ROADMAP.md) for where this is going next (the north star is single-player depth: progression/unlocks and richer Escalations).
 
+## Credits
+
+**Music**
+
+- "The Game" by **Boss Bass** — source: [Free Music Archive](https://freemusicarchive.org/) · license: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+- "Sweet Lofi" by **VibeDepot** — source: [Free Music Archive](https://freemusicarchive.org/) · license: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+> ⚠️ These tracks are **CC BY-NC-SA**: **non-commercial use only**, and works that incorporate them are expected to be shared under the same license. Not cleared for monetized/commercial release or YouTube. Swap them out before any commercial use.
+
+Fonts: **Asimovian** and **Barlow Condensed** (SIL Open Font License — see the `OFL.txt` files under `artassets/fonts/`).
+
 ---
 
 <div align="center">

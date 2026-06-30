@@ -883,6 +883,9 @@
   .help-link{color:var(--accent);text-decoration:none;font-size:14px} .help-link:hover{text-decoration:underline}
   .help-ver{margin:14px 0 0;color:var(--muted);font-size:13px}
   .help-credit-foot{margin:6px 0 0;color:var(--muted);font-style:italic;font-size:13px}
+  .help-music-credits{margin:16px auto 0;max-width:420px;border-top:1px solid var(--line);padding-top:12px}
+  .help-music-credits h3{margin:0 0 8px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--accent)}
+  .help-music-credits p{margin:0 0 8px;font-size:13px;line-height:1.5;color:var(--ink)}
   /* ---- Splash screen ---- */
   #splash{position:fixed;inset:0;z-index:300;background:#0a0612;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:splashIn .6s ease}
   #splash.fade-out{opacity:0;transition:opacity .3s ease;pointer-events:none}
@@ -4965,6 +4968,15 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <p class="help-credit-by">Designed and built by Kit Cabena</p>
         <p><a class="help-link" href="https://github.com/kitcabena" target="_blank" rel="noopener noreferrer">GitHub</a></p>
         <p class="help-ver">v${GAME_VERSION}</p>
+        <div class="help-music-credits">
+          <h3>Music</h3>
+          <p>&ldquo;The Game&rdquo; by <b>Boss Bass</b><br>
+            Source: <a class="help-link" href="https://freemusicarchive.org/" target="_blank" rel="noopener noreferrer">Free Music Archive</a>
+            · License: <a class="help-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a></p>
+          <p>&ldquo;Sweet Lofi&rdquo; by <b>VibeDepot</b><br>
+            Source: <a class="help-link" href="https://freemusicarchive.org/" target="_blank" rel="noopener noreferrer">Free Music Archive</a>
+            · License: <a class="help-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a></p>
+        </div>
         <p class="help-credit-foot">Built with the Web Audio API, Socket.io, and a lot of sims.</p>
       </div>`;
   }
