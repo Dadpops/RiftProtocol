@@ -5314,7 +5314,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // lives in the Help panel's Feedback tab. mountFeedbackButton() kept for reuse.
   mountRcHint();
   mountCoach();
-  if(!tutSeen()) TUT.active=true;
+  // The guided onboarding coach is desktop-only: on a phone the centered panel
+  // sits over the play area and gets in the way, so skip it on narrow viewports.
+  // (The standalone How-to-Play / Rift Cards menu pages remain available to all.)
+  const isMobileViewport = ()=> window.matchMedia('(max-width:760px)').matches;
+  if(!tutSeen() && !isMobileViewport()) TUT.active=true;
   mountHelpButton();
   showSplash();
 })();
