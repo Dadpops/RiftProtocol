@@ -1042,45 +1042,57 @@
     .staging-empty{display:none}
     .target-notice{font-size:14px;padding:6px 12px}
 
-    /* ---- HAND dominates the middle; two pill columns, each its own bounded scroller.
-       Horizontal padding clears the fixed energy (left) and Confirm/Undo (right) rails. ---- */
+    /* ---- HAND dominates the middle; two per-operative pill columns, bottom-anchored
+       (hug the portraits, grow upward), centered, using nearly the full width (the
+       side rails sit higher up, out of the hand's band). ---- */
     .card-tray.pills{flex-direction:row;justify-content:center;align-items:flex-end;
-      height:100%;gap:16px;overflow:visible;padding:0 66px 4px 48px;background:none;border-top:0}
+      height:100%;gap:12px;overflow:visible;padding:0 10px 4px;background:none;border-top:0}
     .card-tray.pills.solo{justify-content:center}
     .card-tray.pills .tray-div{display:none}
-    .card-tray.pills .tray-sec{flex:0 1 170px;max-width:46%;min-width:0;max-height:100%;justify-content:flex-end;gap:3px}
+    .card-tray.pills .tray-sec{flex:1 1 0;max-width:49%;min-width:0;max-height:100%;justify-content:flex-end;gap:3px}
     .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:60%;max-width:80%}
     .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto;padding-bottom:1px}
     .card-tray.pills .hand-fan{flex:0 1 auto;flex-direction:column;align-items:stretch;justify-content:flex-end;
       width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:2px 2px 0;-webkit-overflow-scrolling:touch}
     .card-tray.pills .hand-group{flex-direction:column;align-items:stretch;width:100%;gap:6px}
+    /* no hover motion on touch — pills stay put (the press-hold popup is the preview) */
+    .card-tray.pills .pcard,
+    .card-tray.pills .hand-group:has(.pcard:hover) .pcard,
+    .card-tray.pills .hand-fan:hover .pcard{transform:none !important;transition:none}
+    .card-tray.pills .hand-fan:hover .pcard:not(.cantafford):not(.illegal){opacity:1}
 
     .pcard.pill{flex-direction:row;align-items:center;gap:8px;width:100%;box-sizing:border-box;flex:0 0 auto;
-      min-height:56px;height:58px;margin:0;padding:0 8px;border-radius:10px;overflow:hidden;
+      min-height:56px;height:auto;margin:0;padding:6px 9px;border-radius:10px;overflow:hidden;
       border:1.5px solid var(--cls,var(--accent));background:color-mix(in srgb,var(--cls) 16%,#14130f);
       box-shadow:0 2px 8px rgba(0,0,0,.42)}
     .pcard.pill .pill-cost{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
-      width:25px;height:25px;border-radius:50%;font-size:13.5px;font-weight:800;color:var(--energy);
+      width:24px;height:24px;border-radius:50%;font-size:13px;font-weight:800;color:var(--energy);
       background:rgba(8,8,6,.9);border:1px solid color-mix(in srgb,var(--cls) 45%,transparent)}
-    .pcard.pill .pill-ico{flex:0 0 auto;display:flex;align-items:center;color:var(--ct,var(--accent))}
-    .pcard.pill .pill-name{flex:1 1 auto;min-width:0;font-size:14.5px;font-weight:700;color:#fff;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* name wraps to two lines so it is never cut mid-word */
+    .pcard.pill .pill-name{flex:1 1 auto;min-width:0;font-size:14px;font-weight:700;color:#fff;line-height:1.12;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;word-break:break-word}
+    /* effect badge: value + icon (damage=sword/red, heal=plus/green, block=shield/teal) */
+    .pcard.pill .pill-eff{flex:0 0 auto;display:inline-flex;align-items:center;gap:2px;font-size:14px;font-weight:800;line-height:1}
+    .pcard.pill .pill-eff.dmg{color:var(--bad)}
+    .pcard.pill .pill-eff.heal{color:var(--good)}
+    .pcard.pill .pill-eff.def{color:var(--t1)}
+    .pcard.pill .pill-eff.none{color:color-mix(in srgb,var(--cls) 60%,var(--muted))}
     .pcard.pill.sel{outline:2px solid var(--accent);outline-offset:1px;box-shadow:0 0 0 1px var(--accent) inset}
     .pcard.pill.illegal,.pcard.pill.cantafford{opacity:.4}
     .card-tray.pills.discarding .pcard.pill{outline:2px dashed var(--bad);outline-offset:1px;opacity:1;
       animation:targetpulse 1s ease-in-out infinite}
 
-    /* ---- fixed LEFT energy rail: vertical pip stack in a subtle panel, screen-centered ---- */
-    .mrail{position:fixed;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;
+    /* ---- fixed side rails, raised above the hand's band so the cards get the full width.
+       LEFT = vertical energy pip stack; RIGHT = Confirm (check) over Undo (arrow). ---- */
+    .mrail{position:fixed;top:40%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;
       align-items:center}
-    .mrail-energy{left:6px;gap:5px;padding:8px 6px;border-radius:14px;background:rgba(10,8,16,.72);
+    .mrail-energy{left:6px;gap:4px;padding:7px 5px;border-radius:14px;background:rgba(10,8,16,.72);
       border:1px solid rgba(255,255,255,.1);box-shadow:0 3px 12px rgba(0,0,0,.4)}
-    .me-pips{display:flex;flex-direction:column-reverse;gap:5px}
-    .me-pips i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.14);display:block}
+    .me-pips{display:flex;flex-direction:column-reverse;gap:4px}
+    .me-pips i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.14);display:block}
     .me-pips i.on{background:var(--energy);box-shadow:0 0 6px color-mix(in srgb,var(--energy) 70%,transparent)}
     .me-count{font-size:10px;font-weight:800;color:var(--energy);letter-spacing:.3px}
 
-    /* ---- fixed RIGHT control rail: Confirm (check) over Undo (arrow), screen-centered ---- */
     .mrail-ctrl{right:8px;gap:12px}
     .mctrl{border-image:none;border-radius:50%;display:flex;align-items:center;justify-content:center;
       padding:0;font-weight:800;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.5);touch-action:manipulation}
@@ -4564,18 +4576,31 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     if(k==='defend') return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
     return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
   }
-  // Mobile hand card = compact pill: cost circle → type icon → name (ellipsis).
-  // Same data-* hooks + classes as handCardHTML, so the existing tap/long-press
-  // wiring on `.hand-fan .pcard` applies unchanged. Cost is a plain number (no energy
-  // pip; the "Energy: x/y" bar remains the only energy indicator). Discard is NOT on
-  // the pill — it's the single fixed top-right discard button (arm-then-tap).
+  // Effect badge for a pill: what the card actually does. Damage → red value + sword,
+  // heal → green value + plus, block/defend → teal value + shield; otherwise the plain
+  // type glyph (buffs, spells, utility). Reads `kind`/`amount` from the card data.
+  function pillEffect(c){
+    const t = typeKey(c.type), amt = c.amount;
+    const SWORD = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg>';
+    const SHIELD = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+    const PLUS = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+    if(c.kind==='heal' && amt) return `<span class="pill-eff heal">${amt}${PLUS}</span>`;
+    if(t==='attack' && amt)    return `<span class="pill-eff dmg">${amt}${SWORD}</span>`;
+    if(t==='defend' && amt)    return `<span class="pill-eff def">${amt}${SHIELD}</span>`;
+    return `<span class="pill-eff none">${pillTypeIcon(c.type)}</span>`;
+  }
+  // Mobile hand card = compact pill: cost circle · name (wraps, never cut) · effect
+  // badge (value + icon). Same data-* hooks + classes as handCardHTML, so the existing
+  // tap/long-press wiring on `.hand-fan .pcard` applies unchanged. Cost is a plain
+  // number (the "Energy: x/y" rail is the only energy indicator). Discard is NOT on the
+  // pill — it's the single fixed top-right discard button (arm-then-tap).
   function cardPillHTML(hi, idx, used, illegal, pending, unaffordable, canDiscard){
     const c=hi.card; const cost=GF.energyCost(c);
     const cls = `pcard pill ${used?'used':''} ${illegal?'illegal':''} ${pending?'sel':''} ${unaffordable?'cantafford':''}`;
-    return `<div class="${cls}" data-hand="${idx}" data-aim="${esc(c.aim||'')}" data-ctype="${typeKey(c.type)}" style="--cls:${classColor(c.cls)}" title="${esc(c.name)}">
+    return `<div class="${cls}" data-hand="${idx}" data-aim="${esc(c.aim||'')}" data-ctype="${typeKey(c.type)}" style="--cls:${classColor(c.cls)}" title="${esc(c.name)} — ${esc(c.text)}">
       <span class="pill-cost" title="costs ${cost} energy (T${c.speed})">${cost}</span>
-      <span class="pill-ico sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">${pillTypeIcon(c.type)}</span>
       <span class="pill-name">${esc(c.name)}</span>
+      ${pillEffect(c)}
     </div>`;
   }
   // Fixed top-right discard control (mobile only): tap to arm → cards highlight →
