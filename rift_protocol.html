@@ -213,7 +213,7 @@
   .ctrl-cluster{display:flex;align-items:center;justify-content:space-between;gap:clamp(74px,13vw,140px);
     width:min(620px,94vw);background:rgba(18,17,13,.82);border:1px solid var(--line);
     border-radius:14px;padding:8px 20px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
-  .ctrl-cluster .energy-box{flex-direction:row;align-items:center;gap:8px}
+  .ctrl-cluster .energy-box{flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap;max-width:220px}
   .ctrl-cluster .energy-box .tip{margin:0}
   .ctrl-buttons{display:flex;gap:10px}
   .ctrl-buttons .ctrlbtn{width:auto;min-width:108px;font-size:16px}
@@ -337,7 +337,8 @@
     box-shadow:0 4px 12px rgba(0,0,0,.5)}
   .deck-back img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .deck-back .deck-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:10px;font-weight:700;letter-spacing:.4px;color:rgba(255,255,255,.65);text-transform:uppercase;text-align:center;padding:3px}
+    font-size:10px;font-weight:700;letter-spacing:.4px;color:rgba(255,255,255,.65);text-transform:uppercase;
+    text-align:center;padding:3px;line-height:1.05;overflow-wrap:anywhere;word-break:break-word}
   .deck-count{font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
   .deck.deckdead{opacity:.38;filter:grayscale(.7)}
   .deck.deckdead .deck-count{color:var(--muted)}
@@ -389,10 +390,16 @@
   .intro-video{width:100%;height:100%;object-fit:cover}
   .intro-skip{position:absolute;right:18px;bottom:18px;z-index:81}
 
-  /* right-margin controls — energy is plain teal text now (no pip/token icons) */
-  .energy-box{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+  /* right-margin controls — teal energy text PLUS a row of pips (visual complement) */
+  .energy-box{display:flex;flex-direction:column;gap:4px;align-items:flex-start;flex-wrap:wrap}
   .energy-box .big{font-size:21px;font-weight:800;color:var(--energy);white-space:nowrap}
   .energy-box .big .enext{font-size:13px;font-weight:600;color:var(--muted)}
+  /* energy pips: filled = available, dim = spent. Colour tracks the energy token. */
+  .energy-box .pips{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;line-height:1}
+  .energy-box .pips i{width:9px;height:9px;border-radius:50%;background:#0a0a08;
+    border:1px solid var(--line);box-sizing:border-box;transition:background .18s ease,box-shadow .18s ease}
+  .energy-box .pips i.on{background:var(--energy);border-color:var(--energy);
+    box-shadow:0 0 5px color-mix(in srgb,var(--energy) 65%,transparent)}
   .ctrlbtn{width:100%}
 
   /* ============ HAND (fan + hover focus) — now in the arena, above your team ============ */
@@ -935,12 +942,26 @@
     .ctrl-buttons{gap:8px}
     .ctrl-buttons .ctrlbtn{min-width:84px;padding:8px 10px}
 
-    /* hand: one horizontal swipe-row holding BOTH operatives' cards */
-    .card-tray{overflow-x:auto;justify-content:flex-start;padding:6px 8px;-webkit-overflow-scrolling:touch}
+    /* hand: one horizontal swipe-row holding BOTH operatives' cards. Extra right
+       pad lets the last card peek in from the edge instead of butting the frame. */
+    .card-tray{overflow-x:auto;justify-content:flex-start;padding:6px 8px 6px;scroll-padding-right:24px;
+      -webkit-overflow-scrolling:touch}
     .card-tray .hand-fan{overflow:visible}
     .tray-sec{flex:0 0 auto}
+    .tray-sec:last-child{padding-right:14px}   /* trailing peek space so cards aren't flush-clipped */
     .hand-fan .pcard{width:118px;height:auto;margin-left:-6px}
     .hand-group .pcard:first-child{margin-left:0}
+
+    /* scroll-edge affordance: gradient fades appear only when there is more hand
+       off-screen in that direction (toggled by JS: .tray-more / .tray-less). */
+    .arena-slot:has(.card-tray){position:relative}
+    .arena-slot:has(.card-tray)::before,
+    .arena-slot:has(.card-tray)::after{content:"";position:absolute;top:0;bottom:0;width:30px;
+      pointer-events:none;z-index:7;opacity:0;transition:opacity .2s ease}
+    .arena-slot:has(.card-tray)::before{left:0;background:linear-gradient(to right,rgba(10,6,20,.92),transparent)}
+    .arena-slot:has(.card-tray)::after{right:0;background:linear-gradient(to left,rgba(10,6,20,.92),transparent)}
+    .arena-slot.tray-less::before{opacity:1}
+    .arena-slot.tray-more::after{opacity:1}
 
     /* decks: compact row tucked under the team (no longer overlapping it) */
     .bf-you{flex-direction:column-reverse;gap:4px;align-items:center}
@@ -1063,8 +1084,12 @@
     width:min(310px,84vw);box-sizing:border-box;color:#e8ecf5;font-family:var(--font-body,inherit);
     background:linear-gradient(180deg,rgba(22,16,36,.98),rgba(13,9,22,.98));
     border:1px solid rgba(150,185,255,.4);border-radius:14px;padding:15px 16px 12px;
-    box-shadow:0 16px 54px rgba(0,0,0,.6)}
-  .tut-panel.center{left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,90vw);text-align:center}
+    box-shadow:0 16px 54px rgba(0,0,0,.6);
+    /* never taller than the (chrome-adjusted) viewport — scroll if content exceeds it,
+       so the action buttons/skip link stay reachable on a small phone screen */
+    max-height:calc(100svh - 24px);overflow-y:auto;overscroll-behavior:contain}
+  .tut-panel.center{left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,90vw);text-align:center;
+    max-height:calc(100svh - 24px);overflow-y:auto}
   .tut-panel .tp-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#7fbfff;opacity:.85}
   .tut-panel .tp-title{font-family:var(--font-display,inherit);font-size:19px;color:#cfe6ff;margin:3px 0 7px}
   .tut-panel .tp-body{font-size:14px;line-height:1.5;opacity:.95}
@@ -3672,9 +3697,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
 
     // center control cluster (above the hands): energy → round → Confirm / Undo.
     const hasStaged = sel.picks.length||sel.pendingHi;
+    const pips = Array.from({length:budget}, (_,i)=>`<i class="${i<remaining?'on':''}"></i>`).join('');
     const controls = `<div class="ctrl-cluster">
         <div class="energy-box">
           <div class="big"><span class="elabel">Energy:</span> ${remaining} / ${budget}${st.round<5?` <span class="enext">→ ${nextEnergy} next round</span>`:` <span class="enext">max</span>`}</div>
+          <div class="pips" aria-hidden="true" title="${remaining} of ${budget} energy available">${pips}</div>
         </div>
         <div class="ctrl-buttons">
           <button class="ctrlbtn confirm-btn" data-act="lock"><span class="cbl">Confirm</span> <span class="cb-sword">⚔</span></button>
@@ -3749,6 +3776,19 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       })
     }));
     if(sel.stage && $('#battle')) $('#battle').classList.add('targeting');
+
+    // scroll-edge affordance: toggle fade gradients on the hand row when the
+    // cards overflow the viewport (so it's clear more hand exists off-screen).
+    const tray = $('.card-tray'), traySlot = tray && tray.closest('.arena-slot');
+    if(tray && traySlot){
+      const updFades=()=>{
+        const overflow = tray.scrollWidth - tray.clientWidth;
+        traySlot.classList.toggle('tray-more', overflow - tray.scrollLeft > 4);
+        traySlot.classList.toggle('tray-less', tray.scrollLeft > 4);
+      };
+      updFades();
+      tray.addEventListener('scroll', updFades, {passive:true});
+    }
 
     // wire hand cards
     $$('.hand-fan .pcard').forEach(el=>{
