@@ -4091,11 +4091,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // Missing files degrade gracefully (the arena keeps its gradient / falls back).
   const WARP_ZONES = {
     Soldier:  { bg:'gf_bg_cyberpunk_v1.jpg', entry:"The breach here opened inside a collapsed weapons foundry still running on automated war protocols. Elemental cores fused to the structural metal are destabilizing the local fold. Breachblade holds primary assignment — the only operative who knows how the Junction systems work from the inside." },
-    Arcanist: { bg:'gf_bg_tempest_v1.png',   entry:"A storm-wracked ruin of a civilization that burned too bright. Residual arcane discharge from the collapse keeps tearing new breach points faster than they can be closed. Tempest holds primary assignment — the only one who can read the discharge patterns and predict the next tear." },
+    Arcanist: { bg:'gf_bg_tempest_v1.webp',  entry:"A storm-wracked ruin of a civilization that burned too bright. Residual arcane discharge from the collapse keeps tearing new breach points faster than they can be closed. Tempest holds primary assignment — the only one who can read the discharge patterns and predict the next tear." },
     Scout:    { bg:'gf_bg_wasteland_v1.jpg', entry:"A dead expanse of irradiated flats where nothing moves that does not want to be seen. The breach here is quiet and wide — the most dangerous kind. Wraith holds primary assignment, and prefers to work it alone." },
-    Drifter:  { bg:'gf_bg_western_v1.png',   entry:"A sun-bleached frontier system on the edge of total stellar collapse. Breach points here open and close unpredictably, demanding long-range threat response before RIFT extraction teams can get close. Longshot holds primary assignment, and does not call for backup." },
+    Drifter:  { bg:'gf_bg_western_v1.webp',  entry:"A sun-bleached frontier system on the edge of total stellar collapse. Breach points here open and close unpredictably, demanding long-range threat response before RIFT extraction teams can get close. Longshot holds primary assignment, and does not call for backup." },
     Cleric:   { bg:'gf_bg_shrine_v1.jpg',    entry:"What was once a sanctuary world is now a breach hotspot drawing threats from six adjacent dimensions at once. Beacon holds primary assignment, and has run sustained support operations here longer than any operative has held a single zone." },
-    Warden:   { bg:'gf_bg_aegis_v1.png',     entry:"An orbital station in permanent siege condition, now also a breach magnet for dimensional threats drawn to concentrated structural resistance. Aegis holds primary assignment. The station has not fallen. It will not." },
+    Warden:   { bg:'gf_bg_aegis_v1.webp',    entry:"An orbital station in permanent siege condition, now also a breach magnet for dimensional threats drawn to concentrated structural resistance. Aegis holds primary assignment. The station has not fallen. It will not." },
   };
   function zoneBgPath(cls){ return BG_DIR + (WARP_ZONES[cls] ? WARP_ZONES[cls].bg : ''); }
   function classColor(cls){ return CLASS_COLOR[cls] || '#d8a657'; }
@@ -4106,12 +4106,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   }
   // Per-class deck card-back (used for the on-board draw piles). Path derived from
   // the artassets/cardbacks/ naming convention; <img onerror> reveals a color back.
-  function cardBackFor(cls){ return 'artassets/cardbacks/gf_card_back_' + String(cls).toLowerCase() + '.png'; }
+  function cardBackFor(cls){ return 'artassets/cardbacks/gf_card_back_' + String(cls).toLowerCase() + '.webp'; }
   // Per-type card illustration from artassets/skillportraits/. Types without a file
   // (e.g. Equip) fall back to the type-color background behind the <img>.
   const TYPE_COLOR = { attack:'var(--bad)', defend:'var(--t1)', buff:'var(--good)', spell:'var(--pierce)', potion:'var(--t2)', equip:'var(--accent)', signature:'#f2c14e' };
   function typeColor(type){ return TYPE_COLOR[typeKey(type)] || 'var(--accent)'; }
-  function typeArtFor(type){ return 'artassets/skillportraits/gf_card_' + typeKey(type) + '.png'; }
+  function typeArtFor(type){ return 'artassets/skillportraits/gf_card_' + typeKey(type) + '.webp'; }
   // try a list of image URLs in order; call onLoad(url) for the first that loads.
   function loadFirst(urls, onLoad){
     let i=0;
