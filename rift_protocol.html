@@ -984,6 +984,54 @@
   }
 
   /* =========================================================================
+     MOBILE PILL HAND (≤768px) — the hand renders as two compact pill columns
+     (one per living operative) flanking the centered energy bar; the two draw
+     decks flank the portraits. These classes (.card-tray.pills / .pcard.pill /
+     .you-flank) are emitted by JS only at this viewport (isMobileViewport),
+     so the rules never affect desktop. Placed after the phone pass so the
+     .pcard.pill / .card-tray.pills overrides win same-specificity ties.
+     ========================================================================= */
+  @media (max-width:768px){
+    /* two pill columns pushed to the left & right edges, anchored to the bottom */
+    .card-tray.pills{flex-direction:row;justify-content:space-between;align-items:stretch;
+      height:100%;gap:8px;overflow:visible;padding:2px 6px 0;background:none;border-top:0}
+    .card-tray.pills.solo{justify-content:center}
+    .card-tray.pills .tray-div{display:none}
+    .card-tray.pills .tray-sec{flex:0 1 47%;max-width:47%;min-width:0;height:100%;
+      justify-content:flex-end;gap:4px}
+    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:60%}
+    .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto}
+    .card-tray.pills .hand-fan{flex:0 1 auto;flex-direction:column;align-items:stretch;
+      justify-content:flex-end;width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:0}
+    .card-tray.pills .hand-group{flex-direction:column;align-items:stretch;width:100%;gap:6px}
+
+    /* the pill: cost circle → type icon → name (ellipsis) → discard */
+    .pcard.pill{flex-direction:row;align-items:center;gap:9px;width:100%;box-sizing:border-box;
+      min-height:56px;height:58px;margin:0;padding:0 10px;border-radius:10px;overflow:hidden;
+      border:1.5px solid var(--cls,var(--accent));background:color-mix(in srgb,var(--cls) 15%,#14130f);
+      box-shadow:0 2px 8px rgba(0,0,0,.42)}
+    .pcard.pill .pill-cost{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+      width:26px;height:26px;border-radius:50%;font-size:14px;font-weight:800;color:var(--energy);
+      background:rgba(8,8,6,.9);border:1px solid color-mix(in srgb,var(--cls) 45%,transparent)}
+    .pcard.pill .pill-ico{flex:0 0 auto;display:flex;align-items:center;color:var(--ct,var(--accent))}
+    .pcard.pill .pill-name{flex:1 1 auto;min-width:0;font-size:15px;font-weight:700;color:#fff;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .pcard.pill .disc{flex:0 0 auto;font-size:16px;line-height:1;opacity:.85;cursor:pointer}
+    .pcard.pill.sel{outline:2px solid var(--accent);outline-offset:1px;box-shadow:0 0 0 1px var(--accent) inset}
+    .pcard.pill.illegal,.pcard.pill.cantafford{opacity:.4}
+    .pcard.pill.discardable{outline:2px dashed var(--bad);outline-offset:1px}
+
+    /* your team: the two draw decks flank the portraits, sized to match a portrait */
+    .you-flank{display:flex;align-items:flex-end;justify-content:center;gap:8px;width:100%}
+    .you-flank .pair{width:auto;max-width:none;gap:8px}
+    .you-flank .flank-deck{flex:0 0 auto}
+    .you-flank .flank-deck .deck{gap:2px}
+    .you-flank .flank-deck .deck-back{width:56px;height:64px}
+    .you-flank .flank-deck .deck-count{font-size:10px}
+    .your-side .cfighter .cport{width:64px;height:64px;flex:0 0 64px;min-width:64px;min-height:64px}
+  }
+
+  /* =========================================================================
      RIFT PROTOCOL — UI ART OVERLAYS (artassets/uiUpdate1)
      Frames/panels/buttons have FILLED centers, so they are applied as
      border-image: the ornate ring frames the live content while the center
@@ -3731,6 +3779,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     // `gi` walks the flat `hand` order (groups preserve fighter order), so the
     // data-hand indices stay aligned with the wiring below.
     let gi = 0;
+    // mobile viewport → render each operative's hand as a compact pill column
+    // (two columns flanking the centered energy bar). Same wiring either way.
+    const mobile = isMobileViewport();
+    const renderCard = mobile ? cardPillHTML : handCardHTML;
+    const aliveCount = side.fighters.filter(f=>f.alive).length;
     // only living operatives get a hand section — a lone survivor's hand then
     // centers across the full width instead of sitting in its half.
     const traySecs = side.fighters.filter(f=>f.alive).map(f=>{
@@ -3743,7 +3796,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
           const others = hand.some(h=> h!==hi && !usedItems.has(h) && !reservedDiscards.has(h));
           const playable = (addableMap.get(hi)||[]).length>0 && (!hi.card.discardOnPlay || others);
           const unaffordable = !playable && GF.energyCost(hi.card) > remaining;
-          return handCardHTML(hi, idx, false, !playable && !unaffordable, sel.pendingHi===hi, unaffordable, !sel.discardUsed);
+          return renderCard(hi, idx, false, !playable && !unaffordable, sel.pendingHi===hi, unaffordable, !sel.discardUsed);
         }).join('');
       }
       const label = f.alive ? esc(dn(f.className)) : (esc(dn(f.className)) + " — KO'd");
@@ -3753,7 +3806,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       return `<div class="tray-sec ${f.alive?'':'ko'}" style="--cls:${classColor(f.className)}">
           <div class="tray-label">${label}</div>${inner}</div>`;
     }).join('<div class="tray-div"></div>');
-    const handSlot = `<div class="card-tray">${traySecs}</div>`;
+    const handSlot = `<div class="card-tray${mobile?' pills':''}${mobile&&aliveCount===1?' solo':''}">${traySecs}</div>`;
 
     // deck viewer (opened by clicking a deck in the right rail), contained in the arena
     let deckViewer='', dvCards=[];
@@ -3799,7 +3852,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         el.onmouseenter=()=> showHandPreview(hi.card);
         el.onmouseleave=hideHandPreview;
         let _pt=null;
-        el.addEventListener('touchstart',()=>{ el._lp=false; _pt=setTimeout(()=>{ el._lp=true; showHandPreview(hi.card); }, 240); }, {passive:true});
+        el.addEventListener('touchstart',()=>{ el._lp=false; _pt=setTimeout(()=>{ el._lp=true; showHandPreview(hi.card); }, 400); }, {passive:true});
         const endTouch=()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } if(el._lp) hideHandPreview(); };
         el.addEventListener('touchend', endTouch); el.addEventListener('touchcancel', endTouch);
         el.addEventListener('touchmove',()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } }, {passive:true});
@@ -3912,6 +3965,18 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // your team (full-width bottom row)
   function yourZoneHTML(sideIdx, st, fopt){
     const you = st.sides[sideIdx];
+    // mobile (during card selection): the two draw decks flank the portraits
+    // (deck · pair · deck), each sized to match a portrait — instead of the
+    // desktop bottom-left deck corner.
+    if(isMobileViewport() && fopt.decks!==undefined){
+      const fs = you.fighters;
+      return `<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
+        <div class="you-flank">
+          <div class="flank-deck">${deckHTML(fs[0])}</div>
+          <div class="pair">${fs.map(f=> cfighterHTML(f, fopt.you?fopt.you(f):{})).join('')}</div>
+          <div class="flank-deck">${deckHTML(fs[1])}</div>
+        </div></div>`;
+    }
     const decks = fopt.decks ? `<div class="deck-corner"><div class="rail-label">Your decks</div>${fopt.decks}</div>` : '';
     return `${decks}<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
         <div class="pair">${you.fighters.map(f=> cfighterHTML(f, fopt.you?fopt.you(f):{})).join('')}</div></div>`;
@@ -4179,6 +4244,27 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       ${c.hint?`<div class="phint">↳ ${esc(c.hint)}</div>`:''}
       <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}</div>
       <span class="qribbon">Queued</span>
+    </div>`;
+  }
+  // Compact type glyph for the mobile pill: sword=Attack, shield=Defend, bolt=everything else.
+  function pillTypeIcon(type){
+    const k = typeKey(type);
+    if(k==='attack') return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg>';
+    if(k==='defend') return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+    return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+  }
+  // Mobile hand card = compact pill: cost circle → type icon → name (ellipsis) → discard.
+  // Same data-* hooks + classes as handCardHTML, so the existing tap/long-press/discard
+  // wiring on `.hand-fan .pcard` applies unchanged. Cost is a plain number (no energy pip;
+  // the "Energy: x/y" bar remains the only energy indicator).
+  function cardPillHTML(hi, idx, used, illegal, pending, unaffordable, canDiscard){
+    const c=hi.card; const cost=GF.energyCost(c);
+    const cls = `pcard pill ${used?'used':''} ${illegal?'illegal':''} ${pending?'sel':''} ${unaffordable?'cantafford':''}`;
+    return `<div class="${cls}" data-hand="${idx}" data-aim="${esc(c.aim||'')}" data-ctype="${typeKey(c.type)}" style="--cls:${classColor(c.cls)}" title="${esc(c.name)}">
+      <span class="pill-cost" title="costs ${cost} energy (T${c.speed})">${cost}</span>
+      <span class="pill-ico sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">${pillTypeIcon(c.type)}</span>
+      <span class="pill-name">${esc(c.name)}</span>
+      ${canDiscard?`<span class="disc" title="Discard &amp; redraw — swap this card for a fresh one from its deck (once per turn)">🔄</span>`:''}
     </div>`;
   }
 
