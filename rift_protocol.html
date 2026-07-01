@@ -1044,15 +1044,15 @@
 
     /* ---- HAND dominates the middle; two pill columns, each its own bounded scroller.
        Horizontal padding clears the fixed energy (left) and Confirm/Undo (right) rails. ---- */
-    .card-tray.pills{flex-direction:row;justify-content:space-between;align-items:stretch;
-      height:100%;gap:8px;overflow:visible;padding:0 64px 0 46px;background:none;border-top:0}
+    .card-tray.pills{flex-direction:row;justify-content:center;align-items:flex-end;
+      height:100%;gap:16px;overflow:visible;padding:0 66px 4px 48px;background:none;border-top:0}
     .card-tray.pills.solo{justify-content:center}
     .card-tray.pills .tray-div{display:none}
-    .card-tray.pills .tray-sec{flex:1 1 0;max-width:49%;min-width:0;height:100%;justify-content:flex-start;gap:3px}
-    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:76%;max-width:96%}
-    .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto;padding-top:2px}
-    .card-tray.pills .hand-fan{flex:1 1 auto;flex-direction:column;align-items:stretch;justify-content:flex-start;
-      width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:2px 2px 4px;-webkit-overflow-scrolling:touch}
+    .card-tray.pills .tray-sec{flex:0 1 170px;max-width:46%;min-width:0;max-height:100%;justify-content:flex-end;gap:3px}
+    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:60%;max-width:80%}
+    .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto;padding-bottom:1px}
+    .card-tray.pills .hand-fan{flex:0 1 auto;flex-direction:column;align-items:stretch;justify-content:flex-end;
+      width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:2px 2px 0;-webkit-overflow-scrolling:touch}
     .card-tray.pills .hand-group{flex-direction:column;align-items:stretch;width:100%;gap:6px}
 
     .pcard.pill{flex-direction:row;align-items:center;gap:8px;width:100%;box-sizing:border-box;flex:0 0 auto;
@@ -3243,9 +3243,6 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <button class="menu-item wiz-item" data-w="esc">Escalations</button>
         <button class="menu-item wiz-item" data-w="cards">Rift Cards</button>
         <button class="menu-item wiz-item" data-w="lore">Lore</button>
-        <button class="menu-item wiz-item" data-w="howto">How to Play</button>
-        <button class="menu-item wiz-item" data-w="credits">Credits</button>
-        <button class="menu-item wiz-item" data-w="feedback">Feedback</button>
       </div>
     </div>`);
     const on=(w,fn)=>{ const b=$(`[data-w="${w}"]`); if(b) b.onclick=fn; };
@@ -3253,9 +3250,6 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     on('esc',    ()=> wizGo(wizEscList));
     on('cards',  ()=> showCharacters());   // own screen; Back → showStart → wizMain
     on('lore',   ()=> showLore());
-    on('howto',  ()=> openHelp('howto'));
-    on('credits',()=> openHelp('credits'));
-    on('feedback',()=> openHelp('feedback'));
     UI.back = ()=> true;                    // root: nothing to go back to
   }
   function wizDeployMode(){
