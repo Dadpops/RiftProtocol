@@ -1035,6 +1035,55 @@
     .round-badge{position:static;transform:none}
   }
 
+  /* ===================== Right-click hint + onboarding coachmarks ===================== */
+  /* subtle persistent indicator that right-click = back / undo */
+  #rcHint{position:fixed;left:12px;bottom:12px;z-index:60;pointer-events:none;
+    font-family:var(--font-body,inherit);font-size:11px;letter-spacing:.04em;color:var(--muted,#9aa4bf);
+    background:rgba(10,8,18,.6);border:1px solid rgba(140,160,210,.22);border-radius:8px;padding:3px 9px;
+    opacity:.72;display:flex;align-items:center;gap:5px}
+  #rcHint.hidden{display:none}
+  #rcHint .rc-mouse{font-size:12px;opacity:.9}
+  @media (max-width:600px){ #rcHint{display:none} }   /* no right-click on touch — hide entirely */
+
+  /* onboarding coach overlay (guided, non-blocking: clicks pass through) */
+  #tutCoach{position:fixed;inset:0;z-index:205;pointer-events:none}
+  #tutCoach.hidden{display:none}
+  #tutCoach.scrim{background:rgba(6,4,12,.55)}
+  .tut-ring{position:fixed;border-radius:14px;pointer-events:none;z-index:205;
+    outline:3px solid #8fd0ff;box-shadow:0 0 0 9999px rgba(6,4,12,.55), 0 0 16px 4px #5bd;
+    transition:left .25s ease,top .25s ease,width .25s ease,height .25s ease;
+    animation:tutpulse 1.4s ease-in-out infinite}
+  @keyframes tutpulse{
+    0%,100%{outline-color:#7cc8ff;box-shadow:0 0 0 9999px rgba(6,4,12,.55),0 0 12px 3px #4ad}
+    50%{outline-color:#d4efff;box-shadow:0 0 0 9999px rgba(6,4,12,.48),0 0 28px 9px #8df}}
+  .tut-arrow{position:fixed;z-index:207;pointer-events:none;font-size:34px;line-height:1;color:#9fdcff;
+    text-shadow:0 0 12px #2af,0 2px 4px #000;animation:tutbounce 1s ease-in-out infinite}
+  @keyframes tutbounce{0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
+  .tut-panel{position:fixed;left:24px;top:50%;transform:translateY(-50%);z-index:207;pointer-events:auto;
+    width:min(310px,84vw);box-sizing:border-box;color:#e8ecf5;font-family:var(--font-body,inherit);
+    background:linear-gradient(180deg,rgba(22,16,36,.98),rgba(13,9,22,.98));
+    border:1px solid rgba(150,185,255,.4);border-radius:14px;padding:15px 16px 12px;
+    box-shadow:0 16px 54px rgba(0,0,0,.6)}
+  .tut-panel.center{left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,90vw);text-align:center}
+  .tut-panel .tp-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#7fbfff;opacity:.85}
+  .tut-panel .tp-title{font-family:var(--font-display,inherit);font-size:19px;color:#cfe6ff;margin:3px 0 7px}
+  .tut-panel .tp-body{font-size:14px;line-height:1.5;opacity:.95}
+  .tut-panel .tp-body b{color:#bfe0ff}
+  .tut-panel .tp-actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+  .tut-panel .tp-actions button{flex:1;min-width:96px;padding:8px 10px;border-radius:9px;cursor:pointer;
+    font-family:var(--font-body,inherit);font-size:13px;font-weight:700;
+    background:rgba(60,80,130,.4);border:1px solid rgba(150,185,255,.4);color:#dce6ff}
+  .tut-panel .tp-actions button.primary{background:linear-gradient(180deg,#3d6fd6,#2b53b0);border-color:#6fa0ff;color:#fff}
+  .tut-panel .tp-actions button:hover{filter:brightness(1.12)}
+  .tut-panel .tp-skip{display:block;width:100%;margin-top:9px;background:none;border:0;cursor:pointer;
+    color:#9aa4bf;font-size:11.5px;text-decoration:underline;font-family:var(--font-body,inherit)}
+  .tut-panel .tp-skip:hover{color:#cdd6ee}
+  /* Skip-tutorial button on the first-launch menu */
+  .skip-tut-btn{margin-top:14px;background:rgba(20,16,30,.5);border:1px solid rgba(150,160,190,.3);
+    color:var(--muted,#9aa4bf);font-size:12.5px;letter-spacing:.04em;padding:7px 16px;border-radius:9px;cursor:pointer;
+    font-family:var(--font-body,inherit)}
+  .skip-tut-btn:hover{color:#fff;border-color:rgba(180,190,220,.6)}
+
 </style>
 </head>
 <body>
@@ -2815,7 +2864,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // battle log, where fighters are named by their engine key). Whole-word only; no
   // card name contains a class key, so this is collision-free. Render-time only.
   const dnText = (s)=> s ? Object.keys(GF.CLASSES).reduce((t,k)=> t.replace(new RegExp('\\b'+k+'\\b','g'), dn(k)), s) : s;
-  const render = (html)=>{ hideCardPreview(); hideHandPreview(); app.innerHTML = html; };
+  const render = (html)=>{ hideCardPreview(); hideHandPreview(); UI.back=null; app.innerHTML = html;
+    try{ updateRcHint(); }catch(e){} try{ tutSync(); }catch(e){} };
   const $ = (sel)=> app.querySelector(sel);
   const $$ = (sel)=> Array.from(app.querySelectorAll(sel));
   let overlay = null;
@@ -2915,7 +2965,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
           <button class="menu-item" data-nav="escalations">${NAV_ICO.escalations}<span>Escalations</span></button>
           <button class="menu-item" data-nav="characters">${NAV_ICO.characters}<span>Rift Cards</span></button>
           <button class="menu-item" data-nav="lore">${NAV_ICO.lore}<span>Lore</span></button>
-          <button class="menu-item" data-nav="tutorial">${NAV_ICO.tutorial}<span>How to Play</span></button>
+          ${TUT.active?`<button class="skip-tut-btn" data-act="skiptut">Skip Tutorial</button>`:''}
         </div>
         <div class="fight-sub hidden" id="fightsub">
           <div class="fs-h">Select clearance — AI difficulty</div>
@@ -2933,13 +2983,15 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         </div>
       </div>
     `);
-    $('[data-nav="fight"]').onclick=()=>{ $('#fightsub').classList.toggle('hidden'); };
+    $('[data-nav="fight"]').onclick=()=>{ $('#fightsub').classList.toggle('hidden'); tutSync(); };
     $('[data-nav="escalations"]').onclick=()=> showEscalations();
     $('[data-nav="characters"]').onclick=()=> showCharacters();
     $('[data-nav="lore"]').onclick=()=> showLore();
-    $('[data-nav="tutorial"]').onclick=()=> openHelp('howto');
     $$('[data-mode]').forEach(b=> b.onclick=()=>{ UI.mode=b.dataset.mode; UI.classesP1=[]; UI.classesP2=[]; showClassSelect(1); });
     const mpBtn=$('[data-mpnav="multiplayer"]'); if(mpBtn) mpBtn.onclick=()=> mpEnterFlow();
+    const skipBtn=$('[data-act="skiptut"]'); if(skipBtn) skipBtn.onclick=()=>{ tutMarkSeen(); tutHide(); showStart(); };
+    // right-click on the menu closes the open Deploy submenu (no deeper level to return to)
+    UI.back = ()=>{ const fs=$('#fightsub'); if(fs && !fs.classList.contains('hidden')){ fs.classList.add('hidden'); tutSync(); } return true; };
     applyMenuBg();
   }
 
@@ -3761,6 +3813,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     }
     const quitBtn=$('[data-act="quit"]'); if(quitBtn) quitBtn.onclick=()=> confirmQuit();
     $('[data-act="clear"]').onclick=()=>{ sel.picks=[]; resetPending(); drawSelection(); };
+    // right-click in battle = Undo (clear all staged cards); first closes the deck viewer if open
+    UI.back = ()=>{
+      if(UI.deckView!=null){ UI.deckView=null; drawSelection(); return true; }
+      if(sel.picks.length || sel.pendingHi){ sel.picks=[]; resetPending(); aud('CARD_REMOVE'); drawSelection(); }
+      return true;   // swallow — never let a right-click quit the match
+    };
     $('[data-act="lock"]').onclick=()=>{ if(!sel.pendingHi){
       // finalize discard-on-play costs: move reserved discards to their decks
       sel.picks.forEach(p=>{ if(p.discardHi){ const o=p.discardHi.owner; o.hand=o.hand.filter(x=>x!==p.discardHi); o.deck.discard.push(p.discardHi.card); } });
@@ -4048,7 +4106,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       if(done) return; done=true;
       onDone && onDone();                         // render the battle underneath the overlay
       ov.classList.add('fade-out');               // CSS opacity transition → fades into battle
-      setTimeout(()=>{ try{ ov.remove(); }catch(e){} }, 520);
+      setTimeout(()=>{ try{ ov.remove(); }catch(e){} try{ tutSync(); }catch(e){} }, 520);   // resume coachmarks once the cinematic clears
     };
     const ov=document.createElement('div'); ov.className='intro-overlay';
     const v=document.createElement('video'); v.className='intro-video';
@@ -4067,7 +4125,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   function handCardHTML(hi, idx, used, illegal, pending, unaffordable, canDiscard){
     const c=hi.card; const cost=GF.energyCost(c);
     const cls = `pcard ${used?'used':''} ${illegal?'illegal':''} ${pending?'sel':''} ${unaffordable?'cantafford':''}`;
-    return `<div class="${cls}" data-hand="${idx}" style="--cls:${classColor(c.cls)}" title="${esc(c.flavor)}">
+    return `<div class="${cls}" data-hand="${idx}" data-aim="${esc(c.aim||'')}" data-ctype="${typeKey(c.type)}" style="--cls:${classColor(c.cls)}" title="${esc(c.flavor)}">
       ${canDiscard?`<span class="disc" title="Discard &amp; redraw — swap this card for a fresh one from its deck (once per turn)">🔄</span>`:''}
       <span class="qbadge" aria-hidden="true">✓</span>
       <div class="cardart sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">
@@ -4228,6 +4286,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       </div>`);
     const rm=node.querySelector('[data-act="rematch"]'); if(rm) rm.onclick=()=>{ clearOverlay(); rematch(); };
     node.querySelector('[data-act="menu"]').onclick=()=>{ clearOverlay(); showStart(); };  // showStart() calls mpLeave()
+    if(TUT.active) tutFinish();   // first-time onboarding: thank the tester, then never show again
   }
 
   /* ---------------- audio wiring (RiftAudio; all guarded, never throws) ---------------- */
@@ -4998,15 +5057,225 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       document.removeEventListener('click', dismiss, true);
       document.removeEventListener('keydown', dismiss, true);
       ov.classList.add('fade-out');
-      setTimeout(()=>{ try{ ov.remove(); }catch(e){} }, 320);
+      setTimeout(()=>{ try{ ov.remove(); }catch(e){} try{ tutSync(); }catch(e){} }, 340);   // resume coachmarks once the splash is gone
       showStart();
     };
     document.addEventListener('click', dismiss, true);
     document.addEventListener('keydown', dismiss, true);
   }
 
+  /* ===================== Right-click = Back / Undo =====================
+     Right-click acts as a universal Back button across every menu/mode/tab,
+     and as an Undo (clear staged cards) inside a battle. Priority: close the
+     topmost dismissable modal → in-battle undo (UI.back) → the current screen's
+     own Back button. Native context menu is preserved inside editable fields.  */
+  function handleGlobalBack(){
+    if(_helpEl){ closeHelp(); return; }
+    if(_fbEl){ closeFeedback(); return; }
+    const lm=document.querySelector('.lore-modal-backdrop');
+    if(lm){ const x=lm.querySelector('[data-act="lmclose"]'); if(x) x.click(); else { try{ lm.remove(); }catch(e){} } return; }
+    if(overlay){ const cn=overlay.querySelector && overlay.querySelector('[data-act="cancel"]'); if(cn) cn.click(); return; }  // cancel a quit dialog; flow overlays keep their own controls
+    if(typeof UI.back==='function'){ if(UI.back()!==false) return; }
+    const back=app.querySelector('[data-act="back"]'); if(back) back.click();
+  }
+  document.addEventListener('contextmenu', function(e){
+    if(e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    e.preventDefault();
+    try{ handleGlobalBack(); }catch(err){}
+  });
+
+  /* ---- persistent right-click hint (auto-updates per screen) ---- */
+  function mountRcHint(){
+    if(document.getElementById('rcHint')) return;
+    const el=document.createElement('div'); el.id='rcHint'; el.className='hidden'; document.body.appendChild(el);
+  }
+  function updateRcHint(){
+    const el=document.getElementById('rcHint'); if(!el) return;
+    let txt=null;
+    if(app.querySelector('.card-tray')) txt='Undo';                       // battle selection
+    else if(app.querySelector('[data-act="back"]') || app.querySelector('#menu')) txt='Back';
+    if(txt){ el.innerHTML=`<span class="rc-mouse">🖱</span> Right-click: ${txt}`; el.classList.remove('hidden'); }
+    else el.classList.add('hidden');
+  }
+
+  /* ===================== First-time onboarding (guided, non-blocking) =====================
+     A coach overlay (glow ring + arrow + left explanation panel) walks a new
+     player through their first deployment and match. It never blocks input —
+     clicks pass straight through to the game — and the phase is derived from the
+     live DOM/state each render via tutSync(), so it self-corrects if the player
+     wanders. Shown once; a localStorage flag (or Skip Tutorial) retires it.       */
+  const TUT = { active:false, tour:null, tourDone:false, coreDone:false, logDone:false, helpShown:false, mapDone:false };
+  const TUT_KEY = 'rift_onboarded';
+  function tutSeen(){ try{ return localStorage.getItem(TUT_KEY)==='1'; }catch(e){ return true; } }
+  function tutMarkSeen(){ TUT.active=false; try{ localStorage.setItem(TUT_KEY,'1'); }catch(e){} }
+  function mountCoach(){
+    if(document.getElementById('tutCoach')) return;
+    const c=document.createElement('div'); c.id='tutCoach'; c.className='hidden';
+    c.innerHTML='<div class="tut-ring" style="display:none"></div><div class="tut-arrow" style="display:none">▶</div><div class="tut-panel"></div>';
+    document.body.appendChild(c);
+  }
+  function tutHide(){ const c=document.getElementById('tutCoach'); if(c){ c.classList.add('hidden'); c.classList.remove('scrim'); } }
+  // Render the coach for one step. targetSel = element to ring/arrow (null → centered panel).
+  function tutPlace(targetSel, opts){
+    opts=opts||{};
+    const c=document.getElementById('tutCoach'); if(!c) return;
+    const ring=c.querySelector('.tut-ring'), arrow=c.querySelector('.tut-arrow'), panel=c.querySelector('.tut-panel');
+    c.classList.remove('hidden');
+    c.classList.toggle('scrim', !!opts.center);
+    panel.classList.toggle('center', !!opts.center);
+    if(opts.center){ panel.style.top=''; panel.style.left=''; panel.style.bottom=''; panel.style.transform=''; }  // let CSS .center take over
+    panel.innerHTML =
+      (opts.eyebrow?`<div class="tp-eyebrow">${esc(opts.eyebrow)}</div>`:'')+
+      (opts.title?`<div class="tp-title">${opts.title}</div>`:'')+
+      `<div class="tp-body">${opts.html||''}</div>`+
+      ((opts.actions&&opts.actions.length)?`<div class="tp-actions">${opts.actions.map((a,i)=>`<button data-tpa="${i}" class="${a.primary?'primary':''}">${esc(a.label)}</button>`).join('')}</div>`:'')+
+      (opts.noSkip?'':`<button class="tp-skip" data-tpa="skip">Skip tutorial</button>`);
+    (opts.actions||[]).forEach((a,i)=>{ const b=panel.querySelector(`[data-tpa="${i}"]`); if(b) b.onclick=a.onClick; });
+    const sk=panel.querySelector('[data-tpa="skip"]'); if(sk) sk.onclick=()=>{ tutMarkSeen(); tutHide(); if(app.querySelector('#menu')) showStart(); };
+    // remember the target so a light reposition loop can track it through menu
+    // slide-in animations, layout shifts, and resizes.
+    TUT._sel = (opts.center) ? null : targetSel;
+    tutReposition();
+  }
+  // (re)position the ring + arrow around the current step's target. Cheap; safe to
+  // call repeatedly. Hides the ring when there's no target (centered steps).
+  function tutReposition(){
+    const c=document.getElementById('tutCoach'); if(!c || c.classList.contains('hidden')) return;
+    const ring=c.querySelector('.tut-ring'), arrow=c.querySelector('.tut-arrow');
+    const tgt = TUT._sel ? (app.querySelector(TUT._sel)||document.querySelector(TUT._sel)) : null;
+    if(!tgt){ ring.style.display='none'; arrow.style.display='none'; return; }
+    const r=tgt.getBoundingClientRect(), pad=8;
+    if(r.width===0 && r.height===0){ ring.style.display='none'; arrow.style.display='none'; return; }
+    ring.style.display='block';
+    ring.style.left=(r.left-pad)+'px'; ring.style.top=(r.top-pad)+'px';
+    ring.style.width=(r.width+pad*2)+'px'; ring.style.height=(r.height+pad*2)+'px';
+    arrow.style.display='block'; arrow.textContent='▶';
+    arrow.style.left=(r.left-pad-36)+'px';
+    arrow.style.top=(r.top + r.height/2 - 18)+'px';
+    // keep the explanation panel clear of the highlighted element: drop it to the
+    // top when the target sits in the lower half of the screen (e.g. the hand).
+    const panel=c.querySelector('.tut-panel');
+    if(panel && !panel.classList.contains('center')){
+      const cy=r.top + r.height/2;
+      panel.style.left='24px'; panel.style.bottom='auto';
+      if(cy > window.innerHeight*0.55){ panel.style.top='14px'; panel.style.transform='none'; }
+      else { panel.style.top='50%'; panel.style.transform='translateY(-50%)'; }
+    }
+  }
+  // Battlefield tour: a short Next-driven walk through the four regions (round 1 only).
+  const TUT_TOUR=[
+    ['.enemy-side','Hostiles','The two enemy operatives — most of your cards target them. Neutralize <b>both</b> to win the breach.'],
+    ['.your-side','Your operatives','Your pair, down here. Keep them standing — if both fall, the breach is lost.'],
+    ['.card-tray','Your hand','The cards your operatives can play this round. You stage them from here.'],
+    ['.ctrl-cluster','Energy & Confirm','<b>Energy</b> caps how many cards you can play (it grows each round). <b>Confirm</b> locks your picks and resolves the round.'],
+  ];
+  function tutBattleTour(){
+    if(TUT.tour==null) TUT.tour=0;
+    if(TUT.tour>=TUT_TOUR.length){ TUT.tourDone=true; tutSync(); return; }
+    const i=TUT.tour, last=i>=TUT_TOUR.length-1, t=TUT_TOUR[i];
+    tutPlace(t[0], {eyebrow:`Battlefield tour · ${i+1}/${TUT_TOUR.length}`, title:t[1], html:t[2],
+      actions:[{label: last?'Start playing ›':'Next ›', primary:true, onClick:()=>{ if(last) TUT.tourDone=true; else TUT.tour++; tutSync(); }}]});
+  }
+  // Derive the current onboarding step from the live screen and render its coachmark.
+  function tutSync(){
+    if(!TUT.active){ tutHide(); return; }
+    // pause behind the splash / fight cinematic / any blocking overlay or modal
+    if(document.getElementById('splash') || document.querySelector('.intro-overlay')){ tutHide(); return; }
+    if(overlay || _helpEl || _fbEl || document.querySelector('.lore-modal-backdrop')){ tutHide(); return; }
+    // --- main menu ---
+    if(app.querySelector('#menu')){
+      const fs=app.querySelector('#fightsub');
+      if(fs && fs.classList.contains('hidden')){
+        tutPlace('[data-nav="fight"]', {eyebrow:'Welcome, operative', title:'Run your first deployment',
+          html:'RIFT sends operatives through breaches in pairs. Let’s deploy your first cell.<br><br>Click <b>Deploy</b> to begin.'});
+      } else {
+        tutPlace('[data-mode="random"]', {eyebrow:'Step 1 · Clearance', title:'Choose the enemy clearance',
+          html:'This sets the AI difficulty. For your first run, pick <b>Recruit</b> — the gentlest opponent.'});
+      }
+      return;
+    }
+    // --- class select (standard deploy only) ---
+    if(app.querySelector('.classgrid') && app.querySelector('.team-slots') && !UI.escSetup){
+      const filled=app.querySelectorAll('.team-slot.filled').length;
+      if(filled<2){
+        tutPlace('.classgrid', {eyebrow:'Step 2 · Your cell', title:`Pick two operatives (${filled}/2)`,
+          html:'Each operative fights with their home world’s style and a 20-card deck. <b>Click two portraits</b> to form your pair.'});
+      } else if(!TUT.mapDone && !app.querySelector('.ms-chip.ms-img.sel')){
+        tutPlace('.map-select', {eyebrow:'Step 3 · Warp Zone', title:'Choose where to fight',
+          html:'Pick a Warp Zone — the world you’ll breach into — or leave it on <b>Random</b>.',
+          actions:[{label:'Next ›', primary:true, onClick:()=>{ TUT.mapDone=true; tutSync(); }}]});
+      } else {
+        tutPlace('[data-act="go"]', {eyebrow:'Step 4 · Deploy', title:'Confirm your team',
+          html:'Your cell is ready. Click <b>Confirm team</b> to drop into the breach.'});
+      }
+      return;
+    }
+    // --- battle: card selection ---
+    if(app.querySelector('.card-tray')){
+      if(!TUT.tourDone){ tutBattleTour(); return; }
+      if(!TUT.coreDone){
+        const sel=UI.sel;
+        const stage = sel && sel.stage;
+        if(stage==='target'){                                   // picking an enemy to attack — the target row is glowing
+          tutPlace('#battle .cfighter.targetable', {eyebrow:'Pick a target', title:'Choose who to hit',
+            html:'Now click a <b>glowing enemy</b> up top to aim your attack at them.'});
+        } else if(stage==='ally'){                               // a support card that needs an ally
+          tutPlace('#battle .cfighter.targetable', {eyebrow:'Pick an ally', title:'Choose who receives it',
+            html:'Click a <b>glowing operative</b> to receive this card.'});
+        } else if(stage==='discard'){
+          tutPlace('.card-tray', {eyebrow:'Discard cost', title:'Pick a card to discard',
+            html:'This card asks you to discard another first — click any highlighted card.'});
+        } else {
+          const staged = !!(sel && sel.picks && sel.picks.length);
+          // Prefer to point at a real attack card so the guided path is unambiguous
+          // (attacks then ask for an enemy target). Fall back to the whole tray.
+          const atkSel = '#battle .hand-fan .pcard[data-aim="enemy"]:not(.used):not(.illegal):not(.cantafford)';
+          const hasAtk = !!app.querySelector(atkSel);
+          if(!staged){
+            tutPlace(hasAtk ? atkSel : '.card-tray', {eyebrow:'Your hand', title:'Play a card',
+              html: hasAtk
+                ? 'Click this <b>attack card</b> to play it — cards cost <b>energy</b> and resolve by speed tier (T1→T4). It’ll then ask you to pick a target.'
+                : 'Click a card to stage it for this round. Cards cost <b>energy</b> and resolve by speed tier (T1→T4).'});
+          } else {
+            tutPlace('[data-act="lock"]', {eyebrow:'Lock it in', title:'Confirm the round',
+              html:'Your pick is staged. Click <b>Confirm</b> — both teams reveal and resolve at once.<br><br><span style="opacity:.82">Tip: <b>right-click</b> clears your staged cards.</span>'});
+          }
+        }
+      } else { tutHide(); }
+      return;
+    }
+    // --- battle: resolution / log ---
+    if(app.querySelector('.dock-log')){
+      if(!TUT.logDone){
+        tutPlace('#docklog', {eyebrow:'The battle log', title:'Read what happened',
+          html:'Every hit, block, and KO is reported here as cards fire by tier.',
+          actions:[{label:'Got it ›', primary:true, onClick:()=>{ TUT.logDone=true; tutSync(); }}]});
+      } else if(!TUT.helpShown){
+        tutPlace('#helpBtn', {eyebrow:'Need the rules?', title:'Your reference is here',
+          html:'The <b>?</b> button (bottom-right) has <b>How to Play</b>, the full <b>Battle Log</b>, and credits — open it any time.',
+          actions:[{label:'Got it ›', primary:true, onClick:()=>{ TUT.helpShown=true; TUT.coreDone=true; tutHide(); }}]});
+      } else { tutHide(); }
+      return;
+    }
+    tutHide();
+  }
+  // Called from showEnd on the first match: thank the tester and retire the tutorial.
+  function tutFinish(){
+    tutMarkSeen();
+    tutPlace(null, {center:true, noSkip:true, eyebrow:'Onboarding complete', title:'Thank you for testing RIFT PROTOCOL!',
+      html:'That’s the core loop — deploy a pair, play cards by tier, and close the breach.<br><br>Remember: <b>right-click</b> is Back across the menus and Undo in battle. Explore Escalations, Lore, and the deck library whenever you’re ready.',
+      actions:[{label:'Finish', primary:true, onClick:()=> tutHide()}]});
+  }
+  window.addEventListener('resize', ()=>{ try{ if(TUT.active) tutSync(); }catch(e){} });
+  window.addEventListener('scroll', ()=>{ try{ if(TUT.active) tutReposition(); }catch(e){} }, true);
+  // keep the ring glued to its target through menu slide-ins / layout shifts
+  setInterval(()=>{ try{ if(TUT.active) tutReposition(); }catch(e){} }, 250);
+
   // Floating in-game Feedback button removed (per design slide); feedback still
   // lives in the Help panel's Feedback tab. mountFeedbackButton() kept for reuse.
+  mountRcHint();
+  mountCoach();
+  if(!tutSeen()) TUT.active=true;
   mountHelpButton();
   showSplash();
 })();
