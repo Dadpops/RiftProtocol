@@ -2888,9 +2888,10 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
      CONFIG — the deployed RIFT server (Railway). For local dev, change to
      "http://localhost:3000" and run `node server.js`.                                  */
   const RIFT_SERVER_URL = "https://genrefighters-production.up.railway.app";
-  // Feedback (bug reports / feature requests) are POSTed to this Discord webhook.
-  // Referenced only by name below — never inlined or logged.
-  const FEEDBACK_WEBHOOK_URL = "https://discord.com/api/webhooks/1521678788927160340/nbJo-pDBJ_bxmCT84wy1kfJB_AoZoPdI-oQUPajRdN1n3L372E5GL6kSmui5V-clCCYs";
+  // Feedback is POSTed to our OWN server (same origin as RIFT_SERVER_URL), which
+  // validates + rate-limits and forwards to Discord using a server-side-only
+  // webhook. The webhook URL is never present in this client / the repo.
+  const FEEDBACK_ENDPOINT = RIFT_SERVER_URL + "/api/feedback";
   const GAME_VERSION = "0.1.0";
   // All multiplayer state lives here; when MP.socket is null every mp* function is a
   // no-op, so nothing here can affect Hotseat / Escalations / standard play.
@@ -4827,10 +4828,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // on refocus, snap the (wall-clock) turn timer to the correct value immediately
   try{ document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ try{ mpRenderTimer(); }catch(e){} } }); }catch(e){}
 
-  /* ===================== Feedback (Discord webhook; additive, isolated) =====================
+  /* ===================== Feedback (server-proxied; additive, isolated) =====================
      Shared form used by both the standalone Feedback modal and the Help panel's
-     Feedback tab. Class-based selectors so multiple instances coexist. A failed
-     send can't crash or freeze the game. */
+     Feedback tab. Class-based selectors so multiple instances coexist. Submits raw
+     fields to our own /api/feedback endpoint (never to Discord directly) — the
+     server validates, rate-limits, and forwards using a server-side-only webhook.
+     A failed send can't crash or freeze the game. */
   let _fbEl=null, _fbEsc=null;
   const FB_AREAS=['Gameplay / Cards','Escalations','Multiplayer','Audio','UI / Visual','Lore / Text','Other'];
   function fbFormHTML(){
@@ -4849,6 +4852,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
           <textarea class="fbMsg" maxlength="1000" placeholder="Describe the bug or feature request... (30 characters minimum)"></textarea>
           <div class="fb-count short fbCount">0 / 1000</div>
           <div class="fb-err fbErrMsg"></div></div>
+        <input class="fbHp" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0" placeholder="Leave this field empty">
         <button class="fb-send primary fbSend" disabled>Send Feedback</button>
         <div class="fb-err fbErrSend" style="text-align:center"></div>
       </div>`;
@@ -4880,22 +4884,17 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     if(bad) return;
     form._sending=true;
     const sendEl=q('.fbSend'); sendEl.disabled=true; sendEl.textContent='Sending…';
-    const d=new Date(), pad=n=>String(n).padStart(2,'0');
-    const ts=`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
-    const payload={ embeds:[{
-      title: type+' — '+area, description: msg,
-      color: type==='Bug Report' ? 15158332 : 3447003,
-      fields:[
-        { name:'Name',  value: name  || 'Not provided', inline:true },
-        { name:'Email', value: email || 'Not provided', inline:true },
-        { name:'Submitted', value: ts, inline:false },
-      ],
-      footer:{ text:'RIFT PROTOCOL Feedback · v'+GAME_VERSION },
-    }]};
+    // Send raw fields to our server, which builds the Discord embed itself. The
+    // honeypot (.fbHp) should always be empty for a real user.
+    const hpEl=q('.fbHp');
+    const payload={ type, area, name, email, message: msg, version: GAME_VERSION, hp: hpEl?hpEl.value:'' };
     (async()=>{
       try{
-        const res = await fetch(FEEDBACK_WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-        if(res && res.ok) fbOk(form, onClose); else fbBad(form);
+        const res = await fetch(FEEDBACK_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+        if(res && res.ok) fbOk(form, onClose);
+        else if(res && res.status===429) fbBad(form, 'Too many submissions — please try again in a few minutes.');
+        else if(res && res.status===503) fbBad(form, 'Feedback is temporarily unavailable. Please try again later.');
+        else fbBad(form);
       }catch(e){ fbBad(form); }
     })();
   }
@@ -4906,10 +4905,10 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       <button class="fb-send primary fbDone" style="max-width:180px;margin:12px auto 0">Close</button></div>`;
     const b=form.querySelector('.fbDone'); if(b) b.onclick=()=>{ if(onClose) onClose(); };
   }
-  function fbBad(form){
+  function fbBad(form, msg){
     form._sending=false;
     const s=form.querySelector('.fbSend'); if(s){ s.disabled=false; s.textContent='Send Feedback'; }
-    const e=form.querySelector('.fbErrSend'); if(e) e.textContent='Something went wrong. Please try again.';
+    const e=form.querySelector('.fbErrSend'); if(e) e.textContent=msg||'Something went wrong. Please try again.';
   }
   function openFeedback(){
     if(_fbEl) return;

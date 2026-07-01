@@ -21,6 +21,10 @@
  *      (Railway injects PORT automatically; this server honors process.env.PORT).
  *   5. Copy the Railway public URL (e.g. https://your-app.up.railway.app) and set
  *      it as RIFT_SERVER_URL at the top of the gf-ui script in rift_protocol.html.
+ *   6. Set FEEDBACK_WEBHOOK_URL in the Railway dashboard (Variables) to your
+ *      Discord webhook. It stays server-side only — the client never sees it and
+ *      it is never committed. If unset, the /api/feedback endpoint returns 503
+ *      and the in-game feedback form shows a graceful "unavailable" message.
  * ========================================================================== */
 
 const path = require('path');
@@ -33,6 +37,75 @@ const PORT = process.env.PORT || 3000;
 const LOG_DIR = path.join(__dirname, 'logs');   // opt-in multiplayer session logs land here
 
 const app = express();
+// Behind Railway's proxy → trust the first hop so req.ip is the real client IP
+// (needed for per-IP rate limiting on the feedback endpoint).
+app.set('trust proxy', 1);
+
+/* ---- feedback proxy (server-side; keeps the Discord webhook OFF the client) ----
+   The browser POSTs raw feedback fields to /api/feedback; the server validates,
+   rate-limits, and forwards a Discord embed using FEEDBACK_WEBHOOK_URL — which
+   lives ONLY in the server environment and is never shipped to the client or the
+   repo. Anti-spam: per-IP + global sliding-window limits, a honeypot field, tight
+   size caps, and allowed_mentions disabled so message text can never ping. */
+const FEEDBACK_WEBHOOK_URL = process.env.FEEDBACK_WEBHOOK_URL || '';
+const FB = { ipMax: 5, ipWindowMs: 10 * 60 * 1000, globalMax: 100, globalWindowMs: 10 * 60 * 1000, maxBody: 16 * 1024 };
+const fbIpHits = new Map();   // ip -> [timestamps]
+let fbGlobalHits = [];        // [timestamps]
+function fbPrune(arr, windowMs, now) { const cut = now - windowMs; let i = 0; while (i < arr.length && arr[i] < cut) i++; return i ? arr.slice(i) : arr; }
+function fbRateLimited(ip) {
+  const now = Date.now();
+  fbGlobalHits = fbPrune(fbGlobalHits, FB.globalWindowMs, now);
+  if (fbGlobalHits.length >= FB.globalMax) return true;                 // protect Discord from any flood
+  let hits = fbPrune(fbIpHits.get(ip) || [], FB.ipWindowMs, now);
+  if (hits.length >= FB.ipMax) { fbIpHits.set(ip, hits); return true; } // per-IP cap
+  hits.push(now); fbIpHits.set(ip, hits);
+  fbGlobalHits.push(now);
+  return false;
+}
+// periodic cleanup so idle IP buckets don't accumulate in memory
+const fbCleanup = setInterval(() => {
+  const now = Date.now();
+  for (const [ip, arr] of fbIpHits) { const p = fbPrune(arr, FB.ipWindowMs, now); if (p.length) fbIpHits.set(ip, p); else fbIpHits.delete(ip); }
+}, 5 * 60 * 1000);
+if (fbCleanup.unref) fbCleanup.unref();
+const fbStr = (v, max) => String(v == null ? '' : v).slice(0, max);
+
+app.post('/api/feedback', express.json({ limit: FB.maxBody }), async (req, res) => {
+  try {
+    if (!FEEDBACK_WEBHOOK_URL) return res.status(503).json({ error: 'Feedback is not configured.' });
+    const b = req.body || {};
+    if (b.hp) return res.status(204).end();                            // honeypot tripped → silently drop (looks like success)
+    const type = fbStr(b.type, 40).trim();
+    const area = fbStr(b.area, 60).trim();
+    const message = fbStr(b.message, 1000).trim();
+    const name = fbStr(b.name, 60).trim();
+    const email = fbStr(b.email, 100).trim();
+    const version = fbStr(b.version, 20).trim();
+    if (!type || !area || message.length < 30) return res.status(400).json({ error: 'Invalid feedback.' });
+    const ip = String(req.ip || '');
+    if (fbRateLimited(ip)) return res.status(429).json({ error: 'Too many submissions — please try again later.' });
+    const d = new Date(), pad = (n) => String(n).padStart(2, '0');
+    const ts = `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+    const payload = {
+      allowed_mentions: { parse: [] },                                 // message text can never @ping
+      embeds: [{
+        title: (type + ' — ' + area).slice(0, 256),
+        description: message.slice(0, 4000),
+        color: type === 'Bug Report' ? 15158332 : 3447003,
+        fields: [
+          { name: 'Name', value: (name || 'Not provided').slice(0, 1024), inline: true },
+          { name: 'Email', value: (email || 'Not provided').slice(0, 1024), inline: true },
+          { name: 'Submitted', value: ts, inline: false },
+        ],
+        footer: { text: ('RIFT PROTOCOL Feedback' + (version ? ' · v' + version : '')).slice(0, 2048) },
+      }],
+    };
+    const resp = await fetch(FEEDBACK_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (resp && resp.ok) return res.status(204).end();
+    return res.status(502).json({ error: 'Upstream error.' });
+  } catch (e) { return res.status(500).json({ error: 'Server error.' }); }
+});
+
 // Serve the game (and its art) statically from this directory.
 app.use(express.static(__dirname));
 app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'rift_protocol.html')));
