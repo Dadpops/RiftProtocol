@@ -995,80 +995,106 @@
      after the phone pass so these overrides win same-specificity ties.
      ========================================================================= */
   @media (max-width:768px){
-    /* frame reorder: top(round+hint) · enemy · your team · pills(flex) · controls */
-    #battle{grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:6px;
+    /* frame reorder: top(round·menu) · enemy+staged · HAND(dominant) · allies · controls.
+       Energy and Confirm/Undo are pulled out into fixed side rails (below), so the hand
+       gets the whole middle of the screen. */
+    #battle{grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:5px;
       padding:6px 6px max(6px,env(safe-area-inset-bottom))}
-    .bf-top{grid-row:1;justify-content:flex-start;gap:8px;padding:0 4px;min-height:42px}
-    .bf-center{grid-row:2;padding:2px 6px;gap:4px;justify-content:flex-start}
-    .bf-you{grid-row:3;flex-direction:column;gap:2px;align-items:center;justify-content:flex-end}
-    .bf-hand{grid-row:4}
+    .bf-top{grid-row:1;position:relative;justify-content:center;gap:8px;padding:0 4px;min-height:40px}
+    .bf-center{grid-row:2;padding:2px 6px;gap:3px;justify-content:flex-start}
+    .bf-hand{grid-row:3}
+    .bf-you{grid-row:4;flex-direction:column;gap:2px;align-items:center;justify-content:flex-end}
     .bf-controls{grid-row:5}
 
-    /* top glance bar: small round + hint; Quit folds into the bottom Menu button */
+    /* top bar: Round pinned left · Menu centered · (Discard is the fixed top-right button) */
     .quit-btn{display:none}
-    .bf-controls .round-badge{display:none}   /* round is shown in the top glance bar on mobile */
-    .top-round{display:inline-flex;align-items:baseline;font-weight:800;font-size:15px;color:#fff;
+    .bf-controls .round-badge{display:none}
+    .top-round{position:absolute;left:6px;top:50%;transform:translateY(-50%);
+      display:inline-flex;align-items:baseline;font-weight:800;font-size:15px;color:#fff;
       white-space:nowrap;text-shadow:0 1px 4px #000}
     .top-round .tr-of{font-size:11px;color:var(--muted);margin-left:1px}
-    .top-hint{font-size:12px;max-width:58vw;text-align:left}
+    .mtop-menu{border-image:none;border:1px solid var(--line);border-radius:10px;background:rgba(18,17,13,.94);
+      color:var(--ink);font-size:18px;line-height:1;padding:6px 13px}
 
-    /* fighter panels (glance). enemy a touch larger than your team. */
+    /* fighter panels (glance) */
     .pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;max-width:100%}
     .cfighter{min-width:0;padding:6px 8px;gap:8px;border-radius:9px}
     .cfighter .cname{font-size:14px}
-    .cfighter .chpwrap{margin:4px 0;gap:5px}
+    .cfighter .chpwrap{margin:3px 0;gap:5px}
     .chpnum{font-size:11.5px;min-width:38px}
     .ctag{font-size:10px;padding:0 4px;line-height:1.45}
     .arena-side .label{font-size:9.5px}
     .enemy-side .pair{gap:8px;max-width:100%}
-    .enemy-side .cfighter .cport{width:66px;height:66px;flex:0 0 66px;min-width:66px;min-height:66px}
+    .enemy-side .cfighter .cport{width:64px;height:64px;flex:0 0 64px;min-width:64px;min-height:64px}
     .enemy-side .cfighter .cname{font-size:15px}
-    .your-side .cfighter .cport{width:58px;height:58px;flex:0 0 58px;min-width:58px;min-height:58px}
-    .deck-hold-hint{font-size:9.5px;color:var(--muted);opacity:.7;letter-spacing:.3px}
+    .your-side .cfighter{position:relative}
+    .your-side .cfighter .cport{width:56px;height:56px;flex:0 0 56px;min-width:56px;min-height:56px}
+    /* tap-to-view-deck icon on each ally portrait (single tap; no long-press) */
+    .cdeck-btn{position:absolute;top:3px;right:3px;z-index:4;width:26px;height:26px;border-radius:7px;
+      border:1px solid var(--line);background:rgba(10,8,5,.92);color:var(--accent);
+      display:flex;align-items:center;justify-content:center;padding:0;
+      touch-action:manipulation;user-select:none;-webkit-user-select:none}
 
-    /* ---- pills: two columns, EACH its own bounded scroller (top card is never
-       hidden behind the Round panel — the panel is now at the bottom) ---- */
+    /* compact staged area: one row, no big empty placeholder */
+    .arena-mid{min-height:0}
+    .staging{gap:3px}
+    .staging-label{font-size:9.5px}
+    .staging-empty{display:none}
+    .target-notice{font-size:14px;padding:6px 12px}
+
+    /* ---- HAND dominates the middle; two pill columns, each its own bounded scroller.
+       Horizontal padding clears the fixed energy (left) and Confirm/Undo (right) rails. ---- */
     .card-tray.pills{flex-direction:row;justify-content:space-between;align-items:stretch;
-      height:100%;gap:8px;overflow:visible;padding:0 4px;background:none;border-top:0}
+      height:100%;gap:8px;overflow:visible;padding:0 64px 0 46px;background:none;border-top:0}
     .card-tray.pills.solo{justify-content:center}
     .card-tray.pills .tray-div{display:none}
     .card-tray.pills .tray-sec{flex:1 1 0;max-width:49%;min-width:0;height:100%;justify-content:flex-start;gap:3px}
-    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:64%;max-width:82%}
+    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:76%;max-width:96%}
     .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto;padding-top:2px}
     .card-tray.pills .hand-fan{flex:1 1 auto;flex-direction:column;align-items:stretch;justify-content:flex-start;
       width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:2px 2px 4px;-webkit-overflow-scrolling:touch}
     .card-tray.pills .hand-group{flex-direction:column;align-items:stretch;width:100%;gap:6px}
 
-    .pcard.pill{flex-direction:row;align-items:center;gap:9px;width:100%;box-sizing:border-box;flex:0 0 auto;
-      min-height:56px;height:58px;margin:0;padding:0 10px;border-radius:10px;overflow:hidden;
+    .pcard.pill{flex-direction:row;align-items:center;gap:8px;width:100%;box-sizing:border-box;flex:0 0 auto;
+      min-height:56px;height:58px;margin:0;padding:0 8px;border-radius:10px;overflow:hidden;
       border:1.5px solid var(--cls,var(--accent));background:color-mix(in srgb,var(--cls) 16%,#14130f);
       box-shadow:0 2px 8px rgba(0,0,0,.42)}
     .pcard.pill .pill-cost{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
-      width:26px;height:26px;border-radius:50%;font-size:14px;font-weight:800;color:var(--energy);
+      width:25px;height:25px;border-radius:50%;font-size:13.5px;font-weight:800;color:var(--energy);
       background:rgba(8,8,6,.9);border:1px solid color-mix(in srgb,var(--cls) 45%,transparent)}
     .pcard.pill .pill-ico{flex:0 0 auto;display:flex;align-items:center;color:var(--ct,var(--accent))}
-    .pcard.pill .pill-name{flex:1 1 auto;min-width:0;font-size:15px;font-weight:700;color:#fff;
+    .pcard.pill .pill-name{flex:1 1 auto;min-width:0;font-size:14.5px;font-weight:700;color:#fff;
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .pcard.pill.sel{outline:2px solid var(--accent);outline-offset:1px;box-shadow:0 0 0 1px var(--accent) inset}
     .pcard.pill.illegal,.pcard.pill.cantafford{opacity:.4}
-    /* discard mode armed: every card becomes a redraw candidate and pulses red */
     .card-tray.pills.discarding .pcard.pill{outline:2px dashed var(--bad);outline-offset:1px;opacity:1;
       animation:targetpulse 1s ease-in-out infinite}
 
-    /* ---- bottom control bar: energy line · full-width Confirm · Undo | Menu ---- */
-    .ctrl-cluster{flex-direction:column;gap:7px;width:min(96vw,560px);padding:8px 12px 10px}
-    .ctrl-cluster .energy-box{max-width:none;justify-content:center;gap:10px}
-    .energy-box .big{font-size:17px}
-    .energy-box .big .enext{display:none}
-    .ctrl-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
-    .ctrl-buttons .confirm-btn{grid-column:1 / -1;min-width:0;max-width:none;width:100%;
-      font-size:20px;padding:15px 12px;min-height:56px}
-    .ctrl-buttons .undo-btn{grid-column:1;min-width:0;max-width:none;width:100%}
-    .ctrl-buttons .menu-btn{grid-column:2;min-width:0;max-width:none;width:100%;display:flex;
-      align-items:center;justify-content:center}
-    .skip-btn{width:100%;min-height:52px;font-size:18px}
+    /* ---- fixed LEFT energy rail: vertical pip stack in a subtle panel, screen-centered ---- */
+    .mrail{position:fixed;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;
+      align-items:center}
+    .mrail-energy{left:6px;gap:5px;padding:8px 6px;border-radius:14px;background:rgba(10,8,16,.72);
+      border:1px solid rgba(255,255,255,.1);box-shadow:0 3px 12px rgba(0,0,0,.4)}
+    .me-pips{display:flex;flex-direction:column-reverse;gap:5px}
+    .me-pips i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.14);display:block}
+    .me-pips i.on{background:var(--energy);box-shadow:0 0 6px color-mix(in srgb,var(--energy) 70%,transparent)}
+    .me-count{font-size:10px;font-weight:800;color:var(--energy);letter-spacing:.3px}
 
-    /* ---- fixed discard button (occasional; ok in the top glance zone), safe-area aware ---- */
+    /* ---- fixed RIGHT control rail: Confirm (check) over Undo (arrow), screen-centered ---- */
+    .mrail-ctrl{right:8px;gap:12px}
+    .mctrl{border-image:none;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      padding:0;font-weight:800;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.5);touch-action:manipulation}
+    .mctrl-confirm{width:58px;height:58px;font-size:27px;background:color-mix(in srgb,var(--accent) 32%,#0a0a08);
+      color:#fff;border:2px solid var(--accent)}
+    .mctrl-confirm:active{background:color-mix(in srgb,var(--accent) 48%,#0a0a08)}
+    .mctrl-undo{width:44px;height:44px;font-size:22px;background:rgba(16,14,9,.94);color:var(--ink);
+      border:1px solid var(--line)}
+    .mctrl-undo[disabled]{opacity:.35}
+
+    /* controls row (bottom): empty during selection; Skip/Continue during resolution */
+    .skip-btn{width:auto;min-width:150px;min-height:48px;font-size:17px}
+
+    /* fixed discard button (top-right, safe-area aware) */
     .mob-discard{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:60;
       display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:20px;font-size:13px;
       font-weight:700;color:var(--ink);background:rgba(18,17,13,.94);border:1px solid var(--line);
@@ -1090,6 +1116,61 @@
   .gm-sound .gm-h{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:6px}
   .gm-slider{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);margin:4px 0}
   .gm-slider input{flex:1}
+
+  /* ===== Mobile menu wizard (one decision per page) — rendered only ≤768px ===== */
+  #app:has(.wiz){padding:0;max-width:none}
+  .wiz{min-height:100dvh;display:flex;flex-direction:column;box-sizing:border-box;
+    padding:max(8px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}
+  .wiz-top{display:flex;align-items:center;gap:10px;min-height:46px;flex:0 0 auto}
+  .wiz-back{width:42px;height:42px;flex:0 0 auto;border-image:none;border:1px solid var(--line);border-radius:11px;
+    background:rgba(18,17,13,.92);color:var(--ink);font-size:22px;line-height:1;display:flex;align-items:center;
+    justify-content:center;padding:0;touch-action:manipulation}
+  .wiz-back:hover{color:var(--accent)}
+  .wiz-back-spacer{width:42px;flex:0 0 auto}
+  .wiz-title{flex:1;text-align:center;font-family:var(--font-display,inherit);font-size:19px;font-weight:800;color:#fff;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px #000}
+  .wiz-body{flex:1;min-height:0;overflow-y:auto;padding:12px 2px;-webkit-overflow-scrolling:touch}
+  .wiz-foot{flex:0 0 auto;padding-top:10px}
+
+  .wiz-home{align-items:center;justify-content:center;text-align:center}
+  .wiz-logo{font-family:var(--font-display,inherit);font-size:clamp(34px,9vw,52px);color:var(--accent);
+    margin:0 0 26px;text-shadow:0 3px 18px #000;letter-spacing:2px}
+  .wiz-menu{display:flex;flex-direction:column;gap:11px;width:min(340px,90vw)}
+  .wiz-item{width:100%;padding:15px;font-size:17px;font-weight:800;color:var(--ink);text-align:center}
+
+  .wiz-list{display:flex;flex-direction:column;gap:11px;max-width:420px;margin:0 auto}
+  .wiz-opt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;padding:14px 18px;color:var(--ink);text-align:left}
+  .wiz-opt b{font-size:17px} .wiz-opt span{font-size:12px;color:var(--muted)}
+  .wiz-sep{text-align:center;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin:6px 0 2px}
+
+  .wiz-classgrid{display:flex;flex-direction:column;gap:11px;max-width:460px;margin:0 auto}
+  .wiz-class{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:12px;
+    border:1px solid var(--line);border-left:4px solid var(--cls);background:rgba(20,19,15,.85);color:var(--ink);text-align:left}
+  .wiz-class.sel{box-shadow:0 0 0 2px var(--cls) inset;background:rgba(36,30,18,.9)}
+  .wc-port{width:64px;height:64px;flex:0 0 64px;border-radius:9px;overflow:hidden;position:relative;
+    background:linear-gradient(150deg,color-mix(in srgb,var(--cls) 55%,#1b1a14),#14130f)}
+  .wc-port img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover} .wc-port .ph{display:none}
+  .wc-meta{flex:1;min-width:0} .wc-name{font-weight:800;font-size:17px;color:var(--cls)} .wc-title{font-size:12px;color:var(--muted)}
+  .wc-check{position:absolute;top:8px;right:10px;color:var(--good);font-weight:900;font-size:20px}
+
+  .wiz-maps{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:460px;margin:0 auto}
+  .wiz-map{height:82px;border-radius:12px;border:1px solid var(--line);background-size:cover;background-position:center;
+    color:#fff;display:flex;align-items:flex-end;justify-content:center;padding:8px;background-color:#14130f}
+  .wiz-map.sel{box-shadow:0 0 0 3px var(--accent)} .wm-name{font-weight:800;font-size:13px;text-shadow:0 1px 4px #000}
+
+  .wiz-esc-grid{display:flex;flex-direction:column;gap:11px;max-width:460px;margin:0 auto}
+  .wiz-esc{position:relative;min-height:92px;border-radius:14px;border:1px solid var(--line);border-left:5px solid var(--cls);
+    background-size:cover;background-position:center;background-color:#14130f;color:#fff;display:flex;flex-direction:column;
+    align-items:flex-start;justify-content:flex-end;gap:2px;padding:12px 14px;text-align:left}
+  .wiz-esc .esc-tier{position:absolute;top:8px;right:10px;font-size:11px;font-weight:800;background:rgba(8,8,6,.7);padding:2px 8px;border-radius:9px}
+  .we-name{font-weight:800;font-size:17px;text-shadow:0 1px 4px #000} .we-zone{font-size:12px;opacity:.92;text-shadow:0 1px 3px #000}
+
+  .wiz-foot-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .wiz-count{font-size:13px;color:var(--muted)}
+  .wiz-confirm{flex:0 0 auto;padding:14px 22px;font-size:17px;font-weight:800;color:#fff;
+    background:color-mix(in srgb,var(--accent) 30%,#0a0a08)}
+  .wiz-confirm[disabled]{opacity:.4}
+  .wiz-foot>.wiz-confirm{width:100%}
 
   /* =========================================================================
      RIFT PROTOCOL — UI ART OVERLAYS (artassets/uiUpdate1)
@@ -3090,6 +3171,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     escRun = null; UI.escSetup = null;   // leave any Escalation flow on returning to the menu
     mpLeave();                            // drop any multiplayer socket/session on returning to menu
     music('menu');
+    // mobile: the whole menu + setup is a linear one-decision-per-page wizard.
+    if(isMobileViewport()){ wizMain(); return; }
     render(`
       <div id="menu">
         <h1 class="title">RIFT PROTOCOL</h1>
@@ -3127,6 +3210,123 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     // right-click on the menu closes the open Deploy submenu (no deeper level to return to)
     UI.back = ()=>{ const fs=$('#fightsub'); if(fs && !fs.classList.contains('hidden')){ fs.classList.add('hidden'); tutSync(); } return true; };
     applyMenuBg();
+  }
+
+  /* ================= Mobile menu wizard (≤768px) =================
+     One decision per page with a Back stack. Reuses the existing launch
+     functions (startMatch / beginEscalation / mpEnterFlow) — desktop menu
+     is unchanged. `wizStack` holds page thunks; Back pops one level.        */
+  let wizStack = [];
+  function wizGo(fn){ wizStack.push(fn); fn(); }
+  function wizBack(){ wizStack.pop(); const top = wizStack[wizStack.length-1]; (top || wizMain)(); }
+  function wizFrame(title, body, opts){
+    opts = opts || {};
+    render(`<div class="wiz screen-bg-menu">
+      <div class="wiz-top">
+        <button class="wiz-back" data-act="wizback" aria-label="Back">←</button>
+        <div class="wiz-title">${title}</div>
+        <span class="wiz-back-spacer"></span>
+      </div>
+      <div class="wiz-body">${body}</div>
+      ${opts.foot?`<div class="wiz-foot">${opts.foot}</div>`:''}
+    </div>`);
+    const b=$('[data-act="wizback"]'); if(b) b.onclick=()=> wizBack();
+    UI.back = ()=>{ wizBack(); return true; };
+  }
+  function wizMain(){
+    clearOverlay();
+    wizStack = [wizMain];
+    render(`<div class="wiz wiz-home screen-bg-menu">
+      <h1 class="wiz-logo">RIFT PROTOCOL</h1>
+      <div class="wiz-menu">
+        <button class="menu-item primary wiz-item" data-w="deploy">Deploy</button>
+        <button class="menu-item wiz-item" data-w="esc">Escalations</button>
+        <button class="menu-item wiz-item" data-w="cards">Rift Cards</button>
+        <button class="menu-item wiz-item" data-w="lore">Lore</button>
+        <button class="menu-item wiz-item" data-w="howto">How to Play</button>
+        <button class="menu-item wiz-item" data-w="credits">Credits</button>
+        <button class="menu-item wiz-item" data-w="feedback">Feedback</button>
+      </div>
+    </div>`);
+    const on=(w,fn)=>{ const b=$(`[data-w="${w}"]`); if(b) b.onclick=fn; };
+    on('deploy', ()=> wizGo(wizDeployMode));
+    on('esc',    ()=> wizGo(wizEscList));
+    on('cards',  ()=> showCharacters());   // own screen; Back → showStart → wizMain
+    on('lore',   ()=> showLore());
+    on('howto',  ()=> openHelp('howto'));
+    on('credits',()=> openHelp('credits'));
+    on('feedback',()=> openHelp('feedback'));
+    UI.back = ()=> true;                    // root: nothing to go back to
+  }
+  function wizDeployMode(){
+    wizFrame('Select clearance', `
+      <div class="wiz-list">
+        <button class="menu-item wiz-opt" data-mode="random"><b>Recruit</b><span>Novice AI</span></button>
+        <button class="menu-item wiz-opt" data-mode="heuristic"><b>Clasher</b><span>Easy AI</span></button>
+        <button class="menu-item wiz-opt" data-mode="captain"><b>Captain</b><span>Medium AI</span></button>
+        <button class="menu-item wiz-opt" data-mode="warden"><b>Warden</b><span>Expert AI</span></button>
+        <div class="wiz-sep">or play another operative</div>
+        <button class="menu-item wiz-opt" data-mpnav="mp"><b>Multiplayer</b><span>Online · 1v1</span></button>
+      </div>`);
+    $$('[data-mode]').forEach(b=> b.onclick=()=>{ UI.mode=b.dataset.mode; UI.classesP1=[]; UI.classesP2=[]; UI.map='random';
+      wizGo(()=> wizTeamSelect({inEsc:false})); });
+    const mp=$('[data-mpnav="mp"]'); if(mp) mp.onclick=()=> mpEnterFlow();
+  }
+  function wizTeamSelect(ctx){
+    ctx = ctx || {inEsc:false};
+    const classes = Object.keys(GF.CLASSES);
+    const chosen = [];
+    const draw=()=>{
+      const body = `<div class="wiz-classgrid">
+        ${classes.map(c=>{ const info=GF.CLASSES[c]; const sel=chosen.includes(c);
+          return `<button class="wiz-class ${sel?'sel':''}" data-cls="${c}" style="--cls:${classColor(c)}">
+            <div class="wc-port"><img src="${portraitFor({className:c})}" alt="" onerror="this.style.display='none'"><span class="ph">${esc(dn(c))}</span></div>
+            <div class="wc-meta"><div class="wc-name">${dn(c)}</div><div class="wc-title">${esc(info.title)}</div>
+              <div class="muted" style="font-size:12px;margin-top:3px">${esc(info.blurb)}</div></div>
+            ${sel?'<span class="wc-check">✓</span>':''}
+          </button>`; }).join('')}
+      </div>`;
+      const foot = `<div class="wiz-foot-row">
+          <span class="wiz-count">${chosen.length}/2${chosen.length?': '+chosen.map(dn).join(' + '):''}</span>
+          <button class="wiz-confirm" data-act="teamgo" ${chosen.length===2?'':'disabled'}>${ctx.inEsc?'Start ⚔':'Next →'}</button>
+        </div>`;
+      wizFrame(ctx.inEsc?esc(ctx.escDefn.name):'Choose 2 operatives', body, {foot});
+      $$('[data-cls]').forEach(d=> d.onclick=()=>{ const c=d.dataset.cls; const i=chosen.indexOf(c);
+        if(i>=0) chosen.splice(i,1); else if(chosen.length<2) chosen.push(c); draw(); });
+      const go=$('[data-act="teamgo"]'); if(go) go.onclick=()=>{ if(chosen.length!==2) return;
+        if(ctx.inEsc){ beginEscalation(ctx.escDefn.id, chosen.slice()); return; }
+        UI.classesP1 = chosen.slice(); wizGo(wizMapSelect);
+      };
+    };
+    draw();
+  }
+  function wizMapSelect(){
+    const classes = Object.keys(GF.CLASSES);
+    const draw=()=>{
+      const body = `<div class="wiz-maps">
+        <button class="wiz-map ${UI.map==='random'?'sel':''}" data-map="random"><span class="wm-name">🎲 Random</span></button>
+        ${classes.map(c=>`<button class="wiz-map ${UI.map===c?'sel':''}" data-map="${c}" style="--cls:${classColor(c)};background-image:linear-gradient(rgba(8,8,6,.25),rgba(8,8,6,.72)),url('${zoneBgPath(c)}')"><span class="wm-name">${esc(GF.CLASSES[c].world)}</span></button>`).join('')}
+      </div>`;
+      wizFrame('Choose a Warp Zone', body, {foot:`<button class="wiz-confirm" data-act="launch">Deploy ⚔</button>`});
+      $$('[data-map]').forEach(b=> b.onclick=()=>{ UI.map=b.dataset.map; draw(); });
+      const go=$('[data-act="launch"]'); if(go) go.onclick=()=> startMatch();
+    };
+    draw();
+  }
+  function wizEscList(){
+    const saved = loadPlayer();
+    const body = `<p class="muted" style="text-align:center;margin:0 0 12px;font-size:13px">A sequence of breaches in a fixed Warp Zone — each ends against a mirror cell of its home operative.</p>
+      <div class="wiz-esc-grid">
+      ${ESCALATIONS.map(e=>{ const cleared = !!(saved.escalationClears && saved.escalationClears[e.id]);
+        return `<button class="wiz-esc" data-esc="${e.id}" style="--cls:${classColor(e.homeClass)};background-image:linear-gradient(rgba(8,8,6,.4),rgba(8,8,6,.72)),url('${zoneBgPath(e.homeClass)}')">
+          <span class="esc-tier">${ESC_TIER_LABEL[e.difficulty]}</span>
+          <span class="we-name">${esc(e.name)}${cleared?' ✓':''}</span>
+          <span class="we-zone">${esc(GF.CLASSES[e.homeClass].world)} · ${ESC_COUNT[e.difficulty]} battles</span>
+        </button>`; }).join('')}
+      </div>`;
+    wizFrame('Escalations', body);
+    $$('[data-esc]').forEach(d=> d.onclick=()=>{ const id=d.dataset.esc; UI.escSetup=id;
+      const escDefn=ESCALATIONS.find(x=>x.id===id); wizGo(()=> wizTeamSelect({inEsc:true, escDefn})); });
   }
 
   /* ---------------- characters roster + detail ---------------- */
@@ -3326,6 +3526,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   function showClassSelect(playerNum){
     clearOverlay();
     music('menu');
+    if(isMobileViewport()){
+      const escDefn = UI.escSetup ? ESCALATIONS.find(e=>e.id===UI.escSetup) : null;
+      wizStack=[wizMain]; wizGo(()=> wizTeamSelect({inEsc:!!escDefn, escDefn}));
+      return;
+    }
     const chosen = [];
     const classes = Object.keys(GF.CLASSES);
     const escDefn = UI.escSetup ? ESCALATIONS.find(e=>e.id===UI.escSetup) : null;
@@ -3606,6 +3811,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     clearOverlay();
     escRun=null; UI.escSetup=null;
     music('menu');
+    if(isMobileViewport()){ wizStack=[wizMain]; wizGo(wizEscList); return; }
     const saved = loadPlayer();
     render(`
       <div class="cscreen screen-bg-menu">
@@ -3799,15 +4005,19 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
               : `Click a card to play it. <b>${remaining}</b> energy left.`;
 
     // --- top bar, side panels, staging & dock ---
-    // quit + round + hint across the top.
-    const top = topBarHTML(st, hint);
-
-    // (left How-to-play sidebar removed — help now lives in the bottom-right ? panel)
-
-    // center control cluster (above the hands): energy → round → Confirm / Undo.
+    const mobile = isMobileViewport();
     const hasStaged = sel.picks.length||sel.pendingHi;
     const pips = Array.from({length:budget}, (_,i)=>`<i class="${i<remaining?'on':''}"></i>`).join('');
-    const controls = `<div class="ctrl-cluster">
+
+    // top bar. Desktop: quit + round + hint. Mobile: Round (left) · Menu (center);
+    // Discard is a separate fixed top-right button, energy/Confirm/Undo are side rails.
+    const top = mobile
+      ? `<span class="top-round">Round ${st.round}<span class="tr-of">/5</span></span>
+         <button class="mtop-menu" data-act="gamemenu" title="Menu" aria-label="Menu">☰</button>`
+      : topBarHTML(st, hint);
+
+    // center control cluster (desktop only): energy → round → Confirm / Undo / Menu.
+    const controls = mobile ? '' : `<div class="ctrl-cluster">
         <div class="energy-box">
           <div class="big"><span class="elabel">Energy:</span> ${remaining} / ${budget}${st.round<5?` <span class="enext">→ ${nextEnergy} next round</span>`:` <span class="enext">max</span>`}</div>
           <div class="pips" aria-hidden="true" title="${remaining} of ${budget} energy available">${pips}</div>
@@ -3819,6 +4029,14 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         </div>
       </div>
       <div class="round-badge" title="Round ${st.round} of 5">Round ${st.round}<span class="rb-of">/5</span></div>`;
+
+    // mobile fixed side rails: energy pips (left), Confirm ✓ over Undo ↺ (right).
+    const mobileRails = mobile ? `
+      <div class="mrail mrail-energy" aria-hidden="true"><div class="me-pips">${pips}</div><div class="me-count">${remaining}/${budget}</div></div>
+      <div class="mrail mrail-ctrl">
+        <button class="mctrl mctrl-confirm" data-act="lock" title="Confirm" aria-label="Confirm">✓</button>
+        <button class="mctrl mctrl-undo" data-act="clear" ${hasStaged?'':'disabled'} title="Undo" aria-label="Undo">↺</button>
+      </div>` : '';
 
     // staging: clicked cards wait in the arena middle, shown in cast order (tier
     // speed). Lock in / Undo all sit directly beneath them, above your portraits.
@@ -3841,9 +4059,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     // `gi` walks the flat `hand` order (groups preserve fighter order), so the
     // data-hand indices stay aligned with the wiring below.
     let gi = 0;
-    // mobile viewport → render each operative's hand as a compact pill column
-    // (two columns flanking the centered energy bar). Same wiring either way.
-    const mobile = isMobileViewport();
+    // mobile viewport → render each operative's hand as compact pill columns.
     const renderCard = mobile ? cardPillHTML : handCardHTML;
     const aliveCount = side.fighters.filter(f=>f.alive).length;
     // only living operatives get a hand section — a lone survivor's hand then
@@ -3884,7 +4100,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         staging, deckViewer,
         enemy:(f)=>({enemy:true, clickable: validEnemy.has(f.uid), targetKind:'enemy'})
       }),
-      hand: `<div class="arena-slot">${handSlot}</div>${mobile && UI.deckView==null?mobDiscardHTML(sel):''}`,
+      hand: `<div class="arena-slot">${handSlot}</div>${mobile?mobileRails+(UI.deckView==null?mobDiscardHTML(sel):''):''}`,
       you: yourZoneHTML(sideIdx, st, {
         decks: deckRailHTML(side),
         you:(f)=>({clickable: validAlly.has(f.uid), targetKind:'ally'})
@@ -3963,8 +4179,10 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       const pi=+el.dataset.pick;
       el.onclick=()=>{ hideCardPreview(); aud('CARD_REMOVE'); sel.picks.splice(pi,1); resetPending(); drawSelection(); };
     });
-    // deck rail: click a deck to toggle its card viewer
-    $$('[data-deckview]').forEach(el=> el.onclick=()=>{ const uid=+el.dataset.deckview; UI.deckView=(UI.deckView===uid?null:uid); drawSelection(); });
+    // deck view: single tap toggles the deck viewer — desktop deck rail, or the small
+    // deck icon on each ally portrait (mobile). stopPropagation so tapping the icon on a
+    // portrait can't also trigger ally-targeting.
+    $$('[data-deckview]').forEach(el=> el.onclick=(e)=>{ e.stopPropagation(); const uid=+el.dataset.deckview; UI.deckView=(UI.deckView===uid?null:uid); drawSelection(); });
     if(UI.deckView!=null){
       const pane=$('#dvPreview');
       const cardsEl=$$('.dv-card');
@@ -3975,20 +4193,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     }
     const quitBtn=$('[data-act="quit"]'); if(quitBtn) quitBtn.onclick=()=> confirmQuit();
     const menuBtn=$('[data-act="gamemenu"]'); if(menuBtn) menuBtn.onclick=()=> openGameMenu();
+    // Undo button (desktop cluster / mobile right rail): clear all staged cards
+    const clearBtn=$('[data-act="clear"]'); if(clearBtn) clearBtn.onclick=()=>{ sel.picks=[]; resetPending(); aud('CARD_REMOVE'); drawSelection(); };
     // mobile discard button: toggle arm/disarm (once per turn; disabled after use)
     const discBtn=$('[data-act="discard"]');
     if(discBtn) discBtn.onclick=(e)=>{ e.stopPropagation(); if(sel.discardUsed) return; sel.discardMode=!sel.discardMode; resetPending(); drawSelection(); };
-    // mobile: press-and-hold your own portrait to view that operative's deck (card-backs
-    // are hidden on mobile). Only when not mid-target/discard so it can't clash with a tap.
-    if(mobile && !sel.stage && !sel.discardMode){
-      $$('.your-side .cfighter').forEach(el=>{
-        const uid=+el.dataset.uid; let _pt=null;
-        el.addEventListener('touchstart',()=>{ el._lpd=false; _pt=setTimeout(()=>{ el._lpd=true; UI.deckView=(UI.deckView===uid?null:uid); drawSelection(); }, 400); }, {passive:true});
-        const end=()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } };
-        el.addEventListener('touchend', end); el.addEventListener('touchcancel', end);
-        el.addEventListener('touchmove',()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } }, {passive:true});
-      });
-    }
+    // (mobile deck view is the tap-only deck icon on each portrait — see [data-deckview] above)
     // right-click in battle = Undo (clear all staged cards); first closes the deck viewer if open
     UI.back = ()=>{
       if(UI.deckView!=null){ UI.deckView=null; drawSelection(); return true; }
@@ -4047,12 +4257,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // your team (full-width bottom row)
   function yourZoneHTML(sideIdx, st, fopt){
     const you = st.sides[sideIdx];
-    // mobile (during card selection): no card-back decks on screen — press-and-hold
-    // a portrait to view that operative's deck. Just the two portraits + a hint.
+    // mobile (during card selection): no card-back decks on screen — tap the small
+    // deck icon on a portrait to view that operative's deck. Just the two portraits.
     if(isMobileViewport() && fopt.decks!==undefined){
       return `<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
-        <div class="pair">${you.fighters.map(f=> cfighterHTML(f, fopt.you?fopt.you(f):{})).join('')}</div>
-        <div class="deck-hold-hint">Hold a portrait to view its deck</div></div>`;
+        <div class="pair">${you.fighters.map(f=> cfighterHTML(f, Object.assign({showDeck:true}, fopt.you?fopt.you(f):{}))).join('')}</div></div>`;
     }
     const decks = fopt.decks ? `<div class="deck-corner"><div class="rail-label">Your decks</div>${fopt.decks}</div>` : '';
     return `${decks}<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
@@ -4215,6 +4424,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const tgtClass = o.clickable ? ('targetable '+(o.targetKind==='ally'?'target-ally':'target-enemy')) : '';
     return `<div class="cfighter ${f.alive?'':'dead'} ${tgtClass} ${o.selected?'seltarget':''}"
         data-uid="${f.uid}" style="--cls:${classColor(f.className)}">
+      ${o.showDeck?`<button class="cdeck-btn" data-deckview="${f.uid}" title="View ${esc(dn(f.className))} deck" aria-label="View deck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="8" width="12" height="13" rx="2"/><path d="M8 5h10a2 2 0 0 1 2 2v11"/></svg></button>`:''}
       <div class="floatlayer" data-float="${f.uid}"></div>
       <div class="cport ${o.enemy?'enemyart':''}">
         <img src="${portraitFor(f)}" alt="" onerror="this.style.display='none'"><span class="ph">${esc(dn(f.className))}</span>
