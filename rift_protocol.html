@@ -217,6 +217,8 @@
   .ctrl-cluster .energy-box .tip{margin:0}
   .ctrl-buttons{display:flex;gap:10px}
   .ctrl-buttons .ctrlbtn{width:auto;min-width:108px;font-size:16px}
+  .ctrl-buttons .menu-btn{display:none}   /* mobile-only: appears in the bottom control cluster */
+  .top-round{display:none}                /* mobile-only: round counter shown in the top glance bar */
   .skip-btn{width:auto;min-width:120px;font-size:16px}
   /* Confirm/Undo colours + frame art are defined in the UI-art section below. */
   .quit-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:12px}
@@ -984,31 +986,62 @@
   }
 
   /* =========================================================================
-     MOBILE PILL HAND (≤768px) — the hand renders as two compact pill columns
-     (one per living operative) flanking the centered energy bar; the two draw
-     decks flank the portraits. These classes (.card-tray.pills / .pcard.pill /
-     .you-flank) are emitted by JS only at this viewport (isMobileViewport),
-     so the rules never affect desktop. Placed after the phone pass so the
-     .pcard.pill / .card-tray.pills overrides win same-specificity ties.
+     MOBILE THUMB-ZONE BATTLE LAYOUT (≤768px). One-handed portrait: read-only
+     info up top (round · enemy · your team), every required tap in the bottom
+     (pill columns · full-width Confirm · Undo/Menu). Grid reorders the frame
+     rows; the hand renders as two per-operative pill columns, each its own
+     bounded scroller. Classes (.card-tray.pills / .pcard.pill / .mob-discard)
+     are emitted by JS only at this viewport, so desktop is untouched. Placed
+     after the phone pass so these overrides win same-specificity ties.
      ========================================================================= */
   @media (max-width:768px){
-    /* two pill columns pushed to the left & right edges, anchored to the bottom */
+    /* frame reorder: top(round+hint) · enemy · your team · pills(flex) · controls */
+    #battle{grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:6px;
+      padding:6px 6px max(6px,env(safe-area-inset-bottom))}
+    .bf-top{grid-row:1;justify-content:flex-start;gap:8px;padding:0 4px;min-height:42px}
+    .bf-center{grid-row:2;padding:2px 6px;gap:4px;justify-content:flex-start}
+    .bf-you{grid-row:3;flex-direction:column;gap:2px;align-items:center;justify-content:flex-end}
+    .bf-hand{grid-row:4}
+    .bf-controls{grid-row:5}
+
+    /* top glance bar: small round + hint; Quit folds into the bottom Menu button */
+    .quit-btn{display:none}
+    .bf-controls .round-badge{display:none}   /* round is shown in the top glance bar on mobile */
+    .top-round{display:inline-flex;align-items:baseline;font-weight:800;font-size:15px;color:#fff;
+      white-space:nowrap;text-shadow:0 1px 4px #000}
+    .top-round .tr-of{font-size:11px;color:var(--muted);margin-left:1px}
+    .top-hint{font-size:12px;max-width:58vw;text-align:left}
+
+    /* fighter panels (glance). enemy a touch larger than your team. */
+    .pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;max-width:100%}
+    .cfighter{min-width:0;padding:6px 8px;gap:8px;border-radius:9px}
+    .cfighter .cname{font-size:14px}
+    .cfighter .chpwrap{margin:4px 0;gap:5px}
+    .chpnum{font-size:11.5px;min-width:38px}
+    .ctag{font-size:10px;padding:0 4px;line-height:1.45}
+    .arena-side .label{font-size:9.5px}
+    .enemy-side .pair{gap:8px;max-width:100%}
+    .enemy-side .cfighter .cport{width:66px;height:66px;flex:0 0 66px;min-width:66px;min-height:66px}
+    .enemy-side .cfighter .cname{font-size:15px}
+    .your-side .cfighter .cport{width:58px;height:58px;flex:0 0 58px;min-width:58px;min-height:58px}
+    .deck-hold-hint{font-size:9.5px;color:var(--muted);opacity:.7;letter-spacing:.3px}
+
+    /* ---- pills: two columns, EACH its own bounded scroller (top card is never
+       hidden behind the Round panel — the panel is now at the bottom) ---- */
     .card-tray.pills{flex-direction:row;justify-content:space-between;align-items:stretch;
-      height:100%;gap:8px;overflow:visible;padding:2px 6px 0;background:none;border-top:0}
+      height:100%;gap:8px;overflow:visible;padding:0 4px;background:none;border-top:0}
     .card-tray.pills.solo{justify-content:center}
     .card-tray.pills .tray-div{display:none}
-    .card-tray.pills .tray-sec{flex:0 1 47%;max-width:47%;min-width:0;height:100%;
-      justify-content:flex-end;gap:4px}
-    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:60%}
-    .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto}
-    .card-tray.pills .hand-fan{flex:0 1 auto;flex-direction:column;align-items:stretch;
-      justify-content:flex-end;width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:0}
+    .card-tray.pills .tray-sec{flex:1 1 0;max-width:49%;min-width:0;height:100%;justify-content:flex-start;gap:3px}
+    .card-tray.pills.solo .tray-sec{flex-basis:auto;min-width:64%;max-width:82%}
+    .card-tray.pills .tray-label{font-size:10px;align-self:center;flex:0 0 auto;padding-top:2px}
+    .card-tray.pills .hand-fan{flex:1 1 auto;flex-direction:column;align-items:stretch;justify-content:flex-start;
+      width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;gap:6px;padding:2px 2px 4px;-webkit-overflow-scrolling:touch}
     .card-tray.pills .hand-group{flex-direction:column;align-items:stretch;width:100%;gap:6px}
 
-    /* the pill: cost circle → type icon → name (ellipsis) → discard */
-    .pcard.pill{flex-direction:row;align-items:center;gap:9px;width:100%;box-sizing:border-box;
+    .pcard.pill{flex-direction:row;align-items:center;gap:9px;width:100%;box-sizing:border-box;flex:0 0 auto;
       min-height:56px;height:58px;margin:0;padding:0 10px;border-radius:10px;overflow:hidden;
-      border:1.5px solid var(--cls,var(--accent));background:color-mix(in srgb,var(--cls) 15%,#14130f);
+      border:1.5px solid var(--cls,var(--accent));background:color-mix(in srgb,var(--cls) 16%,#14130f);
       box-shadow:0 2px 8px rgba(0,0,0,.42)}
     .pcard.pill .pill-cost{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
       width:26px;height:26px;border-radius:50%;font-size:14px;font-weight:800;color:var(--energy);
@@ -1016,20 +1049,47 @@
     .pcard.pill .pill-ico{flex:0 0 auto;display:flex;align-items:center;color:var(--ct,var(--accent))}
     .pcard.pill .pill-name{flex:1 1 auto;min-width:0;font-size:15px;font-weight:700;color:#fff;
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .pcard.pill .disc{flex:0 0 auto;font-size:16px;line-height:1;opacity:.85;cursor:pointer}
     .pcard.pill.sel{outline:2px solid var(--accent);outline-offset:1px;box-shadow:0 0 0 1px var(--accent) inset}
     .pcard.pill.illegal,.pcard.pill.cantafford{opacity:.4}
-    .pcard.pill.discardable{outline:2px dashed var(--bad);outline-offset:1px}
+    /* discard mode armed: every card becomes a redraw candidate and pulses red */
+    .card-tray.pills.discarding .pcard.pill{outline:2px dashed var(--bad);outline-offset:1px;opacity:1;
+      animation:targetpulse 1s ease-in-out infinite}
 
-    /* your team: the two draw decks flank the portraits, sized to match a portrait */
-    .you-flank{display:flex;align-items:flex-end;justify-content:center;gap:8px;width:100%}
-    .you-flank .pair{width:auto;max-width:none;gap:8px}
-    .you-flank .flank-deck{flex:0 0 auto}
-    .you-flank .flank-deck .deck{gap:2px}
-    .you-flank .flank-deck .deck-back{width:56px;height:64px}
-    .you-flank .flank-deck .deck-count{font-size:10px}
-    .your-side .cfighter .cport{width:64px;height:64px;flex:0 0 64px;min-width:64px;min-height:64px}
+    /* ---- bottom control bar: energy line · full-width Confirm · Undo | Menu ---- */
+    .ctrl-cluster{flex-direction:column;gap:7px;width:min(96vw,560px);padding:8px 12px 10px}
+    .ctrl-cluster .energy-box{max-width:none;justify-content:center;gap:10px}
+    .energy-box .big{font-size:17px}
+    .energy-box .big .enext{display:none}
+    .ctrl-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+    .ctrl-buttons .confirm-btn{grid-column:1 / -1;min-width:0;max-width:none;width:100%;
+      font-size:20px;padding:15px 12px;min-height:56px}
+    .ctrl-buttons .undo-btn{grid-column:1;min-width:0;max-width:none;width:100%}
+    .ctrl-buttons .menu-btn{grid-column:2;min-width:0;max-width:none;width:100%;display:flex;
+      align-items:center;justify-content:center}
+    .skip-btn{width:100%;min-height:52px;font-size:18px}
+
+    /* ---- fixed discard button (occasional; ok in the top glance zone), safe-area aware ---- */
+    .mob-discard{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:60;
+      display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:20px;font-size:13px;
+      font-weight:700;color:var(--ink);background:rgba(18,17,13,.94);border:1px solid var(--line);
+      box-shadow:0 3px 10px rgba(0,0,0,.5)}
+    .mob-discard[disabled]{opacity:.4}
+    .mob-discard.armed{border-color:var(--bad);color:var(--bad);
+      box-shadow:0 0 0 2px var(--bad),0 3px 10px rgba(0,0,0,.5)}
+
+    /* fold the floating ? / sound / feedback into the in-game Menu on the battle screen */
+    body:has(#battle) #helpBtn,
+    body:has(#battle) #audioToggle,
+    body:has(#battle) #audioPop,
+    body:has(#battle) #fbBtn{display:none !important}
   }
+  /* in-game Menu modal sound sliders (reuses .mp-modal / .mp-card backdrop) */
+  .gm-item{width:100%;padding:11px;border-radius:9px;margin-top:8px;font-weight:700;cursor:pointer}
+  .gm-item.danger{color:var(--bad)}
+  .gm-sound{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;text-align:left}
+  .gm-sound .gm-h{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:6px}
+  .gm-slider{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);margin:4px 0}
+  .gm-slider input{flex:1}
 
   /* =========================================================================
      RIFT PROTOCOL — UI ART OVERLAYS (artassets/uiUpdate1)
@@ -3705,7 +3765,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   }
   function hideHandPreview(){ if(_handPreviewEl) _handPreviewEl.style.display='none'; }
   function doSelection(sideIdx){
-    UI.sel = { sideIdx, picks:[], stage:null, pendingHi:null, discardUsed:false };
+    UI.sel = { sideIdx, picks:[], stage:null, pendingHi:null, discardUsed:false, discardMode:false };
     UI.deckView = null;
     drawSelection();
   }
@@ -3731,7 +3791,8 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       if(sel.stage==='ally')   picksOf.forEach(p=>{ if(p.target) validAlly.add(p.target.uid); });
     }
 
-    const hint = sel.stage==='target' ? `Choose the <b>enemy</b> target for <b>${esc(sel.pendingHi.card.name)}</b>.`
+    const hint = sel.discardMode ? `Tap a card to <b>discard &amp; redraw</b> it — or tap Discard again to cancel.`
+              : sel.stage==='target' ? `Choose the <b>enemy</b> target for <b>${esc(sel.pendingHi.card.name)}</b>.`
               : sel.stage==='ally'   ? `Choose which <b>ally</b> receives <b>${esc(sel.pendingHi.card.name)}</b>.`
               : sel.stage==='discard'? `Choose a card to <b>discard</b> for <b>${esc(sel.pendingHi.card.name)}</b> — click it again to cancel.`
               : remaining<=0 ? `Out of energy — confirm.`
@@ -3754,6 +3815,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <div class="ctrl-buttons">
           <button class="ctrlbtn confirm-btn" data-act="lock"><span class="cbl">Confirm</span> <span class="cb-sword">⚔</span></button>
           <button class="ctrlbtn undo-btn" data-act="clear" ${hasStaged?'':'disabled'}><span class="cbl">Undo</span></button>
+          <button class="ctrlbtn menu-btn" data-act="gamemenu"><span class="cbl">Menu</span></button>
         </div>
       </div>
       <div class="round-badge" title="Round ${st.round} of 5">Round ${st.round}<span class="rb-of">/5</span></div>`;
@@ -3806,7 +3868,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       return `<div class="tray-sec ${f.alive?'':'ko'}" style="--cls:${classColor(f.className)}">
           <div class="tray-label">${label}</div>${inner}</div>`;
     }).join('<div class="tray-div"></div>');
-    const handSlot = `<div class="card-tray${mobile?' pills':''}${mobile&&aliveCount===1?' solo':''}">${traySecs}</div>`;
+    const handSlot = `<div class="card-tray${mobile?' pills':''}${mobile&&aliveCount===1?' solo':''}${mobile&&sel.discardMode?' discarding':''}">${traySecs}</div>`;
 
     // deck viewer (opened by clicking a deck in the right rail), contained in the arena
     let deckViewer='', dvCards=[];
@@ -3822,7 +3884,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         staging, deckViewer,
         enemy:(f)=>({enemy:true, clickable: validEnemy.has(f.uid), targetKind:'enemy'})
       }),
-      hand: `<div class="arena-slot">${handSlot}</div>`,
+      hand: `<div class="arena-slot">${handSlot}</div>${mobile && UI.deckView==null?mobDiscardHTML(sel):''}`,
       you: yourZoneHTML(sideIdx, st, {
         decks: deckRailHTML(side),
         you:(f)=>({clickable: validAlly.has(f.uid), targetKind:'ally'})
@@ -3859,6 +3921,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       }
       const disc=el.querySelector('.disc');
       if(disc) disc.onclick=(ev)=>{ ev.stopPropagation(); doDiscard(hi); };
+      // mobile discard mode (armed via the fixed top-right Discard button): tap any
+      // card to discard & redraw it. Takes priority over staging.
+      if(sel.discardMode){
+        el.onclick=()=>{ if(el._lp){ el._lp=false; return; } if(hi) doDiscard(hi); };
+        return;
+      }
       // during a discard-on-play selection, every card is a discard candidate
       if(sel.stage==='discard'){
         if(hi!==sel.pendingHi) el.classList.add('discardable');
@@ -3906,7 +3974,21 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       const bd=$('[data-act="dvbackdrop"]'); if(bd) bd.onclick=(e)=>{ if(e.target===bd){ UI.deckView=null; drawSelection(); } };   // tap outside closes
     }
     const quitBtn=$('[data-act="quit"]'); if(quitBtn) quitBtn.onclick=()=> confirmQuit();
-    $('[data-act="clear"]').onclick=()=>{ sel.picks=[]; resetPending(); drawSelection(); };
+    const menuBtn=$('[data-act="gamemenu"]'); if(menuBtn) menuBtn.onclick=()=> openGameMenu();
+    // mobile discard button: toggle arm/disarm (once per turn; disabled after use)
+    const discBtn=$('[data-act="discard"]');
+    if(discBtn) discBtn.onclick=(e)=>{ e.stopPropagation(); if(sel.discardUsed) return; sel.discardMode=!sel.discardMode; resetPending(); drawSelection(); };
+    // mobile: press-and-hold your own portrait to view that operative's deck (card-backs
+    // are hidden on mobile). Only when not mid-target/discard so it can't clash with a tap.
+    if(mobile && !sel.stage && !sel.discardMode){
+      $$('.your-side .cfighter').forEach(el=>{
+        const uid=+el.dataset.uid; let _pt=null;
+        el.addEventListener('touchstart',()=>{ el._lpd=false; _pt=setTimeout(()=>{ el._lpd=true; UI.deckView=(UI.deckView===uid?null:uid); drawSelection(); }, 400); }, {passive:true});
+        const end=()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } };
+        el.addEventListener('touchend', end); el.addEventListener('touchcancel', end);
+        el.addEventListener('touchmove',()=>{ if(_pt){ clearTimeout(_pt); _pt=null; } }, {passive:true});
+      });
+    }
     // right-click in battle = Undo (clear all staged cards); first closes the deck viewer if open
     UI.back = ()=>{
       if(UI.deckView!=null){ UI.deckView=null; drawSelection(); return true; }
@@ -3937,7 +4019,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       const owner=hi.owner; owner.hand = owner.hand.filter(x=>x!==hi); owner.deck.discard.push(hi.card);
       drawOneInto(owner, UI.state.rng);
       aud('CARD_REMOVE');
-      sel.discardUsed=true; resetPending(); drawSelection();
+      sel.discardUsed=true; sel.discardMode=false; resetPending(); drawSelection();
     }
   }
 
@@ -3965,17 +4047,12 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   // your team (full-width bottom row)
   function yourZoneHTML(sideIdx, st, fopt){
     const you = st.sides[sideIdx];
-    // mobile (during card selection): the two draw decks flank the portraits
-    // (deck · pair · deck), each sized to match a portrait — instead of the
-    // desktop bottom-left deck corner.
+    // mobile (during card selection): no card-back decks on screen — press-and-hold
+    // a portrait to view that operative's deck. Just the two portraits + a hint.
     if(isMobileViewport() && fopt.decks!==undefined){
-      const fs = you.fighters;
       return `<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
-        <div class="you-flank">
-          <div class="flank-deck">${deckHTML(fs[0])}</div>
-          <div class="pair">${fs.map(f=> cfighterHTML(f, fopt.you?fopt.you(f):{})).join('')}</div>
-          <div class="flank-deck">${deckHTML(fs[1])}</div>
-        </div></div>`;
+        <div class="pair">${you.fighters.map(f=> cfighterHTML(f, fopt.you?fopt.you(f):{})).join('')}</div>
+        <div class="deck-hold-hint">Hold a portrait to view its deck</div></div>`;
     }
     const decks = fopt.decks ? `<div class="deck-corner"><div class="rail-label">Your decks</div>${fopt.decks}</div>` : '';
     return `${decks}<div class="arena-side your-side"><div class="label">Your team · ${GF.sumHp(you)} HP</div>
@@ -4037,6 +4114,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     const timerHTML = (MP.inMatch && typeof MP.timer==='number')
       ? `<span class="mp-timer" id="mpTimer">${mpFmtTime(MP.timeLeft)}</span>` : '';
     return `<button class="quit-btn" data-act="quit" title="Quit to main menu">⮜ Menu</button>
+      <span class="top-round">Round ${st.round}<span class="tr-of">/5</span></span>
       ${timerHTML}<span class="top-hint">${hint||''}</span>`;
   }
   // confirm dialog before abandoning a match.
@@ -4051,6 +4129,35 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       </div>`);
     node.querySelector('[data-act="cancel"]').onclick=()=> clearOverlay();
     node.querySelector('[data-act="quityes"]').onclick=()=>{ clearOverlay(); showStart(); };
+  }
+  // In-game Menu modal (the mobile Menu button; folds in Help + Sound now that the
+  // floating ? / speaker are hidden on the battle screen). Reuses the mp-modal backdrop.
+  function openGameMenu(){
+    const RA=()=> window.RiftAudio;
+    const node=showOverlay(`<div class="mp-modal"><div class="mp-card">
+        <h2>Menu</h2>
+        <button class="gm-item menu-item primary" data-gm="resume">Resume</button>
+        <button class="gm-item menu-item" data-gm="help">How to Play</button>
+        <div class="gm-sound">
+          <div class="gm-h">Sound</div>
+          <label class="gm-slider"><span>Music</span><input type="range" min="0" max="1" step="0.05" id="gmMusic"></label>
+          <label class="gm-slider"><span>Effects</span><input type="range" min="0" max="1" step="0.05" id="gmSfx"></label>
+          <button class="gm-item menu-item" data-gm="mute" id="gmMute">Mute</button>
+        </div>
+        <button class="gm-item menu-item danger" data-gm="quit">Quit to main menu</button>
+      </div></div>`);
+    const q=(s)=> node.querySelector(s);
+    const music=q('#gmMusic'), sfx=q('#gmSfx'), mute=q('#gmMute');
+    const syncMute=()=>{ try{ const m=RA(); if(m&&mute){ mute.textContent=m.isMuted()?'Unmute':'Mute'; mute.classList.toggle('on',m.isMuted()); } }catch(e){} };
+    try{ const m=RA(); if(m){ if(music) music.value=m.getMusicVolume(); if(sfx) sfx.value=m.getSfxVolume(); } }catch(e){}
+    syncMute();
+    if(music) music.oninput=function(){ try{ RA().setMusicVolume(parseFloat(this.value)); }catch(e){} };
+    if(sfx) sfx.oninput=function(){ try{ RA().setSfxVolume(parseFloat(this.value)); }catch(e){} };
+    if(mute) mute.onclick=()=>{ try{ RA().toggleMute(); }catch(e){} syncMute(); };
+    q('[data-gm="resume"]').onclick=()=> clearOverlay();
+    q('[data-gm="help"]').onclick=()=>{ clearOverlay(); openHelp('howto'); };
+    q('[data-gm="quit"]').onclick=()=>{ clearOverlay(); confirmQuit(); };
+    node.addEventListener('click', (e)=>{ if(e.target===node) clearOverlay(); });   // backdrop tap closes
   }
   // One player class deck (draw pile), flanking the portraits on the outside.
   // Card-back art per class; missing file → solid class-color back. Shows the
@@ -4253,10 +4360,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     if(k==='defend') return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
     return '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
   }
-  // Mobile hand card = compact pill: cost circle → type icon → name (ellipsis) → discard.
-  // Same data-* hooks + classes as handCardHTML, so the existing tap/long-press/discard
-  // wiring on `.hand-fan .pcard` applies unchanged. Cost is a plain number (no energy pip;
-  // the "Energy: x/y" bar remains the only energy indicator).
+  // Mobile hand card = compact pill: cost circle → type icon → name (ellipsis).
+  // Same data-* hooks + classes as handCardHTML, so the existing tap/long-press
+  // wiring on `.hand-fan .pcard` applies unchanged. Cost is a plain number (no energy
+  // pip; the "Energy: x/y" bar remains the only energy indicator). Discard is NOT on
+  // the pill — it's the single fixed top-right discard button (arm-then-tap).
   function cardPillHTML(hi, idx, used, illegal, pending, unaffordable, canDiscard){
     const c=hi.card; const cost=GF.energyCost(c);
     const cls = `pcard pill ${used?'used':''} ${illegal?'illegal':''} ${pending?'sel':''} ${unaffordable?'cantafford':''}`;
@@ -4264,8 +4372,15 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       <span class="pill-cost" title="costs ${cost} energy (T${c.speed})">${cost}</span>
       <span class="pill-ico sym-${typeKey(c.type)}" style="--ct:${typeColor(c.type)}">${pillTypeIcon(c.type)}</span>
       <span class="pill-name">${esc(c.name)}</span>
-      ${canDiscard?`<span class="disc" title="Discard &amp; redraw — swap this card for a fresh one from its deck (once per turn)">🔄</span>`:''}
     </div>`;
+  }
+  // Fixed top-right discard control (mobile only): tap to arm → cards highlight →
+  // tap a card to discard & redraw it. Once per turn, then disables.
+  function mobDiscardHTML(sel){
+    const used=sel.discardUsed, armed=sel.discardMode;
+    const label = used ? 'Redraw used' : armed ? 'Tap a card' : 'Discard';
+    return `<button class="mob-discard ${armed?'armed':''}" data-act="discard" ${used?'disabled':''}
+      title="Discard &amp; redraw one card (once per turn)">🔄 <span>${label}</span></button>`;
   }
 
   /* ---------------- resolution + animated reveal ---------------- */
