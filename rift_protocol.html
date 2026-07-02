@@ -133,7 +133,7 @@
   /* type/tier/symbol footer pinned to the bottom of the card */
   .pcard .pt{font-size:13px;color:var(--muted);margin-top:auto;padding:5px 0;display:flex;align-items:center;gap:5px;border-top:1px solid var(--line)}
   .pcard .pe{font-size:14px;color:var(--ink);margin-top:4px}
-  .pcard .phint{font-size:13px;color:var(--good);margin-top:4px}
+  .pcard .phint{font-size:13px;color:var(--good);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .pcard .pf{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:4px}
   .spd{font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:4px;color:#11100b}
   .spd.t1{background:var(--t1)} .spd.t2{background:var(--t2)} .spd.t3{background:var(--t3)} .spd.t4{background:var(--t4)}
@@ -415,6 +415,8 @@
   .hand-fan .pcard{width:clamp(124px,12.5vw,172px);flex:0 0 auto;margin-left:clamp(-62px,-3.6vw,-30px);
     height:auto;cursor:pointer;
     transition:transform .16s ease, margin .16s ease, opacity .16s ease;transform-origin:bottom center}
+  /* uniform height for the full (non-pill) hand cards so every card matches */
+  .hand-fan .pcard:not(.pill){height:192px}
   .hand-group .pcard:first-child{margin-left:0}
   .hand-fan:hover .pcard{opacity:.8}
   .hand-fan .pcard:hover{opacity:1;transform:translateY(-22px) scale(1.12);z-index:6;margin-left:20px;margin-right:34px}
@@ -534,13 +536,15 @@
   .char-hero .hp-badge{display:inline-block;margin-top:8px;font-size:13px;font-weight:700;color:var(--good);
     border:1px solid var(--good);border-radius:20px;padding:3px 12px}
   .catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  /* Fixed height so every catalog card is identical + readable at a glance.
+     Text and flavor are line-clamped so nothing overflows the uniform box. */
   .catcard{border:1px solid var(--line);border-top:3px solid var(--cls,var(--line));border-radius:9px;
-    background:var(--panel);padding:9px 11px}
-  .catcard .ph{display:flex;justify-content:space-between;align-items:center;gap:6px}
-  .catcard .pn{font-weight:700;font-size:13px}
-  .catcard .pt{font-size:11px;color:var(--muted);margin:3px 0}
-  .catcard .pe{font-size:12px;color:var(--ink);margin-top:3px}
-  .catcard .pf{font-size:11px;color:var(--muted);font-style:italic;margin-top:4px}
+    background:var(--panel);padding:9px 11px;height:200px;display:flex;flex-direction:column;overflow:hidden}
+  .catcard .ph{display:flex;justify-content:space-between;align-items:center;gap:6px;flex:0 0 auto}
+  .catcard .pn{font-weight:700;font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .catcard .pt{font-size:11px;color:var(--muted);margin:3px 0;flex:0 0 auto}
+  .catcard .pe{font-size:12px;color:var(--ink);margin-top:3px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .catcard .pf{font-size:11px;color:var(--muted);font-style:italic;margin-top:auto;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
   /* ============ STANDALONE TUTORIAL PAGE ============ */
   .tut-page{max-width:820px}
@@ -1077,21 +1081,14 @@
     .pcard.pill .pill-eff.heal{color:var(--good)}
     .pcard.pill .pill-eff.def{color:var(--t1)}
     .pcard.pill .pill-eff.none{color:color-mix(in srgb,var(--cls) 60%,var(--muted))}
-    /* Card-language quantity icons in rules text ([DMG n] etc.) */
-    .ci{display:inline-flex;align-items:center;gap:.1em;font-weight:800;white-space:nowrap;vertical-align:-.18em}
-    .ci svg{width:1.05em;height:1.05em;flex:0 0 auto}
-    .ci-dmg{color:var(--bad)} .ci-blk{color:var(--t1)} .ci-heal{color:var(--good)}
-    .ci-nrg{color:var(--energy)} .ci-draw{color:var(--ink)} .ci-dur{color:var(--muted)}
     /* Keyword reminders on the big card previews */
     .kw-reminders{display:flex;flex-direction:column;gap:3px;margin:6px 0 2px}
     .kwr{font-size:11.5px;line-height:1.35;color:var(--muted);padding:3px 6px;border-left:2px solid color-mix(in srgb,var(--cls,#8aa) 55%,transparent);background:rgba(255,255,255,.03);border-radius:0 4px 4px 0}
     .kwr-k{font-weight:800;color:color-mix(in srgb,var(--cls,#cde) 70%,var(--ink));margin-right:.4em;letter-spacing:.02em}
     /* Card-language legend (help tab) */
     .cl-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-    .cl-row{display:grid;grid-template-columns:2.4em 5.2em 1fr;align-items:center;gap:8px;padding:5px 8px;background:rgba(255,255,255,.03);border-radius:6px}
-    .cl-ico{font-size:17px;font-weight:800;display:inline-flex;align-items:center}
-    .cl-name{font-weight:800;font-size:12px;letter-spacing:.04em;color:var(--muted)}
-    .cl-kw{grid-column:1/3;font-weight:800;color:var(--t1);letter-spacing:.02em}
+    .cl-row{display:grid;grid-template-columns:6.2em 1fr;align-items:baseline;gap:10px;padding:5px 8px;background:rgba(255,255,255,.03);border-radius:6px}
+    .cl-kw{font-weight:800;color:var(--t1);letter-spacing:.02em}
     .cl-desc{font-size:13px;line-height:1.4;color:var(--ink)}
     .pcard.pill.sel{outline:2px solid var(--accent);outline-offset:1px;box-shadow:0 0 0 1px var(--accent) inset}
     .pcard.pill.illegal,.pcard.pill.cantafford{opacity:.4}
@@ -1397,134 +1394,134 @@ const CLASSES = {
 const CARDS = [
   /* ---------------- SOLDIER ---------------- */
   /* JUNCTIONS — set the gunblade's element for the whole turn (modifies every hit) */
-  { cls:"Soldier", name:"Fire Junction", type:"Spell", speed:1, aim:"self", kind:"special", special:"junction_fire", text:"Junction Fire: your attacks deal [DMG +1]; Burn 2.", hint:"Play first, then swing — every card hits harder and burns.", flavor:"Channel the flame down the blade." },
+  { cls:"Soldier", name:"Fire Junction", type:"Spell", speed:1, aim:"self", kind:"special", special:"junction_fire", text:"Junction Fire: your attacks deal +1; Burn 2.", hint:"Play first, then swing — every card hits harder and burns.", flavor:"Channel the flame down the blade." },
   { cls:"Soldier", name:"Thunder Junction", type:"Spell", speed:1, aim:"self", kind:"special", special:"junction_thunder", text:"Junction Thunder: your attacks Pierce.", hint:"Set up before a barrage to cut through guards.", flavor:"Lightning finds every gap." },
   { cls:"Soldier", name:"Frost Junction", type:"Spell", speed:1, aim:"self", kind:"special", special:"junction_blizzard", text:"Junction Frost: every hit Weakens 1 next turn.", hint:"Flurry to stack the slow on a key threat.", flavor:"Frost slows the trigger finger." },
   /* SMALL, REPEATABLE HITS — the flurry that the junctions amplify */
-  { cls:"Soldier", name:"Trigger", type:"Attack", speed:1, aim:"enemy", kind:"attack", amount:3, text:"Deal [DMG 3] to one enemy.", flavor:"A clean pull of the trigger." },
-  { cls:"Soldier", name:"Trigger", type:"Attack", speed:1, aim:"enemy", kind:"attack", amount:3, text:"Deal [DMG 3] to one enemy.", flavor:"Tap, tap." },
-  { cls:"Soldier", name:"Rough Divide", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"Step in, cut across." },
-  { cls:"Soldier", name:"Solid Barrel", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"solid_barrel", text:"Deal [DMG 3] to one enemy, twice.", hint:"Great with a junction — both hits apply the element.", flavor:"Two rounds, one motion." },
-  { cls:"Soldier", name:"Breach Slash", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, text:"Deal [DMG 5] to one enemy.", flavor:"The basic strike, clean and certain." },
-  { cls:"Soldier", name:"Piercing Round", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, pierce:true, text:"Deal [DMG 5] to one enemy, Pierce.", flavor:"Armor means nothing to it." },
-  { cls:"Soldier", name:"Suppressing Fire", type:"Attack", speed:2, aim:"enemyAll", kind:"aoe", amount:3, text:"Deal [DMG 3] to both enemies.", flavor:"Spread it across the line." },
+  { cls:"Soldier", name:"Trigger", type:"Attack", speed:1, aim:"enemy", kind:"attack", amount:3, text:"Deal 3 to one enemy.", flavor:"A clean pull of the trigger." },
+  { cls:"Soldier", name:"Trigger", type:"Attack", speed:1, aim:"enemy", kind:"attack", amount:3, text:"Deal 3 to one enemy.", flavor:"Tap, tap." },
+  { cls:"Soldier", name:"Rough Divide", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"Step in, cut across." },
+  { cls:"Soldier", name:"Solid Barrel", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"solid_barrel", text:"Deal 3 to one enemy, twice.", hint:"Great with a junction — both hits apply the element.", flavor:"Two rounds, one motion." },
+  { cls:"Soldier", name:"Breach Slash", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, text:"Deal 5 to one enemy.", flavor:"The basic strike, clean and certain." },
+  { cls:"Soldier", name:"Piercing Round", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, pierce:true, text:"Deal 5 to one enemy, Pierce.", flavor:"Armor means nothing to it." },
+  { cls:"Soldier", name:"Suppressing Fire", type:"Attack", speed:2, aim:"enemyAll", kind:"aoe", amount:3, text:"Deal 3 to both enemies.", flavor:"Spread it across the line." },
   /* DEFENSE */
-  { cls:"Soldier", name:"Brace", type:"Defend", speed:1, aim:"ally", kind:"block", amount:10, text:"Block [BLK 10] on a fighter.", hint:"Use to soak a predicted heavy hit.", flavor:"Plant the feet. Hold." },
-  { cls:"Soldier", name:"Brace", type:"Defend", speed:1, aim:"ally", kind:"block", amount:10, text:"Block [BLK 10] on a fighter.", hint:"Use to soak a predicted heavy hit.", flavor:"Nothing gets past." },
-  { cls:"Soldier", name:"Counterstance", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block [BLK 5]; Riposte 4.", hint:"Use when you expect this fighter to be attacked: punish the swing.", flavor:"Make them regret the swing." },
+  { cls:"Soldier", name:"Brace", type:"Defend", speed:1, aim:"ally", kind:"block", amount:10, text:"Block 10 on a fighter.", hint:"Use to soak a predicted heavy hit.", flavor:"Plant the feet. Hold." },
+  { cls:"Soldier", name:"Brace", type:"Defend", speed:1, aim:"ally", kind:"block", amount:10, text:"Block 10 on a fighter.", hint:"Use to soak a predicted heavy hit.", flavor:"Nothing gets past." },
+  { cls:"Soldier", name:"Counterstance", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block 5; Riposte 4.", hint:"Use when you expect this fighter to be attacked: punish the swing.", flavor:"Make them regret the swing." },
   { cls:"Soldier", name:"Cover", type:"Defend", speed:1, aim:"self", kind:"special", special:"cover", text:"Redirect single-target attacks on your ally to this fighter.", hint:"Use to shield a low-HP ally with your tankier fighter.", flavor:"Get behind me." },
-  { cls:"Soldier", name:"Combat Vest", type:"Equip", speed:1, aim:"self", kind:"equipReduce", amount:1, text:"Guard [BLK 1] on this fighter.", hint:"Equip early to blunt every incoming hit all match.", flavor:"Standard issue, life saving." },
+  { cls:"Soldier", name:"Combat Vest", type:"Equip", speed:1, aim:"self", kind:"equipReduce", amount:1, text:"Guard 1 on this fighter.", hint:"Equip early to blunt every incoming hit all match.", flavor:"Standard issue, life saving." },
   /* SUPPORT */
   { cls:"Soldier", name:"Adrenaline", type:"Buff", speed:1, aim:"ally", kind:"buffAttack", amount:3, text:"Empower 3 on a fighter.", hint:"Set up a kill: stack it before your big attack.", flavor:"Lock in." },
-  { cls:"Soldier", name:"Combat Stim", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal [HEAL 4] to a fighter.", hint:"Use to keep a fighter out of kill range.", flavor:"Patch it and push." },
-  { cls:"Soldier", name:"Hold The Line", type:"Spell", speed:1, aim:"allyAll", kind:"reduceBoth", amount:2, text:"Guard [BLK 2] on both fighters.", hint:"Use to weather a turn where both fighters are under fire.", flavor:"Together, we don't break." },
-  { cls:"Soldier", name:"Field Medkit", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal [HEAL 8] to a fighter.", hint:"Save it for a clutch heal that prevents a kill.", flavor:"The one you save for when it counts." },
-  { cls:"Soldier", name:"Blade Cascade", type:"Signature", speed:4, aim:"enemy", kind:"special", amount:9, special:"renzokuken", once:true, text:"Deal [DMG 3] to one enemy, three times.", flavor:"The finishing flurry. No escape." },
+  { cls:"Soldier", name:"Combat Stim", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal 4 to a fighter.", hint:"Use to keep a fighter out of kill range.", flavor:"Patch it and push." },
+  { cls:"Soldier", name:"Hold The Line", type:"Spell", speed:1, aim:"allyAll", kind:"reduceBoth", amount:2, text:"Guard 2 on both fighters.", hint:"Use to weather a turn where both fighters are under fire.", flavor:"Together, we don't break." },
+  { cls:"Soldier", name:"Field Medkit", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal 8 to a fighter.", hint:"Save it for a clutch heal that prevents a kill.", flavor:"The one you save for when it counts." },
+  { cls:"Soldier", name:"Blade Cascade", type:"Signature", speed:4, aim:"enemy", kind:"special", amount:9, special:"renzokuken", once:true, text:"Deal 3 to one enemy, three times.", flavor:"The finishing flurry. No escape." },
   /* ---------------- ARCANIST ---------------- */
-  { cls:"Arcanist", name:"Fire", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"fire_burn", text:"Deal [DMG 3] to one enemy; Burn 2.", flavor:"The first spell anyone learns." },
-  { cls:"Arcanist", name:"Fire", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"fire_burn", text:"Deal [DMG 3] to one enemy; Burn 2.", flavor:"Still gets the job done." },
-  { cls:"Arcanist", name:"Scorch", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:6, text:"Deal [DMG 6] to one enemy.", flavor:"The air itself ignites." },
-  { cls:"Arcanist", name:"Cataclysm", type:"Attack", speed:4, aim:"enemy", kind:"special", amount:9, special:"firaga", text:"Deal [DMG 9] to one enemy; [DMG 3] to the other enemy.", flavor:"Everything within reach burns." },
-  { cls:"Arcanist", name:"Thunder", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"Fast and forking." },
-  { cls:"Arcanist", name:"Thunder", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"Fast and forking." },
-  { cls:"Arcanist", name:"Frost Shard", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal [DMG 4] to one enemy, Pierce.", flavor:"Ice finds the gap in any guard." },
-  { cls:"Arcanist", name:"Meteor Splash", type:"Attack", speed:4, aim:"enemyAll", kind:"aoe", amount:5, text:"Deal [DMG 5] to both enemies.", flavor:"The sky comes down on everyone." },
-  { cls:"Arcanist", name:"Mana Shield", type:"Defend", speed:1, aim:"self", kind:"block", amount:8, text:"Block [BLK 8].", hint:"Use to soak a predicted heavy hit.", flavor:"A thin wall, but it holds once." },
-  { cls:"Arcanist", name:"Reflect", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:4, counter:4, mode:"all", text:"Block [BLK 4]; Riposte 4.", hint:"Use against an enemy you expect to attack this fighter.", flavor:"Your spell, returned to sender." },
-  { cls:"Arcanist", name:"Blink", type:"Defend", speed:1, aim:"self", kind:"reduce", amount:4, text:"Guard [BLK 4] on this fighter.", hint:"Use to blunt incoming damage on a threatened fighter.", flavor:"There, then not." },
-  { cls:"Arcanist", name:"Stoneskin", type:"Buff", speed:1, aim:"ally", kind:"reduce", amount:3, text:"Guard [BLK 3] on a fighter.", hint:"Use to protect an ally you expect to be focused.", flavor:"Flesh to granite, briefly." },
+  { cls:"Arcanist", name:"Fire", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"fire_burn", text:"Deal 3 to one enemy; Burn 2.", flavor:"The first spell anyone learns." },
+  { cls:"Arcanist", name:"Fire", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"fire_burn", text:"Deal 3 to one enemy; Burn 2.", flavor:"Still gets the job done." },
+  { cls:"Arcanist", name:"Scorch", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:6, text:"Deal 6 to one enemy.", flavor:"The air itself ignites." },
+  { cls:"Arcanist", name:"Cataclysm", type:"Attack", speed:4, aim:"enemy", kind:"special", amount:9, special:"firaga", text:"Deal 9 to one enemy; 3 to the other enemy.", flavor:"Everything within reach burns." },
+  { cls:"Arcanist", name:"Thunder", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"Fast and forking." },
+  { cls:"Arcanist", name:"Thunder", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"Fast and forking." },
+  { cls:"Arcanist", name:"Frost Shard", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal 4 to one enemy, Pierce.", flavor:"Ice finds the gap in any guard." },
+  { cls:"Arcanist", name:"Meteor Splash", type:"Attack", speed:4, aim:"enemyAll", kind:"aoe", amount:5, text:"Deal 5 to both enemies.", flavor:"The sky comes down on everyone." },
+  { cls:"Arcanist", name:"Mana Shield", type:"Defend", speed:1, aim:"self", kind:"block", amount:8, text:"Block 8.", hint:"Use to soak a predicted heavy hit.", flavor:"A thin wall, but it holds once." },
+  { cls:"Arcanist", name:"Reflect", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:4, counter:4, mode:"all", text:"Block 4; Riposte 4.", hint:"Use against an enemy you expect to attack this fighter.", flavor:"Your spell, returned to sender." },
+  { cls:"Arcanist", name:"Blink", type:"Defend", speed:1, aim:"self", kind:"reduce", amount:4, text:"Guard 4 on this fighter.", hint:"Use to blunt incoming damage on a threatened fighter.", flavor:"There, then not." },
+  { cls:"Arcanist", name:"Stoneskin", type:"Buff", speed:1, aim:"ally", kind:"reduce", amount:3, text:"Guard 3 on a fighter.", hint:"Use to protect an ally you expect to be focused.", flavor:"Flesh to granite, briefly." },
   { cls:"Arcanist", name:"Focus", type:"Buff", speed:1, aim:"ally", kind:"buffAttack", amount:3, text:"Empower 3 on a fighter.", hint:"Set up a kill: stack it before your big attack.", flavor:"Gather it all into one point." },
   { cls:"Arcanist", name:"Haste", type:"Buff", speed:1, aim:"ally", kind:"special", special:"haste", text:"A fighter's T4 attack resolves at T2.", hint:"Use to land a heavy hit before the enemy can defend or kill the attacker.", flavor:"The heavy blow, but fast." },
   { cls:"Arcanist", name:"Silence", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"silence_magic", text:"Silence: Spells and Signatures.", hint:"Use to shut down a key spellcaster or block an incoming Signature.", flavor:"Seal the throat of their magic." },
-  { cls:"Arcanist", name:"Sleep", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"sleep", text:"Next turn: enemy team has [NRG 2] less energy.", hint:"Use before the enemy's big turn to starve their energy.", flavor:"Heavy eyelids on the battlefield." },
-  { cls:"Arcanist", name:"Drain", type:"Spell", speed:3, aim:"enemy", kind:"special", amount:3, special:"drain", text:"Deal [DMG 3] to one enemy; Heal [HEAL 3] to this fighter.", hint:"Use to chip an enemy while topping yourself off.", flavor:"Their strength becomes yours." },
+  { cls:"Arcanist", name:"Sleep", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"sleep", text:"Next turn: enemy team has 2 less energy.", hint:"Use before the enemy's big turn to starve their energy.", flavor:"Heavy eyelids on the battlefield." },
+  { cls:"Arcanist", name:"Drain", type:"Spell", speed:3, aim:"enemy", kind:"special", amount:3, special:"drain", text:"Deal 3 to one enemy; Heal 3 to this fighter.", hint:"Use to chip an enemy while topping yourself off.", flavor:"Their strength becomes yours." },
   { cls:"Arcanist", name:"Curse", type:"Spell", speed:2, aim:"enemy", kind:"debuff", amount:3, text:"Expose 3 on one enemy.", hint:"Set up a kill: cast it before your attacks land.", flavor:"Misfortune clings to them." },
-  { cls:"Arcanist", name:"Mana Draught", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal [HEAL 8] to a fighter.", hint:"Save it for a clutch heal that swings the match.", flavor:"Bitter, blue, and life-saving." },
-  { cls:"Arcanist", name:"Annihilation", type:"Signature", speed:4, aim:"enemyAll", kind:"aoe", amount:8, pierce:true, once:true, text:"Deal [DMG 8] to both enemies, Pierce.", hint:"Use to close out the game or break through heavy defenses.", flavor:"The forbidden word. Everything ends." },
+  { cls:"Arcanist", name:"Mana Draught", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal 8 to a fighter.", hint:"Save it for a clutch heal that swings the match.", flavor:"Bitter, blue, and life-saving." },
+  { cls:"Arcanist", name:"Annihilation", type:"Signature", speed:4, aim:"enemyAll", kind:"aoe", amount:8, pierce:true, once:true, text:"Deal 8 to both enemies, Pierce.", hint:"Use to close out the game or break through heavy defenses.", flavor:"The forbidden word. Everything ends." },
   /* ---------------- SCOUT ---------------- */
-  { cls:"Scout", name:"Quick Shot", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:3, text:"Deal [DMG 3] to one enemy.", flavor:"Snap aim, squeeze, move." },
-  { cls:"Scout", name:"Quick Shot", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:3, text:"Deal [DMG 3] to one enemy.", flavor:"Always already moving." },
-  { cls:"Scout", name:"Double Tap", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"double_tap", text:"Deal [DMG 3] to one enemy; [DMG +1] if you also attack it or it took damage.", flavor:"Two in the same heartbeat." },
+  { cls:"Scout", name:"Quick Shot", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:3, text:"Deal 3 to one enemy.", flavor:"Snap aim, squeeze, move." },
+  { cls:"Scout", name:"Quick Shot", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:3, text:"Deal 3 to one enemy.", flavor:"Always already moving." },
+  { cls:"Scout", name:"Double Tap", type:"Attack", speed:2, aim:"enemy", kind:"special", amount:3, special:"double_tap", text:"Deal 3 to one enemy; +1 if you also attack it or it took damage.", flavor:"Two in the same heartbeat." },
   { cls:"Scout", name:"Steady Aim", type:"Buff", speed:1, aim:"ally", kind:"buffAttack", amount:1, text:"Empower 1 on a fighter.", hint:"A small, cheap nudge before an attack.", flavor:"Sight it in, breathe, hold." },
-  { cls:"Scout", name:"Headshot", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:6, text:"Deal [DMG 6] to one enemy.", flavor:"One breath held. One trigger pull." },
-  { cls:"Scout", name:"Armor Piercer", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal [DMG 4] to one enemy, Pierce.", flavor:"Punches clean through plate." },
-  { cls:"Scout", name:"Frag Out", type:"Attack", speed:3, aim:"enemyAll", kind:"aoe", amount:3, text:"Deal [DMG 3] to both enemies.", flavor:"Cook it, throw it, duck." },
-  { cls:"Scout", name:"Evade", type:"Defend", speed:1, aim:"self", kind:"reduce", amount:4, text:"Guard [BLK 4] on this fighter.", hint:"Use to soak a predicted heavy hit on this fighter.", flavor:"Not where you aimed." },
-  { cls:"Scout", name:"Smoke Screen", type:"Defend", speed:1, aim:"allyAll", kind:"reduceBoth", amount:3, text:"Guard [BLK 3] on both fighters.", hint:"Use when you expect both fighters to be hit.", flavor:"Can't shoot what you can't see." },
-  { cls:"Scout", name:"Parry", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block [BLK 5]; Riposte 4.", hint:"Use to punish enemies you expect to attack this fighter.", flavor:"Turn their lunge against them." },
-  { cls:"Scout", name:"Counter-Sniper", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:3, counter:4, mode:"one", text:"Block [BLK 3]; Riposte 4 (first only).", hint:"Use to block and snipe back the first attacker.", flavor:"They fired first. They fired last." },
+  { cls:"Scout", name:"Headshot", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:6, text:"Deal 6 to one enemy.", flavor:"One breath held. One trigger pull." },
+  { cls:"Scout", name:"Armor Piercer", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal 4 to one enemy, Pierce.", flavor:"Punches clean through plate." },
+  { cls:"Scout", name:"Frag Out", type:"Attack", speed:3, aim:"enemyAll", kind:"aoe", amount:3, text:"Deal 3 to both enemies.", flavor:"Cook it, throw it, duck." },
+  { cls:"Scout", name:"Evade", type:"Defend", speed:1, aim:"self", kind:"reduce", amount:4, text:"Guard 4 on this fighter.", hint:"Use to soak a predicted heavy hit on this fighter.", flavor:"Not where you aimed." },
+  { cls:"Scout", name:"Smoke Screen", type:"Defend", speed:1, aim:"allyAll", kind:"reduceBoth", amount:3, text:"Guard 3 on both fighters.", hint:"Use when you expect both fighters to be hit.", flavor:"Can't shoot what you can't see." },
+  { cls:"Scout", name:"Parry", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block 5; Riposte 4.", hint:"Use to punish enemies you expect to attack this fighter.", flavor:"Turn their lunge against them." },
+  { cls:"Scout", name:"Counter-Sniper", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:3, counter:4, mode:"one", text:"Block 3; Riposte 4 (first only).", hint:"Use to block and snipe back the first attacker.", flavor:"They fired first. They fired last." },
   { cls:"Scout", name:"Recon", type:"Spell", speed:1, aim:"none", kind:"special", special:"recon", discardOnPlay:true, text:"Discard a card: draw a chosen card next turn.", hint:"Ditch a dead card now to dig for exactly what you need next turn.", flavor:"Know the ground before you cross it." },
   { cls:"Scout", name:"Adrenaline Rush", type:"Buff", speed:1, aim:"ally", kind:"buffAttack", amount:2, text:"Empower 2 on a fighter.", hint:"Set up a kill: play before that fighter's big attack.", flavor:"Heart pounding, hands steady." },
-  { cls:"Scout", name:"Stim Patch", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal [HEAL 4] to a fighter.", hint:"Use to keep a fighter alive or undo chip damage.", flavor:"Slap it on, keep running." },
+  { cls:"Scout", name:"Stim Patch", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal 4 to a fighter.", hint:"Use to keep a fighter alive or undo chip damage.", flavor:"Slap it on, keep running." },
   { cls:"Scout", name:"Light Armor", type:"Equip", speed:1, aim:"self", kind:"special", special:"equip_lightarmor", text:"Your Evade Guards 1 more.", hint:"Equip early if you plan to lean on Evade defenses.", flavor:"Stay light, stay alive." },
   { cls:"Scout", name:"Trip Mine", type:"Spell", speed:2, aim:"self", kind:"special", special:"trip_mine", text:"Riposte 4 (first only).", hint:"Use when you expect this fighter to be targeted.", flavor:"A surprise left in the doorway." },
   { cls:"Scout", name:"Disrupt", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"disrupt", text:"One enemy's T4 attack resolves at T3.", hint:"Use to throw off an enemy's resolution timing.", flavor:"Knock the timing off." },
   { cls:"Scout", name:"Mark", type:"Spell", speed:2, aim:"enemy", kind:"debuff", amount:2, text:"Expose 2 on one enemy.", hint:"Set up a kill: mark before piling on attacks.", flavor:"Tagged and tracked." },
-  { cls:"Scout", name:"Med Injector", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal [HEAL 8] to a fighter.", hint:"Save for a big swing to pull a fighter back from the brink.", flavor:"The last resort in the kit." },
-  { cls:"Scout", name:"Phase Out", type:"Signature", speed:2, aim:"enemy", kind:"special", amount:4, special:"ghost_protocol", once:true, text:"Deal [DMG 4] to one enemy; this fighter then ignores all damage.", hint:"Use to dodge a predicted heavy turn while still attacking.", flavor:"For one moment, you were never there." },
+  { cls:"Scout", name:"Med Injector", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal 8 to a fighter.", hint:"Save for a big swing to pull a fighter back from the brink.", flavor:"The last resort in the kit." },
+  { cls:"Scout", name:"Phase Out", type:"Signature", speed:2, aim:"enemy", kind:"special", amount:4, special:"ghost_protocol", once:true, text:"Deal 4 to one enemy; this fighter then ignores all damage.", hint:"Use to dodge a predicted heavy turn while still attacking.", flavor:"For one moment, you were never there." },
   /* ---------------- DRIFTER ---------------- */
-  { cls:"Drifter", name:"Quickdraw", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"Fastest hand in the wastes." },
-  { cls:"Drifter", name:"Six Shooter", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:6, text:"Deal [DMG 6] to one enemy.", flavor:"Six chances, one barrel." },
-  { cls:"Drifter", name:"Fan The Hammer", type:"Attack", speed:3, aim:"enemy", kind:"special", amount:4, special:"fan_hammer", text:"Flip: Deal [DMG 7] Heads, [DMG 4] Tails to one enemy.", flavor:"All of it, all at once, maybe." },
-  { cls:"Drifter", name:"Cold Shot", type:"Attack", speed:4, aim:"enemy", kind:"attack", amount:9, text:"Deal [DMG 9] to one enemy.", flavor:"The shot he never misses. Almost never." },
-  { cls:"Drifter", name:"Pistol Whip", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:5, text:"Deal [DMG 5] to one enemy.", flavor:"Close enough to smell the fear." },
-  { cls:"Drifter", name:"Ricochet", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal [DMG 4] to one enemy, Pierce.", flavor:"Off the wall and into the gap." },
-  { cls:"Drifter", name:"Both Barrels", type:"Attack", speed:4, aim:"enemyAll", kind:"aoe", amount:5, text:"Deal [DMG 5] to both enemies.", flavor:"No aiming. Just everyone." },
-  { cls:"Drifter", name:"Sidestep", type:"Defend", speed:1, aim:"self", kind:"reduce", amount:5, text:"Guard [BLK 5] on this fighter.", hint:"Use to blunt a predicted heavy hit.", flavor:"Lean out of the line of fire." },
-  { cls:"Drifter", name:"Gunslinger's Parry", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block [BLK 5]; Riposte 4.", hint:"Use when you expect this fighter to be attacked; punishes the attacker.", flavor:"Catch the blade on the barrel." },
+  { cls:"Drifter", name:"Quickdraw", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"Fastest hand in the wastes." },
+  { cls:"Drifter", name:"Six Shooter", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:6, text:"Deal 6 to one enemy.", flavor:"Six chances, one barrel." },
+  { cls:"Drifter", name:"Fan The Hammer", type:"Attack", speed:3, aim:"enemy", kind:"special", amount:4, special:"fan_hammer", text:"Flip: Deal 7 Heads, 4 Tails to one enemy.", flavor:"All of it, all at once, maybe." },
+  { cls:"Drifter", name:"Cold Shot", type:"Attack", speed:4, aim:"enemy", kind:"attack", amount:9, text:"Deal 9 to one enemy.", flavor:"The shot he never misses. Almost never." },
+  { cls:"Drifter", name:"Pistol Whip", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:5, text:"Deal 5 to one enemy.", flavor:"Close enough to smell the fear." },
+  { cls:"Drifter", name:"Ricochet", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal 4 to one enemy, Pierce.", flavor:"Off the wall and into the gap." },
+  { cls:"Drifter", name:"Both Barrels", type:"Attack", speed:4, aim:"enemyAll", kind:"aoe", amount:5, text:"Deal 5 to both enemies.", flavor:"No aiming. Just everyone." },
+  { cls:"Drifter", name:"Sidestep", type:"Defend", speed:1, aim:"self", kind:"reduce", amount:5, text:"Guard 5 on this fighter.", hint:"Use to blunt a predicted heavy hit.", flavor:"Lean out of the line of fire." },
+  { cls:"Drifter", name:"Gunslinger's Parry", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block 5; Riposte 4.", hint:"Use when you expect this fighter to be attacked; punishes the attacker.", flavor:"Catch the blade on the barrel." },
   { cls:"Drifter", name:"Bluff", type:"Defend", speed:1, aim:"self", kind:"special", special:"bluff", text:"Riposte 3 (first only).", hint:"Use when you expect this fighter to be targeted.", flavor:"Maybe he's bluffing. Maybe not." },
-  { cls:"Drifter", name:"Take Cover", type:"Defend", speed:1, aim:"self", kind:"block", amount:7, text:"Block [BLK 7].", hint:"Use to soak a predicted heavy hit.", flavor:"Behind the overturned wagon." },
+  { cls:"Drifter", name:"Take Cover", type:"Defend", speed:1, aim:"self", kind:"block", amount:7, text:"Block 7.", hint:"Use to soak a predicted heavy hit.", flavor:"Behind the overturned wagon." },
   { cls:"Drifter", name:"Lucky Coin", type:"Buff", speed:1, aim:"ally", kind:"special", special:"lucky_coin", text:"Flip: Empower 4 Heads.", hint:"Use before a big attack for a chance at extra damage.", flavor:"He always calls heads." },
-  { cls:"Drifter", name:"Hip Fire", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:5, text:"Deal [DMG 5] to one enemy.", flavor:"Fast, loose, and close." },
-  { cls:"Drifter", name:"Whiskey", type:"Buff", speed:1, aim:"ally", kind:"special", special:"whiskey", text:"Heal [HEAL 4] to a fighter; Expose 1 next turn.", hint:"Use to patch a fighter when next turn's risk is low.", flavor:"Numbs the pain, dulls the edge." },
+  { cls:"Drifter", name:"Hip Fire", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:5, text:"Deal 5 to one enemy.", flavor:"Fast, loose, and close." },
+  { cls:"Drifter", name:"Whiskey", type:"Buff", speed:1, aim:"ally", kind:"special", special:"whiskey", text:"Heal 4 to a fighter; Expose 1 next turn.", hint:"Use to patch a fighter when next turn's risk is low.", flavor:"Numbs the pain, dulls the edge." },
   { cls:"Drifter", name:"Worn Duster", type:"Equip", speed:1, aim:"self", kind:"special", special:"equip_duster", text:"First time this fighter reaches 0, survive at 1; Expose 2 permanently.", hint:"Equip early to survive one lethal hit.", flavor:"It's seen worse days than this." },
   { cls:"Drifter", name:"Marked Card", type:"Spell", speed:2, aim:"enemy", kind:"debuff", amount:3, text:"Expose 3 on one enemy.", hint:"Stack before your attacks to set up a kill.", flavor:"The ace was up his sleeve all along." },
   { cls:"Drifter", name:"Lucky Streak", type:"Buff", speed:1, aim:"ally", kind:"special", special:"lucky_streak", text:"Flip: Empower 4 Heads, 2 Tails.", hint:"A safer gamble — it always pays out something.", flavor:"When you're hot, you're hot." },
-  { cls:"Drifter", name:"Ante Up", type:"Spell", speed:1, aim:"none", kind:"special", special:"ante_up", discardOnPlay:true, text:"Discard a card: draw [DRAW 2] extra next turn.", hint:"Pitch a dead card to dig two deep next turn.", flavor:"Push the chips in." },
-  { cls:"Drifter", name:"Snake Oil", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal [HEAL 8] to a fighter.", hint:"Save for a big heal when a fighter is badly hurt.", flavor:"Cures what ails you. Probably." },
-  { cls:"Drifter", name:"Sundown", type:"Signature", speed:4, aim:"enemy", kind:"special", amount:8, special:"high_noon", once:true, text:"Deal [DMG 8] to one enemy; [DMG 10] if this fighter is below half HP.", flavor:"Two shadows. One street. One walks away." },
+  { cls:"Drifter", name:"Ante Up", type:"Spell", speed:1, aim:"none", kind:"special", special:"ante_up", discardOnPlay:true, text:"Discard a card: draw 2 extra next turn.", hint:"Pitch a dead card to dig two deep next turn.", flavor:"Push the chips in." },
+  { cls:"Drifter", name:"Snake Oil", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal 8 to a fighter.", hint:"Save for a big heal when a fighter is badly hurt.", flavor:"Cures what ails you. Probably." },
+  { cls:"Drifter", name:"Sundown", type:"Signature", speed:4, aim:"enemy", kind:"special", amount:8, special:"high_noon", once:true, text:"Deal 8 to one enemy; 10 if this fighter is below half HP.", flavor:"Two shadows. One street. One walks away." },
   /* ---------------- CLERIC ---------------- */
-  { cls:"Cleric", name:"Smite", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, text:"Deal [DMG 5] to one enemy.", flavor:"Faith with a heavy hand." },
-  { cls:"Cleric", name:"Holy Bolt", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"A spark of judgment." },
-  { cls:"Cleric", name:"Holy Bolt", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"Quick and clean." },
-  { cls:"Cleric", name:"Condemn", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:3, text:"Deal [DMG 3] to one enemy.", flavor:"The verdict is read." },
-  { cls:"Cleric", name:"Searing Light", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:3, pierce:true, text:"Deal [DMG 3] to one enemy, Pierce.", flavor:"No shadow to hide in." },
-  { cls:"Cleric", name:"Wrath", type:"Attack", speed:4, aim:"enemy", kind:"attack", amount:7, text:"Deal [DMG 7] to one enemy.", flavor:"Even patience has a limit." },
-  { cls:"Cleric", name:"Sanctified Ground", type:"Attack", speed:3, aim:"enemyAll", kind:"aoe", amount:3, text:"Deal [DMG 3] to both enemies.", flavor:"Holy fire, evenly spread." },
-  { cls:"Cleric", name:"Cure", type:"Defend", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal [HEAL 4] to a fighter.", hint:"Use to keep a wounded fighter alive and in the fight.", flavor:"The wound closes." },
-  { cls:"Cleric", name:"Rebuke", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:3, text:"Deal [DMG 3] to one enemy.", flavor:"Turn from your folly." },
-  { cls:"Cleric", name:"Shell", type:"Defend", speed:1, aim:"ally", kind:"block", amount:9, text:"Block [BLK 9] on a fighter.", hint:"Use to soak a predicted heavy hit on one fighter.", flavor:"A dome of warded light." },
-  { cls:"Cleric", name:"Guardian", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block [BLK 5]; Riposte 4.", hint:"Use to punish enemies you expect to attack this fighter.", flavor:"Strike the shepherd, feel the staff." },
-  { cls:"Cleric", name:"Regen", type:"Buff", speed:1, aim:"ally", kind:"special", amount:2, special:"regen", text:"Heal [HEAL 2] to a fighter, now and next turn.", hint:"Use for steady healing when no big hit is incoming.", flavor:"Life, slowly returning." },
+  { cls:"Cleric", name:"Smite", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, text:"Deal 5 to one enemy.", flavor:"Faith with a heavy hand." },
+  { cls:"Cleric", name:"Holy Bolt", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"A spark of judgment." },
+  { cls:"Cleric", name:"Holy Bolt", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"Quick and clean." },
+  { cls:"Cleric", name:"Condemn", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:3, text:"Deal 3 to one enemy.", flavor:"The verdict is read." },
+  { cls:"Cleric", name:"Searing Light", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:3, pierce:true, text:"Deal 3 to one enemy, Pierce.", flavor:"No shadow to hide in." },
+  { cls:"Cleric", name:"Wrath", type:"Attack", speed:4, aim:"enemy", kind:"attack", amount:7, text:"Deal 7 to one enemy.", flavor:"Even patience has a limit." },
+  { cls:"Cleric", name:"Sanctified Ground", type:"Attack", speed:3, aim:"enemyAll", kind:"aoe", amount:3, text:"Deal 3 to both enemies.", flavor:"Holy fire, evenly spread." },
+  { cls:"Cleric", name:"Cure", type:"Defend", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal 4 to a fighter.", hint:"Use to keep a wounded fighter alive and in the fight.", flavor:"The wound closes." },
+  { cls:"Cleric", name:"Rebuke", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:3, text:"Deal 3 to one enemy.", flavor:"Turn from your folly." },
+  { cls:"Cleric", name:"Shell", type:"Defend", speed:1, aim:"ally", kind:"block", amount:9, text:"Block 9 on a fighter.", hint:"Use to soak a predicted heavy hit on one fighter.", flavor:"A dome of warded light." },
+  { cls:"Cleric", name:"Guardian", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block 5; Riposte 4.", hint:"Use to punish enemies you expect to attack this fighter.", flavor:"Strike the shepherd, feel the staff." },
+  { cls:"Cleric", name:"Regen", type:"Buff", speed:1, aim:"ally", kind:"special", amount:2, special:"regen", text:"Heal 2 to a fighter, now and next turn.", hint:"Use for steady healing when no big hit is incoming.", flavor:"Life, slowly returning." },
   { cls:"Cleric", name:"Bless", type:"Buff", speed:1, aim:"ally", kind:"buffAttack", amount:3, text:"Empower 3 on a fighter.", hint:"Set up a kill: play before your big attack this turn.", flavor:"Strength granted from above." },
-  { cls:"Cleric", name:"Protect", type:"Buff", speed:1, aim:"ally", kind:"reduce", amount:3, text:"Guard [BLK 3] on a fighter.", hint:"Use to soften a predicted heavy hit on one fighter.", flavor:"Warded against harm." },
-  { cls:"Cleric", name:"Sanctuary", type:"Buff", speed:1, aim:"allyAll", kind:"special", special:"sanctuary", text:"Heal [HEAL 1] to both fighters; Guard [BLK 1].", hint:"Use when both fighters are hurt and under fire.", flavor:"A moment of grace for all." },
+  { cls:"Cleric", name:"Protect", type:"Buff", speed:1, aim:"ally", kind:"reduce", amount:3, text:"Guard 3 on a fighter.", hint:"Use to soften a predicted heavy hit on one fighter.", flavor:"Warded against harm." },
+  { cls:"Cleric", name:"Sanctuary", type:"Buff", speed:1, aim:"allyAll", kind:"special", special:"sanctuary", text:"Heal 1 to both fighters; Guard 1.", hint:"Use when both fighters are hurt and under fire.", flavor:"A moment of grace for all." },
   { cls:"Cleric", name:"Dispel", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"dispel", text:"Remove all buffs and Equips from one enemy.", hint:"Use to strip an enemy's stacked buffs or equipped defense.", flavor:"Strip the false blessings away." },
   { cls:"Cleric", name:"Silence", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"silence_spell", text:"Silence: Spells.", hint:"Use to shut down an enemy's spell-heavy turn.", flavor:"A finger to the lips of war." },
-  { cls:"Cleric", name:"Sacrifice", type:"Spell", speed:1, aim:"none", kind:"special", special:"sacrifice", text:"Move up to [HEAL 6] from the healthier fighter to the weaker.", hint:"Use to save a near-dead fighter using your healthy one's HP.", flavor:"Bear their burden as your own." },
-  { cls:"Cleric", name:"Holy Water", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:6, once:true, text:"Heal [HEAL 6] to a fighter.", hint:"Use as your second heal source for an emergency top-up.", flavor:"Blessed at the last clean spring." },
-  { cls:"Cleric", name:"Divine Intervention", type:"Signature", speed:1, aim:"allyAll", kind:"special", special:"divine", once:true, text:"Block [BLK 10] on both fighters (stops Pierce).", hint:"Save for a predicted alpha strike to blank a big enemy turn.", flavor:"A hand reaches down and says: not today." },
+  { cls:"Cleric", name:"Sacrifice", type:"Spell", speed:1, aim:"none", kind:"special", special:"sacrifice", text:"Move up to 6 HP from the healthier fighter to the weaker.", hint:"Use to save a near-dead fighter using your healthy one's HP.", flavor:"Bear their burden as your own." },
+  { cls:"Cleric", name:"Holy Water", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:6, once:true, text:"Heal 6 to a fighter.", hint:"Use as your second heal source for an emergency top-up.", flavor:"Blessed at the last clean spring." },
+  { cls:"Cleric", name:"Divine Intervention", type:"Signature", speed:1, aim:"allyAll", kind:"special", special:"divine", once:true, text:"Block 10 on both fighters (stops Pierce).", hint:"Save for a predicted alpha strike to blank a big enemy turn.", flavor:"A hand reaches down and says: not today." },
   /* ---------------- WARDEN ---------------- */
-  { cls:"Warden", name:"Rifle Burst", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"Steady, suppressing, sure." },
-  { cls:"Warden", name:"Rifle Burst", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, text:"Deal [DMG 5] to one enemy.", flavor:"Hold the trigger, hold the line." },
-  { cls:"Warden", name:"Shield Bash", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal [DMG 4] to one enemy.", flavor:"The wall hits back." },
-  { cls:"Warden", name:"Concussive Shell", type:"Attack", speed:3, aim:"enemy", kind:"special", amount:4, special:"concussive", text:"Deal [DMG 4] to one enemy; Weaken 2 next turn.", flavor:"Rattles the helmet and the resolve." },
-  { cls:"Warden", name:"Breaching Round", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal [DMG 4] to one enemy, Pierce.", flavor:"Made for doors and the things behind them." },
-  { cls:"Warden", name:"Heavy Slug", type:"Attack", speed:4, aim:"enemy", kind:"attack", amount:7, text:"Deal [DMG 7] to one enemy.", flavor:"Slow to load, hard to forget." },
-  { cls:"Warden", name:"Covering Volley", type:"Attack", speed:3, aim:"enemyAll", kind:"aoe", amount:2, text:"Deal [DMG 2] to both enemies.", flavor:"Keep their heads down." },
-  { cls:"Warden", name:"Bulwark", type:"Defend", speed:1, aim:"self", kind:"riposte", amount:6, counter:3, mode:"all", text:"Block [BLK 6]; Riposte 3.", hint:"Use when you expect this fighter to be attacked; soaks a hit and bites back.", flavor:"Dig in. Nothing moves you." },
-  { cls:"Warden", name:"Bulwark", type:"Defend", speed:1, aim:"self", kind:"riposte", amount:6, counter:3, mode:"all", text:"Block [BLK 6]; Riposte 3.", hint:"Use when you expect this fighter to be attacked; soaks a hit and bites back.", flavor:"Bedrock in armor plate." },
-  { cls:"Warden", name:"Dig In", type:"Defend", speed:1, aim:"allyAll", kind:"blockBoth", amount:6, text:"Block [BLK 6] on both fighters.", hint:"Use to blunt incoming hits on both fighters at once.", flavor:"Everyone behind the line." },
-  { cls:"Warden", name:"Retaliate", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block [BLK 5]; Riposte 4.", hint:"Use when you expect this fighter to be attacked; punishes attackers.", flavor:"Armor that bites back." },
+  { cls:"Warden", name:"Rifle Burst", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"Steady, suppressing, sure." },
+  { cls:"Warden", name:"Rifle Burst", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:5, text:"Deal 5 to one enemy.", flavor:"Hold the trigger, hold the line." },
+  { cls:"Warden", name:"Shield Bash", type:"Attack", speed:2, aim:"enemy", kind:"attack", amount:4, text:"Deal 4 to one enemy.", flavor:"The wall hits back." },
+  { cls:"Warden", name:"Concussive Shell", type:"Attack", speed:3, aim:"enemy", kind:"special", amount:4, special:"concussive", text:"Deal 4 to one enemy; Weaken 2 next turn.", flavor:"Rattles the helmet and the resolve." },
+  { cls:"Warden", name:"Breaching Round", type:"Attack", speed:3, aim:"enemy", kind:"attack", amount:4, pierce:true, text:"Deal 4 to one enemy, Pierce.", flavor:"Made for doors and the things behind them." },
+  { cls:"Warden", name:"Heavy Slug", type:"Attack", speed:4, aim:"enemy", kind:"attack", amount:7, text:"Deal 7 to one enemy.", flavor:"Slow to load, hard to forget." },
+  { cls:"Warden", name:"Covering Volley", type:"Attack", speed:3, aim:"enemyAll", kind:"aoe", amount:2, text:"Deal 2 to both enemies.", flavor:"Keep their heads down." },
+  { cls:"Warden", name:"Bulwark", type:"Defend", speed:1, aim:"self", kind:"riposte", amount:6, counter:3, mode:"all", text:"Block 6; Riposte 3.", hint:"Use when you expect this fighter to be attacked; soaks a hit and bites back.", flavor:"Dig in. Nothing moves you." },
+  { cls:"Warden", name:"Bulwark", type:"Defend", speed:1, aim:"self", kind:"riposte", amount:6, counter:3, mode:"all", text:"Block 6; Riposte 3.", hint:"Use when you expect this fighter to be attacked; soaks a hit and bites back.", flavor:"Bedrock in armor plate." },
+  { cls:"Warden", name:"Dig In", type:"Defend", speed:1, aim:"allyAll", kind:"blockBoth", amount:6, text:"Block 6 on both fighters.", hint:"Use to blunt incoming hits on both fighters at once.", flavor:"Everyone behind the line." },
+  { cls:"Warden", name:"Retaliate", type:"Defend", speed:2, aim:"self", kind:"riposte", amount:5, counter:4, mode:"all", text:"Block 5; Riposte 4.", hint:"Use when you expect this fighter to be attacked; punishes attackers.", flavor:"Armor that bites back." },
   { cls:"Warden", name:"Battle Surge", type:"Buff", speed:1, aim:"ally", kind:"special", amount:3, special:"stim_pack", text:"Empower 3 on a fighter; Expose 1 on that fighter.", hint:"Set up a kill: stack it before your big attack.", flavor:"Push past the limit, pay for it later." },
-  { cls:"Warden", name:"Repair Kit", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:5, text:"Heal [HEAL 5] to a fighter.", hint:"Use to keep a fighter out of kill range.", flavor:"Weld the plate, seal the breach." },
-  { cls:"Warden", name:"Plated Armor", type:"Equip", speed:1, aim:"self", kind:"equipReduce", amount:2, text:"Guard [BLK 2] on this fighter.", hint:"Play early so the damage reduction pays off over many turns.", flavor:"More plate than person." },
-  { cls:"Warden", name:"Reinforced Plating", type:"Equip", speed:1, aim:"self", kind:"special", special:"equip_reinforced", text:"First time this fighter's Block overflows, Block [BLK 2] more.", hint:"Use to squeeze extra value out of your block cards.", flavor:"Layer on layer on layer." },
+  { cls:"Warden", name:"Repair Kit", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:5, text:"Heal 5 to a fighter.", hint:"Use to keep a fighter out of kill range.", flavor:"Weld the plate, seal the breach." },
+  { cls:"Warden", name:"Plated Armor", type:"Equip", speed:1, aim:"self", kind:"equipReduce", amount:2, text:"Guard 2 on this fighter.", hint:"Play early so the damage reduction pays off over many turns.", flavor:"More plate than person." },
+  { cls:"Warden", name:"Reinforced Plating", type:"Equip", speed:1, aim:"self", kind:"special", special:"equip_reinforced", text:"First time this fighter's Block overflows, Block 2 more.", hint:"Use to squeeze extra value out of your block cards.", flavor:"Layer on layer on layer." },
   { cls:"Warden", name:"Suppress", type:"Spell", speed:2, aim:"enemy", kind:"special", amount:3, special:"suppress", text:"Weaken 3 on one enemy.", hint:"Use to defang a heavy attacker before they swing.", flavor:"Pin them down, choke the offense." },
   { cls:"Warden", name:"Taunt", type:"Spell", speed:1, aim:"self", kind:"special", special:"taunt", text:"Redirect enemy single-target attacks to this fighter.", hint:"Use to shield a hurt ally by drawing fire onto this fighter.", flavor:"Come at me, then." },
-  { cls:"Warden", name:"Hold Position", type:"Spell", speed:1, aim:"allyAll", kind:"reduceBoth", amount:2, text:"Guard [BLK 2] on both fighters.", hint:"Use to soften a turn of heavy incoming damage on both fighters.", flavor:"We do not move. We do not yield." },
-  { cls:"Warden", name:"Medpack", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal [HEAL 8] to a fighter.", hint:"Save for an emergency to pull a fighter out of kill range.", flavor:"Field-grade, fast-acting." },
-  { cls:"Warden", name:"Anchor Down", type:"Signature", speed:4, aim:"enemy", kind:"special", amount:4, special:"siege", once:true, text:"Deal [DMG 4] to one enemy; Block [BLK 8] next turn.", flavor:"Become the fortress. Nothing moves you." },
+  { cls:"Warden", name:"Hold Position", type:"Spell", speed:1, aim:"allyAll", kind:"reduceBoth", amount:2, text:"Guard 2 on both fighters.", hint:"Use to soften a turn of heavy incoming damage on both fighters.", flavor:"We do not move. We do not yield." },
+  { cls:"Warden", name:"Medpack", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal 8 to a fighter.", hint:"Save for an emergency to pull a fighter out of kill range.", flavor:"Field-grade, fast-acting." },
+  { cls:"Warden", name:"Anchor Down", type:"Signature", speed:4, aim:"enemy", kind:"special", amount:4, special:"siege", once:true, text:"Deal 4 to one enemy; Block 8 next turn.", flavor:"Become the fortress. Nothing moves you." },
 ];
 
 // index by class
@@ -3433,7 +3430,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <span class="artph">${esc(c.type)}</span>
       </div>
       <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}${c.once?' · once':''}</div>
-      <div class="pe">${renderCardText(c.text)}</div>
+      <div class="pe">${esc(c.text)}</div>
       ${c.flavor?`<div class="pf">${esc(c.flavor)}</div>`:''}
     </div>`;
   }
@@ -3982,7 +3979,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
         <span class="artph">${esc(c.type)}</span></div>
       <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}${c.once?' · once':''}</div>
-      <div class="pe">${renderCardText(c.text)}</div>
+      <div class="pe">${esc(c.text)}</div>
       ${keywordReminders(c)}
       ${c.hint?`<div class="phint">↳ ${esc(c.hint)}</div>`:''}
       ${c.flavor?`<div class="pf">${esc(c.flavor)}</div>`:''}
@@ -4313,7 +4310,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
       </div>
       <div class="pn">${esc(c.name)}</div>
       <span class="compact-name">${esc(c.name)}</span>
-      <div class="pe">${renderCardText(c.text)}</div>
+      <div class="pe">${esc(c.text)}</div>
       <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}</div>
       ${tgt?`<div class="staged-tgt">${esc(tgt)}</div>`:''}
       ${p.discardHi?`<div class="staged-tgt">⤵ ${esc(p.discardHi.card.name)}</div>`:''}
@@ -4327,7 +4324,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <div class="muted">Recon · ${esc(dn(f.className))}</div>
         <h1 style="font-size:26px;margin:0">Pick a card into your hand</h1>
         <div class="dv-grid reconpick-grid">
-          ${cards.length ? cards.map((c,i)=>`<div class="dv-card" data-rp="${i}" style="--cls:${classColor(c.cls)}" title="${esc(plainCardText(c.text))}">
+          ${cards.length ? cards.map((c,i)=>`<div class="dv-card" data-rp="${i}" style="--cls:${classColor(c.cls)}" title="${esc(c.text)}">
               <span class="dv-cost cost t${c.speed}"><span class="ecirc"></span>${GF.energyCost(c)}</span>
               <span class="tsym-wrap">${typeSymHTML(c)}</span>
               <span class="dv-name">${esc(c.name)}</span>
@@ -4437,7 +4434,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <img class="cardart-img" src="${typeArtFor(c.type)}" alt="" onerror="this.style.display='none'">
         <span class="artph">${esc(c.type)}</span>
       </div>
-      <div class="dv-prev-text">${renderCardText(c.text)}</div>
+      <div class="dv-prev-text">${esc(c.text)}</div>
       ${keywordReminders(c)}
       ${c.flavor?`<div class="dv-prev-flavor">${esc(c.flavor)}</div>`:''}
     </div>`;
@@ -4582,7 +4579,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
         <span class="cost-badge cost t${c.speed}" title="costs ${cost} energy (T${c.speed})"><span class="ecirc"></span>${cost}</span>
       </div>
       <div class="pn">${esc(c.name)}</div>
-      <div class="pe">${renderCardText(c.text)}</div>
+      <div class="pe">${esc(c.text)}</div>
       ${c.hint?`<div class="phint">↳ ${esc(c.hint)}</div>`:''}
       <div class="pt"><span class="tsym-wrap">${typeSymHTML(c)}</span> <span class="spd t${c.speed}">T${c.speed}</span> ${esc(c.type)}</div>
       <span class="qribbon">Queued</span>
@@ -4608,29 +4605,6 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     if(t==='defend' && amt)    return `<span class="pill-eff def">${amt}${SHIELD}</span>`;
     return `<span class="pill-eff none">${pillTypeIcon(c.type)}</span>`;
   }
-  // ---- Card-language icon tokens (Phase 1) ----
-  // Rules text stores quantities as [ID n] tokens, e.g. "Deal [DMG 5] to one enemy."
-  // renderCardText() swaps each token for an inline SVG glyph (value first, glyph
-  // after — same outline style + reused paths as the mobile pill badges above, so the
-  // whole card language is visually consistent). plainCardText() strips tokens to the
-  // bare numeral for plain-text contexts (title tooltips). Icons cover quantities only.
-  const CI_SVG = {
-    // DMG/BLK/HEAL/NRG reuse the pill paths; DRAW + DUR are the two new glyphs.
-    DMG:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg>',
-    BLK:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    HEAL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
-    NRG:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/></svg>',
-    DRAW:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="12" height="15" rx="1.6"/><path d="M8 4.5h11a1.6 1.6 0 0 1 1.6 1.6V19"/></svg>',
-    DUR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10M7 21h10M8 3c0 4 8 5 8 9s-8 5-8 9M16 3c0 4-8 5-8 9"/></svg>'
-  };
-  const CI_CLS = { DMG:'ci-dmg', BLK:'ci-blk', HEAL:'ci-heal', NRG:'ci-nrg', DRAW:'ci-draw', DUR:'ci-dur' };
-  const CI_RE = /\[(DMG|BLK|HEAL|NRG|DRAW|DUR) ([+\-]?\d+)\]/g;
-  function renderCardText(t){
-    // esc the whole string first (tokens contain no HTML-special chars, so they
-    // survive), then swap the surviving tokens for SVG spans.
-    return esc(t==null?'':String(t)).replace(CI_RE, (m,id,num)=>`<span class="ci ${CI_CLS[id]}">${num}${CI_SVG[id]}</span>`);
-  }
-  function plainCardText(t){ return (t==null?'':String(t)).replace(CI_RE, '$2'); }
   // ---- Keyword glossary (Phase 1) ----
   // The 12 locked mechanic keywords + one-line reminder text. Shown on the big card
   // previews (hover / long-press popup and the deck viewer) for whatever keywords the
@@ -4669,7 +4643,7 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
   function cardPillHTML(hi, idx, used, illegal, pending, unaffordable, canDiscard){
     const c=hi.card; const cost=GF.energyCost(c);
     const cls = `pcard pill ${used?'used':''} ${illegal?'illegal':''} ${pending?'sel':''} ${unaffordable?'cantafford':''}`;
-    return `<div class="${cls}" data-hand="${idx}" data-aim="${esc(c.aim||'')}" data-ctype="${typeKey(c.type)}" style="--cls:${classColor(c.cls)}" title="${esc(c.name)} — ${esc(plainCardText(c.text))}">
+    return `<div class="${cls}" data-hand="${idx}" data-aim="${esc(c.aim||'')}" data-ctype="${typeKey(c.type)}" style="--cls:${classColor(c.cls)}" title="${esc(c.name)} — ${esc(c.text)}">
       <span class="pill-cost" title="costs ${cost} energy (T${c.speed})">${cost}</span>
       <span class="pill-name">${esc(c.name)}</span>
       ${pillEffect(c)}
@@ -5527,14 +5501,11 @@ if(typeof globalThis!=='undefined') globalThis.GF = GF;
     else if(tab==='credits'){ body.innerHTML = helpCreditsHTML(); body.scrollTop=0; }
     else if(tab==='feedback'){ body.innerHTML = `<div class="fb-sub" style="margin-bottom:12px">Help us improve RIFT PROTOCOL.</div>`+fbFormHTML(); fbWire(body.querySelector('.fb-form'), closeHelp); body.scrollTop=0; }
   }
-  // The card-language legend: 6 quantity icons + 12 mechanic keywords. Shown as a help
+  // The card-language legend: the 12 mechanic keywords + reminder text. Shown as a help
   // tab and auto-opened once per profile (see maybeShowCardLangLegend).
   function helpCardLangHTML(){
-    const icons=[['DMG','5','Damage dealt'],['BLK','8','Damage prevented — Block pools and Guard'],['HEAL','6','Health restored'],['NRG','2','Energy'],['DRAW','2','Cards drawn'],['DUR','1','Turns an effect lasts']];
-    const iconRows = icons.map(([id,n,desc])=>`<div class="cl-row"><span class="cl-ico">${renderCardText('['+id+' '+n+']')}</span><span class="cl-name">${id}</span><span class="cl-desc">${esc(desc)}</span></div>`).join('');
     const kwRows = Object.keys(KEYWORD_GLOSSARY).map(k=>`<div class="cl-row"><span class="cl-kw">${esc(k)}</span><span class="cl-desc">${esc(KEYWORD_GLOSSARY[k])}</span></div>`).join('');
-    return `<div class="help-sec"><h3>Icons — quantities</h3><p>Numbers on cards use these symbols; the value always comes first.</p><div class="cl-list">${iconRows}</div></div>
-      <div class="help-sec"><h3>Keywords — mechanics</h3><p>Capitalized words on cards are keywords. Hover a card on desktop, or press and hold on mobile, to see these reminders in context.</p><div class="cl-list">${kwRows}</div></div>`;
+    return `<div class="help-sec"><h3>Keywords</h3><p>Capitalized words on cards are keywords — shared mechanics with one meaning. Hover a card on desktop, or press and hold on mobile, to see these reminders in context.</p><div class="cl-list">${kwRows}</div></div>`;
   }
   // Show-once card-language legend for new profiles. Deferred + guarded so it never
   // collides with the splash, the first-run onboarding coach, or another open modal.

@@ -3,6 +3,8 @@
 **Status: READ-ONLY audit, presented at the stop-gate. No cards have been changed.**
 Source of truth: the live `GF.CARDS` extracted from `rift_protocol.html` (not the xlsx). 120 cards, 112 unique (8 are duplicate copies). Every rewrite below is verified against the actual `gf-core` engine handlers, not the old card prose.
 
+> **Post-implementation update:** the icon *symbols* (Deliverable 3) were **dropped** after implementation per user feedback — the inline glyphs clashed with the existing type icons on the card footer and worked against the "condense + uniform size" goal. The condensed **wording** and the 12 **keywords** were kept; the `[DMG 5]`-style tokens in the mapping table below ship as **plain numbers** (`Deal 5 to one enemy.`). Cards were also standardized to a uniform height (catalog 200px, hand 192px). The "Card Language" help tab now lists keywords only.
+
 ---
 
 ## Deliverable 3 — Icon vocabulary (6 of 10 cap used)
