@@ -1455,7 +1455,7 @@ const CARDS = [
   { cls:"Scout", name:"Stim Patch", type:"Buff", speed:1, aim:"ally", kind:"heal", amount:4, text:"Heal 4 to a fighter.", hint:"Use to keep a fighter alive or undo chip damage.", flavor:"Slap it on, keep running." },
   { cls:"Scout", name:"Light Armor", type:"Equip", speed:1, aim:"self", kind:"special", special:"equip_lightarmor", text:"Your Evade Guards 1 more.", hint:"Equip early if you plan to lean on Evade defenses.", flavor:"Stay light, stay alive." },
   { cls:"Scout", name:"Trip Mine", type:"Spell", speed:2, aim:"self", kind:"special", special:"trip_mine", text:"Riposte 4 (first only).", hint:"Use when you expect this fighter to be targeted.", flavor:"A surprise left in the doorway." },
-  { cls:"Scout", name:"Disrupt", type:"Spell", speed:1, aim:"enemy", kind:"special", special:"disrupt", text:"One enemy's T4 attack resolves at T3.", hint:"Use to throw off an enemy's resolution timing.", flavor:"Knock the timing off." },
+  { cls:"Scout", name:"Flash Bang", type:"Spell", speed:1, aim:"enemy", kind:"special", amount:3, special:"suppress", text:"Weaken 3 on one enemy.", hint:"Use to defang a heavy attacker before it swings.", flavor:"A white flash, and their aim is gone." },
   { cls:"Scout", name:"Mark", type:"Spell", speed:2, aim:"enemy", kind:"debuff", amount:2, text:"Expose 2 on one enemy.", hint:"Set up a kill: mark before piling on attacks.", flavor:"Tagged and tracked." },
   { cls:"Scout", name:"Med Injector", type:"Potion", speed:1, aim:"ally", kind:"heal", amount:8, once:true, text:"Heal 8 to a fighter.", hint:"Save for a big swing to pull a fighter back from the brink.", flavor:"The last resort in the kit." },
   { cls:"Scout", name:"Phase Out", type:"Signature", speed:2, aim:"enemy", kind:"special", amount:4, special:"ghost_protocol", once:true, text:"Deal 4 to one enemy; this fighter then ignores all damage.", hint:"Use to dodge a predicted heavy turn while still attacking.", flavor:"For one moment, you were never there." },
@@ -2143,7 +2143,7 @@ const SPECIALS = {
     logLine(ctx.log,'flip',`  ⊙ Lucky Coin (${fname(ctx.caster)}): flip = ${heads?'HEADS, +4 to next attack':'TAILS, +0'}`, ctx.caster); },
   lucky_streak(ctx){ const heads=ctx.state.rng.coin(); const amt=heads?4:2; applyAttackBuff(ctx.target||ctx.caster, amt);
     logLine(ctx.log,'flip',`  ⊙ Lucky Streak (${fname(ctx.caster)}): flip = ${heads?'HEADS, +4':'TAILS, +2'} to next attack`, ctx.caster); },
-  suppress(ctx){ if(ctx.target){ ctx.target.turn.outgoing += 3; logTag(ctx.log,ctx.c,ctx.caster,`${ctx.target.name} deals -3`);} },
+  suppress(ctx){ if(ctx.target){ const n=ctx.c.amount||3; ctx.target.turn.outgoing += n; logTag(ctx.log,ctx.c,ctx.caster,`${ctx.target.name} deals -${n}`);} },
   standoff(ctx){ ctx.caster.turn.outgoing += 2; if(ctx.target) ctx.target.turn.outgoing += 2; logTag(ctx.log,ctx.c,ctx.caster,'standoff -2 both'); },
   dispel(ctx){ const t=ctx.target; if(!t) return; t.turn.reduce=0; t.turn.attackBuff=0; t.turn.incoming=Math.max(0,t.turn.incoming);
     t.hasReduceEquip=false; t.equipReduce=0; t.sidearm=false; t.lightArmor=false; t.reinforced=false; t.duster=false;
