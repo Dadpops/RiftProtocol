@@ -18,6 +18,7 @@ _Pick your pair, enter the Warp Zone, and close the fold._
 **RIFT PROTOCOL** is a tactical 2v2 card battler that runs entirely in the browser — no install, no build step. You command a pair of **RIFT operatives** (Rapid Interdimensional Field Team), each pulled from a collapsing world and fighting with that world's combat style. Stage your cards, confirm, and watch the round resolve in strict speed-tiers. Matches last about **3 minutes**.
 
 - **6 operatives**, each a distinct archetype — **120 cards** total (20 per class)
+- **Readable at a glance** — every card follows one short template with a shared **keyword vocabulary** (Pierce, Block, Guard, Riposte, Weaken…) and uniform sizing; hover on desktop or long-press on mobile for keyword reminders
 - **~3-minute matches**, 5 rounds, deep enough to reward planning
 - **Single-player vs AI** (4 difficulty tiers) and a **single-player Escalations ladder**
 - **Online 1v1 multiplayer** over rooms + a chat lobby
